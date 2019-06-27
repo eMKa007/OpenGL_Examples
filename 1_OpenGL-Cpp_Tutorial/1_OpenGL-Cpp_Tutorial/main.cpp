@@ -1,23 +1,68 @@
-
 #include "libs.h"
 
 int main()
 {
-	glfwInit();
+	/* Init GLFW */
+	if(!glfwInit()) {
+    return -1;
+	}
 
-	//CREATE WINDOW BEFORE GLEW INIT!
+	/* Create Window */
+	const int WINDOW_WIDTH = 640;
+	const int WINDOW_HEIGHT = 480;
+	int framebufferWidth = 0;
+	int framebufferHeight = 0;
+
+	//Use OpenGL core profile, OpenGL version 4.4
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);		
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);		
+	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+
+	GLFWwindow* window = glfwCreateWindow( WINDOW_WIDTH, WINDOW_HEIGHT, "Main_Window", NULL, NULL);
+
+	// Created frame buffer is the same as window.
+	glfwGetFramebufferSize(window, &framebufferWidth, &framebufferHeight);
+	// Canvas size. From (0,0) to (framebufferWidth, framebufferHeight)
+	glViewport(0, 0, framebufferWidth, framebufferHeight);
 	
+	// Important!!! Bind created window to thread.
+	glfwMakeContextCurrent(window);
+
+
+	/* Init GLEW (Needs the window and OpenGL context) */
 	glewExperimental = GL_TRUE;
 
-	if(glewInit() != GLEW_OK)
+	//Error
+	if( glewInit() != GLEW_OK )
 	{
+		std::cout << "ERROR::MAIN.CPP::GLEW_INIT_FAILED" << std::endl;
 		glfwTerminate();
-		std::cout << "Bad hat harry.." << "\n";
 	}
-	else
-		std::cout << "Good.." << "\n";
 
 
-	system("pause");
+	/* Main Loop */
+	while( !glfwWindowShouldClose(window) )
+	{
+		/* CHECK INPUT */
+		glfwPollEvents();
+
+		/* UPDATE */
+
+		/* DRAW */
+			// Clear
+		glClearColor(0.f, 0.f, 0.f, 1.f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);		//Clear all three buffers.
+
+			// Draw
+
+			// End Draw
+		glfwSwapBuffers(window);
+		glFlush();
+	}
+
+	/* End of program */
+	glfwTerminate();
+
 	return 0;
 }
