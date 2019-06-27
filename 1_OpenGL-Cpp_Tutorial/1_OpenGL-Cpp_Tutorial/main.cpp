@@ -1,5 +1,7 @@
 #include "libs.h"
 
+void framebuffer_resize_callback(GLFWwindow* window, int framebufferWidth, int framebufferHeight );
+
 int main()
 {
 	/* Init GLFW */
@@ -17,15 +19,18 @@ int main()
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);		
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);		
-	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+	glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
 
 	GLFWwindow* window = glfwCreateWindow( WINDOW_WIDTH, WINDOW_HEIGHT, "Main_Window", NULL, NULL);
 
 	// Created frame buffer is the same as window.
-	glfwGetFramebufferSize(window, &framebufferWidth, &framebufferHeight);
+	//glfwGetFramebufferSize(window, &framebufferWidth, &framebufferHeight);
 	// Canvas size. From (0,0) to (framebufferWidth, framebufferHeight)
-	glViewport(0, 0, framebufferWidth, framebufferHeight);
-	
+	//glViewport(0, 0, framebufferWidth, framebufferHeight);
+
+	// Switched to resizeable window
+	glfwSetFramebufferSizeCallback(window, framebuffer_resize_callback);
+		
 	// Important!!! Bind created window to thread.
 	glfwMakeContextCurrent(window);
 
@@ -65,4 +70,9 @@ int main()
 	glfwTerminate();
 
 	return 0;
+}
+
+void framebuffer_resize_callback(GLFWwindow* window, int framebufferWidth, int framebufferHeight )
+{
+	glViewport(0, 0, framebufferWidth, framebufferHeight);
 }
