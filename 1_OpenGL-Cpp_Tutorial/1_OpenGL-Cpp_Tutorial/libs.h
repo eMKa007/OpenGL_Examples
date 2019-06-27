@@ -2,9 +2,12 @@
 
 #include <iostream>
 
+/* OpenGL Extension Wrangler */
 #include <glew.h>
+
 #include <glfw3.h>
 
+/* GLM - OpenGL Mathematics */
 #include <glm.hpp>
 #include <vec2.hpp>
 #include <vec3.hpp>
@@ -12,3 +15,6 @@
 #include <mat4x4.hpp>
 #include <gtc/matrix_transform.hpp>
 #include <gtc/type_ptr.hpp>
+
+/* SOIL2 - Simple OpenGL Image Library */
+#include <SOIL2.h>

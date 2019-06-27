@@ -6,7 +6,7 @@ int main()
 	glfwInit();
 
 	//CREATE WINDOW BEFORE GLEW INIT!
-
+	
 	glewExperimental = GL_TRUE;
 
 	if(glewInit() != GLEW_OK)
