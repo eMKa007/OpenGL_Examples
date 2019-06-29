@@ -1,6 +1,9 @@
 #pragma once
 
 #include <iostream>
+#include <fstream>
+#include <string>
+#include <vector>
 
 /* OpenGL Extension Wrangler */
 #include <glew.h>

@@ -22,6 +22,7 @@ int main()
 	glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
 
 	GLFWwindow* window = glfwCreateWindow( WINDOW_WIDTH, WINDOW_HEIGHT, "Main_Window", NULL, NULL);
+	bool loadShaders( GLuint& program );
 
 	// Created frame buffer is the same as window.
 	//glfwGetFramebufferSize(window, &framebufferWidth, &framebufferHeight);
@@ -34,7 +35,6 @@ int main()
 	// Important!!! Bind created window to thread.
 	glfwMakeContextCurrent(window);
 
-
 	/* Init GLEW (Needs the window and OpenGL context) */
 	glewExperimental = GL_TRUE;
 
@@ -44,6 +44,11 @@ int main()
 		std::cout << "ERROR::MAIN.CPP::GLEW_INIT_FAILED" << std::endl;
 		glfwTerminate();
 	}
+
+	//SHADER INIT
+	GLuint core_program;
+	if( !loadShaders(core_program) )
+		glfwTerminate();
 
 
 	/* Main Loop */
@@ -67,7 +72,13 @@ int main()
 	}
 
 	/* End of program */
+	glfwDestroyWindow( window );
 	glfwTerminate();
+
+	/* Delete program */
+	glDeleteProgram( core_program );
+
+	
 
 	return 0;
 }
@@ -75,4 +86,121 @@ int main()
 void framebuffer_resize_callback(GLFWwindow* window, int framebufferWidth, int framebufferHeight )
 {
 	glViewport(0, 0, framebufferWidth, framebufferHeight);
+}
+
+bool loadShaders( GLuint& program )
+{
+	bool loadSucces = true;
+	char infoLog[512];
+	GLint success;
+
+	std::string temp = "";
+	std::string src = "";
+
+	std::ifstream in_file;
+
+	//Vertex Shader
+	in_file.open("vertex_core.glsl");
+
+	/* Read from file source of vertex shader. */
+	if( in_file.is_open() )
+	{
+		while( std::getline( in_file, temp) )
+			src += temp + "\n";
+	}
+	else
+	{
+		std::cout << "ERROR::LOADSHADERS::COULD_NOT_OPEN_VERTEX_FILE" << "\n";
+		loadSucces = false;
+	}
+		
+	in_file.close();
+
+	/* Create and compile vertex shader */
+	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
+	const GLchar* vertex_src = src.c_str();
+	glShaderSource( vertexShader, 1, &vertex_src, NULL);
+	glCompileShader( vertexShader );
+
+	/* Check for compilation errors */
+	glGetShaderiv( vertexShader, GL_COMPILE_STATUS, &success);
+	if( !success )
+	{
+		std::cout << "ERROR::LOADSHADERS::COULD_NOT_COMPILE_VERTEX_SHADER" << "\n";
+		
+		glGetShaderInfoLog( vertexShader, 512, NULL, infoLog);
+		std::cout << infoLog << "\n";
+
+		loadSucces = false;
+	}
+
+	temp = "";
+	src = "";
+
+	/* Fragment */
+	in_file.open("fragment_core.glsl");
+
+	/* Read from source of fragment shader */
+	if( in_file.is_open() )
+	{
+		while( std::getline(in_file, temp ) )
+			src += temp + "\n";
+	}
+	else
+	{
+		std::cout << "ERROR::LOADSHADERS::COULD_NOT_OPEN_FRAGMENT_FILE" << "\n";
+		loadSucces = false;
+	}
+		
+	in_file.close();
+
+	/* Create and compile vertex shader */
+	GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+	const GLchar* fragment_src = src.c_str();
+	glShaderSource( fragmentShader, 1, &fragment_src, NULL);
+	glCompileShader( fragmentShader );
+
+	/* Check for compilation errors */
+	glGetShaderiv( fragmentShader, GL_COMPILE_STATUS, &success);
+	if( !success )
+	{
+		std::cout << "ERROR::LOADSHADERS::COULD_NOT_COMPILE_FRAGMENT_SHADER" << "\n";
+
+		glGetShaderInfoLog( fragmentShader, 512, NULL, infoLog);
+		std::cout << infoLog << "\n";
+
+		loadSucces = false;
+	}
+
+	/* Create Program */
+	program = glCreateProgram();
+
+	/* Attach shaders to newly created program. */
+	glAttachShader( program, vertexShader );
+	glAttachShader( program, fragmentShader );
+
+	/* Link Attached shaders to the program. */
+	glLinkProgram( program );
+
+	/* Check for linking errors */
+	glGetProgramiv( program, GL_LINK_STATUS, &success );
+	if( !success )
+	{
+		std::cout << "ERROR::LOADSHADERS::COULD_NOT_LINK_PROGRAM" << "\n";
+
+		glGetProgramInfoLog( program, 512, NULL, infoLog);
+		std::cout << infoLog << "\n";
+
+		loadSucces = false;
+	}
+
+	/* End. Tidy up. Delete Shaders. 
+	 * Once, you've created program you do not need these individuals shaders anymore. 
+	 * They'll be linked into program. 
+	 */
+	glUseProgram( 0 );
+	glDeleteShader( vertexShader );
+	glDeleteShader( fragmentShader );
+
+	return loadSucces;
 }
