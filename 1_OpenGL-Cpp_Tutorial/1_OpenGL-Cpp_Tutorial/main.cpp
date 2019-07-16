@@ -31,7 +31,7 @@ int main( int argc, char* argv[] )
 	// Switched to resizeable window
 	glfwSetFramebufferSizeCallback(window, framebuffer_resize_callback);
 		
-	// Important!!! Bind created window to thread.
+	// Important!!! Bind created window to thread. !!!
 	glfwMakeContextCurrent(window);
 
 	/* Init GLEW (Needs the window and OpenGL context) */
@@ -43,6 +43,20 @@ int main( int argc, char* argv[] )
 		std::cout << "ERROR::MAIN.CPP::GLEW_INIT_FAILED" << std::endl;
 		glfwTerminate();
 	}
+
+	/* OPENGL OPTIONS  
+	 * OpenGL is a state machine. Before we draw something, we want to enable some options.
+	 */
+	glEnable(GL_DEPTH_TEST); // Lock Z-coordinate. Impossible to use Z-values.
+
+	glEnable(GL_CULL_FACE); // Remove (do not draw) object that are not seen. (Face culling)
+	glCullFace(GL_BACK);	// Back side of object will not be drawn
+	glFrontFace(GL_CCW);	// Front face- which will be drawn - is that with counter-clock wise vertex order. 
+
+	glPolygonMode( GL_FRONT_AND_BACK, GL_FILL); // Fill drawn shape with full color. Could be GL_LINE etc.
+
+	glEnable(GL_BLEND); // Enable color blending.
+	glBlendFunc(GL_SRC0_ALPHA, GL_ONE_MINUS_SRC_ALPHA); // Color blending function. 
 
 	//SHADER INIT
 	GLuint core_program;
@@ -85,9 +99,9 @@ int main( int argc, char* argv[] )
 /*	----------------------------------------------------------
 *	Function name:	framebuffer_resize_callback()
 *	Parameters:	GLFWwindow* window - window to be used in resize
-*			int framebufferWidth - new framebuffer width
-*			int framebufferHeight - new framebuffer height
-*	Used to:		Set new size of veiwport baser on given width and height values.
+*			int framebufferWidth - new frame buffer width
+*			int framebufferHeight - new frame buffer height
+*	Used to:		Set new size of viewport baser on given width and height values.
 *	Return:		none
 */
 void framebuffer_resize_callback(GLFWwindow* window, int framebufferWidth, int framebufferHeight )
@@ -97,7 +111,7 @@ void framebuffer_resize_callback(GLFWwindow* window, int framebufferWidth, int f
 
 /*	----------------------------------------------------------
 *	Function name:	loadShaders()
-*	Parameters:	GLuint& program - reference to program which shaderrs need to be linked in.
+*	Parameters:	GLuint& program - reference to program which shaders need to be linked in.
 *	Used to:		Load and compile vertex and fragment shader.
 *	Return:		bool - is shaders are properly loaded and linked.
 */
