@@ -2,6 +2,14 @@
 
 void framebuffer_resize_callback(GLFWwindow* window, int framebufferWidth, int framebufferHeight );
 bool loadShaders( GLuint& program );
+void updateInput( GLFWwindow* window )
+{
+	if( glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS )
+	{
+		glfwSetWindowShouldClose(window, true);
+	}
+
+}
 
 int main( int argc, char* argv[] )
 {
@@ -71,6 +79,7 @@ int main( int argc, char* argv[] )
 		glfwPollEvents();
 
 		/* UPDATE */
+		updateInput(window);
 
 		/* DRAW */
 			// Clear
