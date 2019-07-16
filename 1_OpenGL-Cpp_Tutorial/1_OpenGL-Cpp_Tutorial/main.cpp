@@ -11,6 +11,29 @@ void updateInput( GLFWwindow* window )
 
 }
 
+/* 
+ * Declare vertex positions/color/texture coordinates.
+ * Will be used to draw triange in this case.
+ */
+Vertex vertices[] =
+{
+	// Position						// Color					// texcoord
+	glm::vec3(0.f, 0.5f, 0.f),		glm::vec3(1.f, 0.f, 0.f),	glm::vec2(0.f, 1.f),	// Vertex 1
+	glm::vec3(-0.5f, -0.5f, 0.f),	glm::vec3(0.f, 1.f, 0.f),	glm::vec2(0.f, 0.f),	// Vertex 2
+	glm::vec3(0.5f, -0.5f, 0.f),	glm::vec3(0.f, 0.f, 1.f),	glm::vec2(1.f, 0.f)		// Vertex 3
+};
+unsigned nrOfVertices = sizeof(vertices) / sizeof(Vertex);
+
+/* 
+ * Determine the sequence of vertices to be drawn.
+ */
+GLuint indices[] =
+{
+	0, 1, 2
+};
+unsigned nrOfIndices = sizeof(indices) / sizeof(GLuint);
+
+
 int main( int argc, char* argv[] )
 {
 	/* Init GLFW */
@@ -66,11 +89,66 @@ int main( int argc, char* argv[] )
 	glEnable(GL_BLEND); // Enable color blending.
 	glBlendFunc(GL_SRC0_ALPHA, GL_ONE_MINUS_SRC_ALPHA); // Color blending function. 
 
-	//SHADER INIT
+	/* SHADER INIT
+	 * Create and compile shaders.
+	 */
 	GLuint core_program;
 	if( !loadShaders(core_program) )
 		glfwTerminate();
 
+	/* VAO, VBO, EBO */
+	/* GEN VAO AND BIND
+	 * VAO (Vertex Array Object) - big box to hold all model (all triangle)
+	 */
+	GLuint VAO;
+	glCreateVertexArrays(1, &VAO);
+	glBindVertexArray( VAO );	// Activate the box! Anything we'll do to the others buffers it will bind to this VAO. 
+
+	/* GEN VBO AND BIND AND SEND DATA
+	 * VBO (Vertex Buffer Object) - is gonna send the vertex data of object.
+	 */
+	GLuint VBO;
+	glGenBuffers(1, &VBO);
+	// Make sure that VBO is put in the specific place inside VAO box. Bc can be more than one buffers inside VAO.
+	glBindBuffer( GL_ARRAY_BUFFER, VBO );	// Bind VBO as ARRAY_BUFFER inside VAO box. 
+	// Data we'll send to the graphics card. Target is ARRAY_BUFFER, send all vertices (size and pointer to data), STATIC_DRAW (as we'll not change vertices often)
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+	/* GEN EBO AND BIND AND SEND DATA
+	 * EBO (Element Buffer Object) - is gonna send the indices data of object.
+	 */
+	GLuint EBO;
+	glGenBuffers(1, &EBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO );	// Bind Element Array Buffer (EBO) to specific place inside VAO box.
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);	// Determine indices data to be sent to graphics card.
+
+	/* SET VERTEXATTRIBPOINTERS AND ENABLE (INPUT ASSEMBLY)
+	 * Setting specific vertex attributes (position, color and texture coordinate) to determine in what order they are set inside memory.
+	 */
+		// Position Attribute
+	GLuint attribLocation = glGetAttribLocation( core_program, "vertex_position");	// Get position (location) of that attribute inside core_program.
+		// 0 - is location inside vertex shader. So we assume to let graphics card to know order of position coordinates inside big table of vertexes.
+		// 3 - is size of single data pack used by location 0 (inside vertex shader). 3 floats.
+		// GL_FLOAT - data type, 
+		// stride = sizeof(Vertex) - how many bytes to move forwart on table to get into next vertex position
+		// offsetof - to store offset from first vertex attribute
+	glVertexAttribPointer(attribLocation, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, position));
+	glEnableVertexAttribArray(attribLocation);	// Need to be same number (location) as inside vertex shader (used by core_program).
+
+		// Color Attribute
+	attribLocation = glGetAttribLocation( core_program, "vertex_color");
+	glVertexAttribPointer(attribLocation, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, color));
+	glEnableVertexAttribArray(attribLocation);	// Need to be same number (location) as inside vertex shader (used by core_program).
+
+		// Texture Coordinates Attribute
+	attribLocation = glGetAttribLocation( core_program, "vertex_texcoord");
+	glVertexAttribPointer(attribLocation, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, texcoord));
+	glEnableVertexAttribArray(attribLocation);	// Need to be same number (location) as inside vertex shader (used by core_program).
+
+	/* BIND VAO 0 (unbind previously active one)
+	 * Unbind previously active VAO. To make sure no VAO is active now.
+	 */
+	glBindVertexArray( 0 );
 
 	/* Main Loop */
 	while( !glfwWindowShouldClose(window) )
