@@ -1,3 +1,5 @@
+/* fragment shader - run for each pixel on the screen */
+
 #version 440
 
 in vec3 vs_position;

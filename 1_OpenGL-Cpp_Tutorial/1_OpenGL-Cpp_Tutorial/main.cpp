@@ -1,13 +1,13 @@
 #include "libs.h"
 
 void framebuffer_resize_callback(GLFWwindow* window, int framebufferWidth, int framebufferHeight );
+bool loadShaders( GLuint& program );
 
-int main()
+int main( int argc, char* argv[] )
 {
 	/* Init GLFW */
-	if(!glfwInit()) {
-    return -1;
-	}
+	if( !glfwInit() ) 
+		return -1;
 
 	/* Create Window */
 	const int WINDOW_WIDTH = 640;
@@ -17,14 +17,13 @@ int main()
 
 	//Use OpenGL core profile, OpenGL version 4.4
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);		
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);		
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);
 	glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
 
 	GLFWwindow* window = glfwCreateWindow( WINDOW_WIDTH, WINDOW_HEIGHT, "Main_Window", NULL, NULL);
-	bool loadShaders( GLuint& program );
 
-	// Created frame buffer is the same as window.
+	// Created frame buffer is the same as window. Created window is not resizeable
 	//glfwGetFramebufferSize(window, &framebufferWidth, &framebufferHeight);
 	// Canvas size. From (0,0) to (framebufferWidth, framebufferHeight)
 	//glViewport(0, 0, framebufferWidth, framebufferHeight);
@@ -83,13 +82,28 @@ int main()
 	return 0;
 }
 
+/*	----------------------------------------------------------
+*	Function name:	framebuffer_resize_callback()
+*	Parameters:	GLFWwindow* window - window to be used in resize
+*			int framebufferWidth - new framebuffer width
+*			int framebufferHeight - new framebuffer height
+*	Used to:		Set new size of veiwport baser on given width and height values.
+*	Return:		none
+*/
 void framebuffer_resize_callback(GLFWwindow* window, int framebufferWidth, int framebufferHeight )
 {
 	glViewport(0, 0, framebufferWidth, framebufferHeight);
 }
 
+/*	----------------------------------------------------------
+*	Function name:	loadShaders()
+*	Parameters:	GLuint& program - reference to program which shaderrs need to be linked in.
+*	Used to:		Load and compile vertex and fragment shader.
+*	Return:		bool - is shaders are properly loaded and linked.
+*/
 bool loadShaders( GLuint& program )
 {
+
 	bool loadSucces = true;
 	char infoLog[512];
 	GLint success;
@@ -102,7 +116,7 @@ bool loadShaders( GLuint& program )
 	//Vertex Shader
 	in_file.open("vertex_core.glsl");
 
-	/* Read from file source of vertex shader. */
+	/* Read all from source file of vertex shader. */
 	if( in_file.is_open() )
 	{
 		while( std::getline( in_file, temp) )
@@ -131,7 +145,8 @@ bool loadShaders( GLuint& program )
 		glGetShaderInfoLog( vertexShader, 512, NULL, infoLog);
 		std::cout << infoLog << "\n";
 
-		loadSucces = false;
+		/* If vertex shader fail to compile- do not try to compile fragment shader */
+		return false;
 	}
 
 	temp = "";
@@ -154,7 +169,7 @@ bool loadShaders( GLuint& program )
 		
 	in_file.close();
 
-	/* Create and compile vertex shader */
+	/* Create and compile fragment shader */
 	GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 	const GLchar* fragment_src = src.c_str();
 	glShaderSource( fragmentShader, 1, &fragment_src, NULL);
@@ -169,7 +184,11 @@ bool loadShaders( GLuint& program )
 		glGetShaderInfoLog( fragmentShader, 512, NULL, infoLog);
 		std::cout << infoLog << "\n";
 
-		loadSucces = false;
+		/* If fragment shader fail to compile- do not create main program.
+		 * Previously created vertex shader need to be deleted.
+		 */
+		glDeleteShader( vertexShader );
+		return false;
 	}
 
 	/* Create Program */

@@ -1,3 +1,5 @@
+/* vertex shader - run for each vertex */
+
 #version 440
 
 layout (location = 0) in vec3 vertex_position;
