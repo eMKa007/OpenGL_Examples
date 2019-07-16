@@ -164,7 +164,14 @@ int main( int argc, char* argv[] )
 		glClearColor(0.f, 0.f, 0.f, 1.f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);		//Clear all three buffers.
 
+			// Use a program (shader) - need to tell what shader we want to use.
+		glUseProgram(core_program);
+
+			// Bind Vertex Array Object (VAO) to the selected program (shaders).
+		glBindVertexArray( VAO );
+		
 			// Draw
+		glDrawElements(GL_TRIANGLES, nrOfIndices, GL_UNSIGNED_INT, 0);	// Draw triangles. made of nrOfIndices which are unsigned int, starting from 0 index.
 
 			// End Draw
 		glfwSwapBuffers(window);
