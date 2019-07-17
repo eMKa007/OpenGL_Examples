@@ -112,9 +112,9 @@ int main( int argc, char* argv[] )
 	 */
 	GLuint VBO;
 	glGenBuffers(1, &VBO);
-	// Make sure that VBO is put in the specific place inside VAO box. Bc can be more than one buffers inside VAO.
+		// Make sure that VBO is put in the specific place inside VAO box. Bc can be more than one buffers inside VAO.
 	glBindBuffer( GL_ARRAY_BUFFER, VBO );	// Bind VBO as ARRAY_BUFFER inside VAO box. 
-	// Data we'll send to the graphics card. Target is ARRAY_BUFFER, send all vertices (size and pointer to data), STATIC_DRAW (as we'll not change vertices often)
+		// Data we'll send to the graphics card. Target is ARRAY_BUFFER, send all vertices (size and pointer to data), STATIC_DRAW (as we'll not change vertices often)
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
 	/* GEN EBO AND BIND AND SEND DATA
@@ -152,6 +152,42 @@ int main( int argc, char* argv[] )
 	 * Unbind previously active VAO. To make sure no VAO is active now.
 	 */
 	glBindVertexArray( 0 );
+
+	/* INIT TEXTURE
+	 * Load an input image using SOIL library. Generate and bind texture object.
+	 */
+	int image_width = 0;
+	int image_height = 0;
+	unsigned char* image = SOIL_load_image("Images/atom.png", &image_width, &image_height, NULL, SOIL_LOAD_RGBA);
+
+	GLuint texture0;
+	glGenTextures(1, &texture0);	// Generate empty texture object. 
+
+	glBindTexture(GL_TEXTURE_2D, texture0);	// Bind texture to work on it. 
+
+		//SET TEXTURE PARAMETERS (OPTIONS)
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// Repeat texture if is enough space to do so. S- is tex coordinates (x coordinate). Same as U and V.
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);	// Y coordinate.
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);	 // Characteristic while magnifying (zooming). Anti-aliasing for texture.
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);	// Characteristic while minimization. Similar as magnification. 
+
+
+	if( image )	//Check for errors. If image is loaded correctly - create specific OpenGL texture object. Automatically associated with previously bound 'texture0' variable.
+	{
+		// Create OpenGL texture using image data stored inside 'image' variable.
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_width, image_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
+
+		// Mipmap is basically same image in several different resolutions to use it depends of distance of viewing object.
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else
+	{
+		std::cout << "ERROR::TEXTURE_LOADING_FAILED" << "\n";
+	}
+
+	glActiveTexture(0);
+	glBindTexture(GL_TEXTURE_2D, 0);	// Unbound any texture!!! Tidy up purpose. 
+	SOIL_free_image_data(image);	// Image is loaded, not need to hold its raw data.
 
 	/* Main Loop */
 	while( !glfwWindowShouldClose(window) )
