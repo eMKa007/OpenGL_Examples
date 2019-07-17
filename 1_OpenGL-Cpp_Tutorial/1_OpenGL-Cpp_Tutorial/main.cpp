@@ -202,12 +202,17 @@ int main( int argc, char* argv[] )
 		glClearColor(0.f, 0.f, 0.f, 1.f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);		//Clear all three buffers.
 
+		/* ---------------   START OF CURRENT CORE_PROGRAM --------------- */
+
 			// Use a program (shader) - need to tell what shader we want to use.
 		glUseProgram(core_program);
 
+			// Update uniforms (variables send to gpu [shader] from cpu)
+		glUniform1i(glGetUniformLocation(core_program, "texture0"), 0);	//Send one integer to uniform variable. Zero mean that we'll be using GL_TEXTURE0
+
 			// Activate Texture
 		glActiveTexture(GL_TEXTURE0);	// Put created texture to first texture unit.
-		glBindTexture(GL_TEXTURE_2D, texture0);
+		glBindTexture(GL_TEXTURE_2D, texture0);	// Bind a texture object to that activated texture unit.
 
 			// Bind Vertex Array Object (VAO) to the selected program (shaders).
 		glBindVertexArray( VAO );
@@ -219,6 +224,14 @@ int main( int argc, char* argv[] )
 			// End Draw
 		glfwSwapBuffers(window);
 		glFlush();
+
+			// Unbind the current program
+		glBindVertexArray(0);
+		glUseProgram(0);
+		glActiveTexture(0);
+		glBindTexture(GL_TEXTURE_2D,0);
+
+		/* ---------------   END OF CURRENT CORE_PROGRAM --------------- */
 	}
 
 	/* End of program */
@@ -228,7 +241,6 @@ int main( int argc, char* argv[] )
 	/* Delete program */
 	glDeleteProgram( core_program );
 
-	
 
 	return 0;
 }
