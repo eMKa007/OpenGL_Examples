@@ -171,7 +171,6 @@ int main( int argc, char* argv[] )
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);	 // Characteristic while magnifying (zooming). Anti-aliasing for texture.
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);	// Characteristic while minimization. Similar as magnification. 
 
-
 	if( image )	//Check for errors. If image is loaded correctly - create specific OpenGL texture object. Automatically associated with previously bound 'texture0' variable.
 	{
 		// Create OpenGL texture using image data stored inside 'image' variable.
@@ -205,6 +204,10 @@ int main( int argc, char* argv[] )
 
 			// Use a program (shader) - need to tell what shader we want to use.
 		glUseProgram(core_program);
+
+			// Activate Texture
+		glActiveTexture(GL_TEXTURE0);	// Put created texture to first texture unit.
+		glBindTexture(GL_TEXTURE_2D, texture0);
 
 			// Bind Vertex Array Object (VAO) to the selected program (shaders).
 		glBindVertexArray( VAO );
