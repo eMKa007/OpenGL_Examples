@@ -157,7 +157,24 @@ int main( int argc, char* argv[] )
 	/* INIT TEXTURE 0 */
 	GLuint texture0 = CreateAndBindTexture( "Images/atom.png" );
 	GLuint texture1 = CreateAndBindTexture( "Images/floor.png" );
-	
+
+	/* MODEL MATRIX
+	 * Adapt local coordinates to global ones.
+	 */
+	glm::mat4 ModelMatrix(1.f);	//Create identity matrix
+
+		// Initialize all three modifications with zero values.
+	ModelMatrix = glm::translate(ModelMatrix, glm::vec3(0.f, 0.f, 0.f));	// vec3 - translation vector
+	ModelMatrix = glm::rotate(ModelMatrix, glm::radians(0.f), glm::vec3(1.f, 0.f, 0.f));		// Choose angle of rotation and then rotation axis. (X)
+	ModelMatrix = glm::rotate(ModelMatrix, glm::radians(0.f), glm::vec3(0.f, 1.f, 0.f));		// Choose angle of rotation and then rotation axis. (Y)
+	ModelMatrix = glm::rotate(ModelMatrix, glm::radians(0.f), glm::vec3(0.f, 0.f, 1.f));		// Choose angle of rotation and then rotation axis. (Z)
+	ModelMatrix = glm::scale(ModelMatrix, glm::vec3(1.f));	// vec3 - scale vector ( 1 means = no scaling )
+
+		//Send ModelMatrix to vertex shader of specified program.
+	glUseProgram( core_program );
+	glUniformMatrix4fv(glGetUniformLocation(core_program, "ModelMatrix"), 1, GL_FALSE, glm::value_ptr(ModelMatrix));
+	glUseProgram(0);
+
 	/* Main Loop */
 	while( !glfwWindowShouldClose(window) )
 	{
@@ -177,9 +194,17 @@ int main( int argc, char* argv[] )
 			// Use a program (shader) - need to tell what shader we want to use.
 		glUseProgram(core_program);
 
-			// Update uniforms (variables send to gpu [shader] from cpu)
+			// Update uniforms (variables send to gpu [shader] from cpu)- every change they're updated.
 		glUniform1i(glGetUniformLocation(core_program, "texture0"), 0);	//Send one integer to uniform variable. Zero mean that we'll be using GL_TEXTURE0
 		glUniform1i(glGetUniformLocation(core_program, "texture1"), 1);	//Send one integer to uniform variable. 1 - use GL_TEXTURE1 (another texture unit).
+		glUniformMatrix4fv(glGetUniformLocation(core_program, "ModelMatrix"), 1, GL_FALSE, glm::value_ptr(ModelMatrix));	// Update uniform ModelMatrix variable
+
+			// Move, rotate & scale
+		ModelMatrix = glm::translate(ModelMatrix, glm::vec3(0.f, 0.f, 0.f));	// vec3 - translation vector
+		ModelMatrix = glm::rotate(ModelMatrix, glm::radians(0.f), glm::vec3(1.f, 0.f, 0.f));		// Choose angle of rotation and then rotation axis. (X)
+		ModelMatrix = glm::rotate(ModelMatrix, glm::radians(0.f), glm::vec3(0.f, 1.f, 0.f));		// Choose angle of rotation and then rotation axis. (Y)
+		ModelMatrix = glm::rotate(ModelMatrix, glm::radians(2.f), glm::vec3(0.f, 0.f, 1.f));		// Choose angle of rotation and then rotation axis. (Z)
+		ModelMatrix = glm::scale(ModelMatrix, glm::vec3(1.005f));	// vec3 - scale vector ( 1 means = no scaling )
 
 			// Activate Texture
 		glActiveTexture(GL_TEXTURE0);	// Put created texture to first texture unit.
