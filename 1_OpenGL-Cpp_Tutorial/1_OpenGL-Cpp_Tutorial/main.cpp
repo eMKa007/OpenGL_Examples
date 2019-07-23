@@ -2,6 +2,7 @@
 
 void framebuffer_resize_callback(GLFWwindow* window, int framebufferWidth, int framebufferHeight );
 bool loadShaders( GLuint& program );
+GLuint CreateAndBindTexture( const char* src_path );
 void updateInput( GLFWwindow* window )
 {
 	if( glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS )
@@ -153,41 +154,10 @@ int main( int argc, char* argv[] )
 	 */
 	glBindVertexArray( 0 );
 
-	/* INIT TEXTURE
-	 * Load an input image using SOIL library. Generate and bind texture object.
-	 */
-	int image_width = 0;
-	int image_height = 0;
-	unsigned char* image = SOIL_load_image("Images/atom.png", &image_width, &image_height, NULL, SOIL_LOAD_RGBA);
-
-	GLuint texture0;
-	glGenTextures(1, &texture0);	// Generate empty texture object. 
-
-	glBindTexture(GL_TEXTURE_2D, texture0);	// Bind texture to work on it. 
-
-		//SET TEXTURE PARAMETERS (OPTIONS)
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// Repeat texture if is enough space to do so. S- is tex coordinates (x coordinate). Same as U and V.
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);	// Y coordinate.
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);	 // Characteristic while magnifying (zooming). Anti-aliasing for texture.
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);	// Characteristic while minimization. Similar as magnification. 
-
-	if( image )	//Check for errors. If image is loaded correctly - create specific OpenGL texture object. Automatically associated with previously bound 'texture0' variable.
-	{
-		// Create OpenGL texture using image data stored inside 'image' variable.
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_width, image_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
-
-		// Mipmap is basically same image in several different resolutions to use it depends of distance of viewing object.
-		glGenerateMipmap(GL_TEXTURE_2D);
-	}
-	else
-	{
-		std::cout << "ERROR::TEXTURE_LOADING_FAILED" << "\n";
-	}
-
-	glActiveTexture(0);
-	glBindTexture(GL_TEXTURE_2D, 0);	// Unbound any texture!!! Tidy up purpose. 
-	SOIL_free_image_data(image);	// Image is loaded, not need to hold its raw data.
-
+	/* INIT TEXTURE 0 */
+	GLuint texture0 = CreateAndBindTexture( "Images/atom.png" );
+	GLuint texture1 = CreateAndBindTexture( "Images/floor.png" );
+	
 	/* Main Loop */
 	while( !glfwWindowShouldClose(window) )
 	{
@@ -209,10 +179,14 @@ int main( int argc, char* argv[] )
 
 			// Update uniforms (variables send to gpu [shader] from cpu)
 		glUniform1i(glGetUniformLocation(core_program, "texture0"), 0);	//Send one integer to uniform variable. Zero mean that we'll be using GL_TEXTURE0
+		glUniform1i(glGetUniformLocation(core_program, "texture1"), 1);	//Send one integer to uniform variable. 1 - use GL_TEXTURE1 (another texture unit).
 
 			// Activate Texture
 		glActiveTexture(GL_TEXTURE0);	// Put created texture to first texture unit.
 		glBindTexture(GL_TEXTURE_2D, texture0);	// Bind a texture object to that activated texture unit.
+
+		glActiveTexture(GL_TEXTURE1);	// Use another texture unit
+		glBindTexture(GL_TEXTURE_2D, texture1);	// Bind a texture object to that activated texture unit.
 
 			// Bind Vertex Array Object (VAO) to the selected program (shaders).
 		glBindVertexArray( VAO );
@@ -385,4 +359,49 @@ bool loadShaders( GLuint& program )
 	glDeleteShader( fragmentShader );
 
 	return loadSucces;
+}
+
+/*	----------------------------------------------------------
+*	Function name:	CreateAndBindTexture()
+*	Parameters:	const char* src_path - Path to input image
+*	Used to:		Create and bind new texture to GL_TEXTURE_2D socket.
+*	Return:		GLuint - newly created texture bound.
+*/
+GLuint CreateAndBindTexture( const char* src_path )
+{
+	/* INIT TEXTURE
+	 * Load an input image using SOIL library. Generate and bind texture object.
+	 */
+	int image_width = 0;
+	int image_height = 0;
+	unsigned char* image = SOIL_load_image( src_path, &image_width, &image_height, NULL, SOIL_LOAD_RGBA);
+
+	GLuint texture0;
+	glGenTextures(1, &texture0);	// Generate empty texture object. 
+
+	glBindTexture(GL_TEXTURE_2D, texture0);	// Bind texture to work on it. 
+
+		//SET TEXTURE PARAMETERS (OPTIONS)
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// Repeat texture if is enough space to do so. S- is tex coordinates (x coordinate). Same as U and V.
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);	// Y coordinate.
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);	 // Characteristic while magnifying (zooming). Anti-aliasing for texture.
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);	// Characteristic while minimization. Similar as magnification. 
+
+	if( image )	//Check for errors. If image is loaded correctly - create specific OpenGL texture object. Automatically associated with previously bound 'texture0' variable.
+	{
+		// Create OpenGL texture using image data stored inside 'image' variable.
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_width, image_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
+
+		// Mipmap is basically same image in several different resolutions to use it depends of distance of viewing object.
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else
+	{
+		std::cout << "ERROR::TEXTURE_LOADING_FAILED" << "\n";
+	}
+
+	glActiveTexture(0);
+	glBindTexture(GL_TEXTURE_2D, 0);	// Unbound any texture!!! Tidy up purpose. 
+	SOIL_free_image_data(image);	// Image is loaded, not need to hold its raw data.
+	return texture0;
 }
