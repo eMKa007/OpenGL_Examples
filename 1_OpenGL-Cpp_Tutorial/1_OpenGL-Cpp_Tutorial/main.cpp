@@ -14,7 +14,7 @@ void updateInput( GLFWwindow* window )
 
 /* 
  * Declare vertex positions/color/texture coordinates.
- * Will be used to draw triange in this case.
+ * Will be used to draw triangle in this case.
  */
 Vertex vertices[] =
 {
@@ -59,7 +59,7 @@ int main( int argc, char* argv[] )
 	GLFWwindow* window = glfwCreateWindow( WINDOW_WIDTH, WINDOW_HEIGHT, "Main_Window", NULL, NULL);
 
 	// Created frame buffer is the same as window. Created window is not resizeable
-	//glfwGetFramebufferSize(window, &framebufferWidth, &framebufferHeight);
+	glfwGetFramebufferSize(window, &framebufferWidth, &framebufferHeight);
 	// Canvas size. From (0,0) to (framebufferWidth, framebufferHeight)
 	//glViewport(0, 0, framebufferWidth, framebufferHeight);
 
@@ -170,9 +170,31 @@ int main( int argc, char* argv[] )
 	ModelMatrix = glm::rotate(ModelMatrix, glm::radians(0.f), glm::vec3(0.f, 0.f, 1.f));		// Choose angle of rotation and then rotation axis. (Z)
 	ModelMatrix = glm::scale(ModelMatrix, glm::vec3(1.f));	// vec3 - scale vector ( 1 means = no scaling )
 
-		//Send ModelMatrix to vertex shader of specified program.
+		//Initialize ViewMatrix
+	glm::vec3 worldUp(0.f, 1.f, 0.f);	// Camera coordinates.
+	glm::vec3 camFront(0.f, 0.f, -1.f);
+	glm::vec3 camPosition(0.f, 0.f, 1.f);
+	glm::mat4 ViewMatrix(1.f);
+	ViewMatrix = glm::lookAt(camPosition, camPosition + camFront, worldUp);
+
+		// Initialize Perspective matrix
+	float fov = 90.f;	// Field of view. 90 degrees.
+	float nearPlane = 0.1f;
+	float farPlane = 1000.f;
+	glm::mat4 ProjectionMatrix(1.f);
+
+	ProjectionMatrix = glm::perspective(
+		glm::radians(fov),
+		static_cast<float>(framebufferWidth) / static_cast<float>(framebufferHeight), 
+		nearPlane, 
+		farPlane
+	);
+
+	   	//Init Uniforms
 	glUseProgram( core_program );
 	glUniformMatrix4fv(glGetUniformLocation(core_program, "ModelMatrix"), 1, GL_FALSE, glm::value_ptr(ModelMatrix));
+	glUniformMatrix4fv(glGetUniformLocation(core_program, "ViewMatrix"), 1, GL_FALSE, glm::value_ptr(ViewMatrix));
+	glUniformMatrix4fv(glGetUniformLocation(core_program, "ProjectionMatrix"), 1, GL_FALSE, glm::value_ptr(ProjectionMatrix));
 	glUseProgram(0);
 
 	/* Main Loop */
@@ -199,12 +221,23 @@ int main( int argc, char* argv[] )
 		glUniform1i(glGetUniformLocation(core_program, "texture1"), 1);	//Send one integer to uniform variable. 1 - use GL_TEXTURE1 (another texture unit).
 		glUniformMatrix4fv(glGetUniformLocation(core_program, "ModelMatrix"), 1, GL_FALSE, glm::value_ptr(ModelMatrix));	// Update uniform ModelMatrix variable
 
+				// Update frame buffers size, and send new Projection Matrix.
+		glfwGetFramebufferSize(window, &framebufferWidth, &framebufferHeight);
+		ProjectionMatrix = glm::perspective
+		(
+			glm::radians(fov), 
+			static_cast<float>(framebufferWidth)/framebufferHeight, 
+			nearPlane, 
+			farPlane
+		);
+		glUniformMatrix4fv(glGetUniformLocation(core_program, "ProjectionMatrix"), 1, GL_FALSE, glm::value_ptr(ProjectionMatrix));
+
 			// Move, rotate & scale
 		ModelMatrix = glm::translate(ModelMatrix, glm::vec3(0.f, 0.f, 0.f));	// vec3 - translation vector
 		ModelMatrix = glm::rotate(ModelMatrix, glm::radians(0.f), glm::vec3(1.f, 0.f, 0.f));		// Choose angle of rotation and then rotation axis. (X)
-		ModelMatrix = glm::rotate(ModelMatrix, glm::radians(0.f), glm::vec3(0.f, 1.f, 0.f));		// Choose angle of rotation and then rotation axis. (Y)
-		ModelMatrix = glm::rotate(ModelMatrix, glm::radians(2.f), glm::vec3(0.f, 0.f, 1.f));		// Choose angle of rotation and then rotation axis. (Z)
-		ModelMatrix = glm::scale(ModelMatrix, glm::vec3(1.005f));	// vec3 - scale vector ( 1 means = no scaling )
+		ModelMatrix = glm::rotate(ModelMatrix, glm::radians(2.f), glm::vec3(0.f, 1.f, 0.f));		// Choose angle of rotation and then rotation axis. (Y)
+		ModelMatrix = glm::rotate(ModelMatrix, glm::radians(0.f), glm::vec3(0.f, 0.f, 1.f));		// Choose angle of rotation and then rotation axis. (Z)
+		ModelMatrix = glm::scale(ModelMatrix, glm::vec3(1.f));	// vec3 - scale vector ( 1 means = no scaling )
 
 			// Activate Texture
 		glActiveTexture(GL_TEXTURE0);	// Put created texture to first texture unit.
