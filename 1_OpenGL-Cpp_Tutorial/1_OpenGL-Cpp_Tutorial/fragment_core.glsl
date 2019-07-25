@@ -13,6 +13,7 @@ uniform sampler2D texture0; /* Picker. Can sample color data from piceture */
 uniform sampler2D texture1; /* Picker. Can sample color data from piceture */
 
 uniform vec3 lightPos0;
+uniform vec3 cameraPosition;
 
 void main()
 {
@@ -31,7 +32,16 @@ void main()
 	float diffuse = clamp( dot(posToLightDirVec, vs_normal), 0, 1);
 	vec3 diffuseFinal = diffuseColor * diffuse;
 
+	/* Specular Lightning */
+	vec3 lightToPosDirVec = normalize( lightPos0 - vs_position );
+	vec3 reflectDirVec = normalize( reflect(lightToPosDirVec, normalize(vs_normal) ) );
+	vec3 posToViewDirVec = normalize( vs_position - cameraPosition );
+	float SpecularConstant = pow( max( dot( posToViewDirVec, reflectDirVec), 0), 35);
+	vec3 SpecularFinal = vec3(1.f, 1.f, 1.f) * SpecularConstant;
+
+	/* Attenuation */
+
 	fs_color = 
 		texture(texture0, vs_texcoord) * vec4(vs_color,1.f)
-		 * ( vec4(ambientLight, 1.f) + vec4(diffuseFinal, 1.f));
+		 * ( vec4(ambientLight, 1.f) + vec4(diffuseFinal, 1.f) + vec4(SpecularFinal, 1.f));
 }
