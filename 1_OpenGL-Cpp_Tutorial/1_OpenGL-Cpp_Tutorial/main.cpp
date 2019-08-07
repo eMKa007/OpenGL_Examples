@@ -138,9 +138,7 @@ int main( int argc, char* argv[] )
 	/* SHADER INIT
 	 * Create and compile shaders.
 	 */
-	GLuint core_program;
-	if( !loadShaders(core_program) )
-		glfwTerminate();
+	Shader core_program("vertex_core.glsl", "fragment_core.glsl");
 
 	/* VAO, VBO, EBO */
 	/* GEN VAO AND BIND
@@ -171,30 +169,26 @@ int main( int argc, char* argv[] )
 	/* SET VERTEXATTRIBPOINTERS AND ENABLE (INPUT ASSEMBLY)
 	 * Setting specific vertex attributes (position, color and texture coordinate) to determine in what order they are set inside memory.
 	 */
-		// Position Attribute
-	GLuint attribLocation = glGetAttribLocation( core_program, "vertex_position");	// Get position (location) of that attribute inside core_program.
-		// 0 - is location inside vertex shader. So we assume to let graphics card to know order of position coordinates inside big table of vertexes.
-		// 3 - is size of single data pack used by location 0 (inside vertex shader). 3 floats.
-		// GL_FLOAT - data type, 
-		// stride = sizeof(Vertex) - how many bytes to move forwart on table to get into next vertex position
-		// offsetof - to store offset from first vertex attribute
-	glVertexAttribPointer(attribLocation, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, position));
-	glEnableVertexAttribArray(attribLocation);	// Need to be same number (location) as inside vertex shader (used by core_program).
+	// Position Attribute	// Get position (location) of that attribute inside core_program.
+	// 0 - is location inside vertex shader. So we assume to let graphics card to know order of position coordinates inside big table of vertexes.
+	// 3 - is size of single data pack used by location 0 (inside vertex shader). 3 floats.
+	// GL_FLOAT - data type, 
+	// stride = sizeof(Vertex) - how many bytes to move forwart on table to get into next vertex position
+	// offsetof - to store offset from first vertex attribute
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, position));
+	glEnableVertexAttribArray(0);	// Need to be same number (location) as inside vertex shader (used by core_program).
 
 		// Color Attribute
-	attribLocation = glGetAttribLocation( core_program, "vertex_color");
-	glVertexAttribPointer(attribLocation, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, color));
-	glEnableVertexAttribArray(attribLocation);	// Need to be same number (location) as inside vertex shader (used by core_program).
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, color));
+	glEnableVertexAttribArray(1);	// Need to be same number (location) as inside vertex shader (used by core_program).
 
 		// Texture Coordinates Attribute
-	attribLocation = glGetAttribLocation( core_program, "vertex_texcoord");
-	glVertexAttribPointer(attribLocation, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, texcoord));
-	glEnableVertexAttribArray(attribLocation);	// Need to be same number (location) as inside vertex shader (used by core_program).
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, texcoord));
+	glEnableVertexAttribArray(2);	// Need to be same number (location) as inside vertex shader (used by core_program).
 
 		// Normal Vectors Attribute
-	attribLocation = glGetAttribLocation( core_program, "vertex_normal");
-	glVertexAttribPointer(attribLocation, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, normal));
-	glEnableVertexAttribArray(attribLocation);
+	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, normal));
+	glEnableVertexAttribArray(3);
 
 	/* BIND VAO 0 (unbind previously active one)
 	 * Unbind previously active VAO. To make sure no VAO is active now.
@@ -245,14 +239,12 @@ int main( int argc, char* argv[] )
 	glm::vec3 lightPos0(0.f, 0.f, 1.f);
 
 	   	//Init Uniforms
-	glUseProgram( core_program );
-	glUniformMatrix4fv(glGetUniformLocation(core_program, "ModelMatrix"), 1, GL_FALSE, glm::value_ptr(ModelMatrix));
-	glUniformMatrix4fv(glGetUniformLocation(core_program, "ViewMatrix"), 1, GL_FALSE, glm::value_ptr(ViewMatrix));
-	glUniformMatrix4fv(glGetUniformLocation(core_program, "ProjectionMatrix"), 1, GL_FALSE, glm::value_ptr(ProjectionMatrix));
-	
-	glUniform3fv(glGetUniformLocation(core_program, "lightPos0"), 1, glm::value_ptr(lightPos0));
-	glUniform3fv(glGetUniformLocation(core_program, "cameraPosition"), 1, glm::value_ptr(camPosition));
-	glUseProgram(0);
+	core_program.setMat4fv(ModelMatrix, "ModelMatrix");
+	core_program.setMat4fv(ViewMatrix, "ViewMatrix");
+	core_program.setMat4fv(ProjectionMatrix, "ProjectionMatrix");
+
+	core_program.setVec3f(lightPos0, "lightPos0");
+	core_program.setVec3f(camPosition, "cameraPosition");
 
 	/* Main Loop */
 	while( !glfwWindowShouldClose(window) )
@@ -271,13 +263,10 @@ int main( int argc, char* argv[] )
 
 		/* ---------------   START OF CURRENT CORE_PROGRAM --------------- */
 
-			// Use a program (shader) - need to tell what shader we want to use.
-		glUseProgram(core_program);
-
 			// Update uniforms (variables send to gpu [shader] from cpu)- every change they're updated.
-		glUniform1i(glGetUniformLocation(core_program, "texture0"), 0);	//Send one integer to uniform variable. Zero mean that we'll be using GL_TEXTURE0
-		glUniform1i(glGetUniformLocation(core_program, "texture1"), 1);	//Send one integer to uniform variable. 1 - use GL_TEXTURE1 (another texture unit).
-		glUniformMatrix4fv(glGetUniformLocation(core_program, "ModelMatrix"), 1, GL_FALSE, glm::value_ptr(ModelMatrix));	// Update uniform ModelMatrix variable
+		core_program.set1i(0, "texture0");		//Send one integer to uniform variable. Zero mean that we'll be using GL_TEXTURE0
+		core_program.set1i(1, "texture1");		//Send one integer to uniform variable. 1 - use GL_TEXTURE1 (another texture unit).
+		core_program.setMat4fv(ModelMatrix, "ModelMatrix");	// Update uniform ModelMatrix variable
 
 				// Update frame buffers size, and send new Projection Matrix.
 		glfwGetFramebufferSize(window, &framebufferWidth, &framebufferHeight);
@@ -288,7 +277,8 @@ int main( int argc, char* argv[] )
 			nearPlane, 
 			farPlane
 		);
-		glUniformMatrix4fv(glGetUniformLocation(core_program, "ProjectionMatrix"), 1, GL_FALSE, glm::value_ptr(ProjectionMatrix));
+		
+		core_program.setMat4fv(ProjectionMatrix, "ProjectionMatrix");
 
 			// Move, rotate & scale
 		ModelMatrix = glm::mat4(1.f);
@@ -297,6 +287,9 @@ int main( int argc, char* argv[] )
 		ModelMatrix = glm::rotate(ModelMatrix, glm::radians(rotation.y), glm::vec3(0.f, 1.f, 0.f));		// Choose angle of rotation and then rotation axis. (Y)
 		ModelMatrix = glm::rotate(ModelMatrix, glm::radians(rotation.z), glm::vec3(0.f, 0.f, 1.f));		// Choose angle of rotation and then rotation axis. (Z)
 		ModelMatrix = glm::scale(ModelMatrix, scale);	// vec3 - scale vector ( 1 means = no scaling )
+
+			// Use a program (shader) - need to tell what shader we want to use.
+		core_program.use();
 
 			// Activate Texture
 		glActiveTexture(GL_TEXTURE0);	// Put created texture to first texture unit.
@@ -328,10 +321,6 @@ int main( int argc, char* argv[] )
 	/* End of program */
 	glfwDestroyWindow( window );
 	glfwTerminate();
-
-	/* Delete program */
-	glDeleteProgram( core_program );
-
 
 	return 0;
 }
