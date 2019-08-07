@@ -1,6 +1,11 @@
 #include  "Shader.h"
 
-
+/*	----------------------------------------------------------
+*	Default class constructor
+*	Parameters: const char* vertexFile - pointer to string consisting path to vertex shader source code
+*			const char* fragmentFile - pointer to string consisting path to vertex shader source code
+*			const char* geometryFile - pointer to string consisting path to vertex shader source code ( default value is "", not used )
+*/
 Shader::Shader(const char* vertexFile, const char* fragmentFile, const char* geometryFile)
 {
 	GLuint vertexShader = 0;
@@ -27,16 +32,21 @@ Shader::Shader(const char* vertexFile, const char* fragmentFile, const char* geo
 	glDeleteShader( fragmentShader );
 }
 
+/*	----------------------------------------------------------
+*	Default class destructor
+*	Parameters: none
+*	Used to: delete previously created program instance
+*/
 Shader::~Shader()
 {
 	glDeleteProgram(this->id);
 }
 
 /*	----------------------------------------------------------
-*	Function name:
-*	Parameters:	
-*	Used to:	
-*	Return:	
+*	Function name: use()
+*	Parameters:	none
+*	Used to: Bind current program to be in use
+*	Return:	void
 */
 void Shader::use()
 {
@@ -44,10 +54,10 @@ void Shader::use()
 }
 
 /*	----------------------------------------------------------
-*	Function name:
-*	Parameters:	
-*	Used to:	
-*	Return:	
+*	Function name: unuse()
+*	Parameters:	none
+*	Used to: Unbound current program from scope
+*	Return:	void
 */
 void Shader::unuse()
 {
@@ -55,10 +65,27 @@ void Shader::unuse()
 }
 
 /*	----------------------------------------------------------
-*	Function name:
-*	Parameters:	
-*	Used to:	
-*	Return:	
+*	Function name: setVec4f()
+*	Parameters:	glm::fvec4 value - vector of four floats to be passed to shader
+*			const GLchar* name - name of uniform's location in shader
+*	Used to: Pass vector data to shader by given variable name
+*	Return:	void
+*/
+void Shader::setVec4f(glm::fvec4 value, const GLchar* name)
+{
+	this->use();
+
+	glUniform4fv(glGetUniformLocation(this->id, name), 1, glm::value_ptr(value));
+
+	this->unuse();
+}
+
+/*	----------------------------------------------------------
+*	Function name: setVec3f()
+*	Parameters:	glm::fvec3 value - vector of three floats to be passed to shader
+*			const GLchar* name - name of uniform's location in shader
+*	Used to: Pass vector data to shader by given variable name
+*	Return:	void
 */
 void Shader::setVec3f(glm::fvec3 value, const GLchar* name)
 {
@@ -70,10 +97,11 @@ void Shader::setVec3f(glm::fvec3 value, const GLchar* name)
 }
 
 /*	----------------------------------------------------------
-*	Function name:
-*	Parameters:	
-*	Used to:	
-*	Return:	
+*	Function name: setVec2f()
+*	Parameters:	glm::fvec2 value - vector of two floats to be passed to shader
+*			const GLchar* name - name of uniform's location in shader
+*	Used to: Pass vector data to shader by given variable name
+*	Return:	void
 */
 void Shader::setVec2f(glm::fvec2 value, const GLchar* name)
 {
@@ -86,9 +114,10 @@ void Shader::setVec2f(glm::fvec2 value, const GLchar* name)
 
 /*	----------------------------------------------------------
 *	Function name:
-*	Parameters:	
-*	Used to:	
-*	Return:	
+*	Parameters:	GLfloat value - float variable to be passed to shader
+*			const GLchar* name - name of uniform's location in shader
+*	Used to: Pass float variable to shader by given variable name
+*	Return:	void
 */
 void Shader::setVec1f(GLfloat value, GLchar* name)
 {
@@ -100,10 +129,12 @@ void Shader::setVec1f(GLfloat value, GLchar* name)
 }
 
 /*	----------------------------------------------------------
-*	Function name:
-*	Parameters:	
-*	Used to:	
-*	Return:	
+*	Function name: setMat4fv()
+*	Parameters:	glm::mat4 value - 4x4 matrix to be passed to shader
+*			const GLchar* name - name of uniform's location in shader
+*			GLboolean transpose - logic value, if true then matrix is assumed in row major order. Default parameter = GL_FALSE
+*	Used to: Pass matrix data to shader by given variable name
+*	Return:	void
 */
 void Shader::setMat4fv(glm::mat4 value, const GLchar* name, GLboolean transpose)
 {
@@ -115,10 +146,12 @@ void Shader::setMat4fv(glm::mat4 value, const GLchar* name, GLboolean transpose)
 }
 
 /*	----------------------------------------------------------
-*	Function name:
-*	Parameters:	
-*	Used to:	
-*	Return:	
+*	Function name: setMat3fv()
+*	Parameters:	glm::mat3 value - 3x3 matrix to be passed to shader
+*			const GLchar* name - name of uniform's location in shader
+*			GLboolean transpose - logic value, if true then matrix is assumed in row major order. Default parameter = GL_FALSE
+*	Used to: Pass matrix data to shader by given variable name
+*	Return:	void
 */
 void Shader::setMat3fv(glm::mat3 value, const GLchar* name, GLboolean transpose)
 {
@@ -130,10 +163,11 @@ void Shader::setMat3fv(glm::mat3 value, const GLchar* name, GLboolean transpose)
 }
 
 /*	----------------------------------------------------------
-*	Function name:
-*	Parameters:	
-*	Used to:	
-*	Return:	
+*	Function name: set1i()
+*	Parameters:	GLint value - integer value to be passed to shader
+*			const GLchar* name - name of uniform's location in shader
+*	Used to: Pass integer data to shader by given variable name
+*	Return:	void
 */
 void Shader::set1i(GLint value, const GLchar* name)
 {
@@ -145,25 +179,10 @@ void Shader::set1i(GLint value, const GLchar* name)
 }
 
 /*	----------------------------------------------------------
-*	Function name:
-*	Parameters:	
-*	Used to:	
-*	Return:	
-*/
-void Shader::setVec4f(glm::fvec4 value, const GLchar* name)
-{
-	this->use();
-
-	glUniform4fv(glGetUniformLocation(this->id, name), 1, glm::value_ptr(value));
-
-	this->unuse();
-}
-
-/*	----------------------------------------------------------
-*	Function name:
-*	Parameters:	
-*	Used to:	
-*	Return:	
+*	Function name: loadShaderSource()
+*	Parameters:	const char* fileName - Pointer to string which consist input file name
+*	Used to: Read input file to temporary buffer and return it if read is finished
+*	Return:	std::string
 */
 std::string Shader::loadShaderSource(const char* fileName)
 {
@@ -190,7 +209,6 @@ std::string Shader::loadShaderSource(const char* fileName)
 
 	return src;
 }
-
 
 /*	----------------------------------------------------------
 *	Function name: loadShader()
@@ -226,12 +244,13 @@ GLuint Shader::loadShader(GLenum type, const char* fileName)
 	return shader;
 }
 
-
 /*	----------------------------------------------------------
 *	Function name:
-*	Parameters:
-*	Used to:
-*	Return:
+*	Parameters: GLuint vertexShader - binding to created vertex shader
+*			GLuint geometryShader - binding to created geometry shader ( could be not specified )
+*			GLuint fragmentShader - binding to created fragment shader
+*	Used to: Link Attached shaders to the program.
+*	Return: void 
 */
 void Shader::linkProgram(GLuint vertexShader, GLuint geometryShader, GLuint fragmentShader)
 {
