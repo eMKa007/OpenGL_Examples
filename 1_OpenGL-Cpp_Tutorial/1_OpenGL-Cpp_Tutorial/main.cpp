@@ -195,9 +195,9 @@ int main( int argc, char* argv[] )
 	 */
 	glBindVertexArray( 0 );
 
-	/* INIT TEXTURE 0 */
-	GLuint texture0 = CreateAndBindTexture( "Images/atom.png" );
-	GLuint texture1 = CreateAndBindTexture( "Images/floor.png" );
+	/* INIT TEXTURE 0 and 1 */
+	Texture texture0("Images/atom.png", GL_TEXTURE_2D, GL_TEXTURE0);
+	Texture texture1("Images/floor.png", GL_TEXTURE_2D, GL_TEXTURE1);
 
 	/* INIT MATRICES
 	 * Adapt local coordinates to global ones.
@@ -264,8 +264,9 @@ int main( int argc, char* argv[] )
 		/* ---------------   START OF CURRENT CORE_PROGRAM --------------- */
 
 			// Update uniforms (variables send to gpu [shader] from cpu)- every change they're updated.
-		core_program.set1i(0, "texture0");		//Send one integer to uniform variable. Zero mean that we'll be using GL_TEXTURE0
-		core_program.set1i(1, "texture1");		//Send one integer to uniform variable. 1 - use GL_TEXTURE1 (another texture unit).
+		core_program.set1i(texture0.getTextureUnit(), "texture0");		//Send one integer to uniform variable. Zero mean that we'll be using GL_TEXTURE0
+		core_program.set1i(texture1.getTextureUnit(), "texture1");		//Send one integer to uniform variable. 1 - use GL_TEXTURE1 (another texture unit).
+		
 		core_program.setMat4fv(ModelMatrix, "ModelMatrix");	// Update uniform ModelMatrix variable
 
 				// Update frame buffers size, and send new Projection Matrix.
@@ -292,11 +293,8 @@ int main( int argc, char* argv[] )
 		core_program.use();
 
 			// Activate Texture
-		glActiveTexture(GL_TEXTURE0);	// Put created texture to first texture unit.
-		glBindTexture(GL_TEXTURE_2D, texture0);	// Bind a texture object to that activated texture unit.
-
-		glActiveTexture(GL_TEXTURE1);	// Use another texture unit
-		glBindTexture(GL_TEXTURE_2D, texture1);	// Bind a texture object to that activated texture unit.
+		texture0.bind();
+		texture1.bind();
 
 			// Bind Vertex Array Object (VAO) to the selected program (shaders).
 		glBindVertexArray( VAO );

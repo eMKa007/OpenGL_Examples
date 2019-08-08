@@ -42,6 +42,6 @@ void main()
 	/* Attenuation */
 
 	fs_color = 
-		texture(texture0, vs_texcoord) * vec4(vs_color,1.f)
+		texture(texture1, vs_texcoord) * vec4(vs_color,1.f)
 		 * ( vec4(ambientLight, 1.f) + vec4(diffuseFinal, 1.f) + vec4(SpecularFinal, 1.f));
 }
