@@ -198,6 +198,9 @@ int main( int argc, char* argv[] )
 	/* INIT TEXTURE 0 and 1 */
 	Texture texture0("Images/atom.png", GL_TEXTURE_2D, GL_TEXTURE0);
 	Texture texture1("Images/floor.png", GL_TEXTURE_2D, GL_TEXTURE1);
+	 
+	/* INIT MATERIAL OBJECTS */
+	Material material0(glm::vec3(0.1f), glm::vec3(1.f), glm::vec3(1.f), texture0.getTextureUnit(), texture1.getTextureUnit());
 
 	/* INIT MATRICES
 	 * Adapt local coordinates to global ones.
@@ -262,11 +265,8 @@ int main( int argc, char* argv[] )
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);		//Clear all three buffers.
 
 		/* ---------------   START OF CURRENT CORE_PROGRAM --------------- */
-
 			// Update uniforms (variables send to gpu [shader] from cpu)- every change they're updated.
-		core_program.set1i(texture0.getTextureUnit(), "texture0");		//Send one integer to uniform variable. Zero mean that we'll be using GL_TEXTURE0
-		core_program.set1i(texture1.getTextureUnit(), "texture1");		//Send one integer to uniform variable. 1 - use GL_TEXTURE1 (another texture unit).
-		
+		material0.sendToShader(core_program);
 		core_program.setMat4fv(ModelMatrix, "ModelMatrix");	// Update uniform ModelMatrix variable
 
 				// Update frame buffers size, and send new Projection Matrix.

@@ -117,7 +117,7 @@ void Texture::loadFromFile(const char* fileName)
 	else
 	{
 		std::cout << "ERROR::TEXTURE::LOAD_FROM_FILE::TEXTURE_LOADING_FAILED" << fileName << "\n";
-	}
+	} 
 
 	glActiveTexture(0);
 	glBindTexture(type, 0);	// Unbound any texture!!! Tidy up purpose. 
