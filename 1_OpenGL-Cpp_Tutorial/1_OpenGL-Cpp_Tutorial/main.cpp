@@ -140,6 +140,9 @@ int main( int argc, char* argv[] )
 	 */
 	Shader core_program("vertex_core.glsl", "fragment_core.glsl");
 
+	/* MODEL MESH */
+	Mesh test(vertices, nrOfVertices, indices, nrOfIndices);
+
 	/* VAO, VBO, EBO */
 	/* GEN VAO AND BIND
 	 * VAO (Vertex Array Object) - big box to hold all model (all triangle)
@@ -302,6 +305,8 @@ int main( int argc, char* argv[] )
 			// Draw
 		//glDrawArrays( GL_TRIANGLES, 0, nrOfVertices);
 		glDrawElements(GL_TRIANGLES, nrOfIndices, GL_UNSIGNED_INT, 0);	// Draw triangles. made of nrOfIndices which are unsigned int, starting from 0 index.
+		
+		test.render( &core_program );
 
 			// End Draw
 		glfwSwapBuffers(window);
