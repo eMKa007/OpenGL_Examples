@@ -21,38 +21,56 @@ in vec3 vs_normal;
 
 out vec4 fs_color;
 
-/* Uniform to send in material struct */
+/* UNIFORMS */
 uniform Material material;
-
 uniform vec3 lightPos0;
 uniform vec3 cameraPosition;
 
-void main()
+/* FUNCTIONS */
+/* Ambient Light - effect like "if there is no light, you can see only ambient light" */
+vec3 calculateAmbient( Material material )
 {
-	//fs_color = vec4(vs_color, 1.f);
-	//fs_color = (texture( texture0, vs_texcoord ) + texture( texture1, vs_texcoord )) * vec4(vs_color, 1.f);
-	
-	/* Ambient Light - effect like "if there is no light, you can see only ambient light" */
-	vec3 ambientLight = material.ambient;
+	return material.ambient;
+}
 
-	/* Diffuse Light 
-	* posToLightDirVec - position to light normalized vector.
-	* diffuse - dot product of given two vectors.
-	*/
+/* Diffuse Light 
+ * posToLightDirVec - position to light normalized vector.
+ * diffuse - dot product of given two vectors.
+ */
+vec3 calculateDiffuse( Material material, vec3 vs_position, vec3 vs_normal, vec3 lightPos0 )
+{
 	vec3 posToLightDirVec = normalize( vs_position - lightPos0 );
 	float diffuse = clamp( dot(posToLightDirVec, vs_normal), 0, 1);
 	vec3 diffuseFinal = material.diffuse * diffuse;
 
-	/* Specular Lightning */
+	return diffuseFinal;
+}
+
+/* Specular Lightning */
+vec3 calculateSpecular( Material material, vec3 vs_position, vec3 vs_normal, vec3 lightPos0, vec3 cameraPosition )
+{
 	vec3 lightToPosDirVec = normalize( lightPos0 - vs_position );
 	vec3 reflectDirVec = normalize( reflect(lightToPosDirVec, normalize(vs_normal) ) );
 	vec3 posToViewDirVec = normalize( vs_position - cameraPosition );
 	float SpecularConstant = pow( max( dot( posToViewDirVec, reflectDirVec), 0), 35);
 	vec3 SpecularFinal = material.specular * SpecularConstant;
 
+	return SpecularFinal;
+}
+
+void main()
+{
+	//fs_color = vec4(vs_color, 1.f);
+	//fs_color = (texture( texture0, vs_texcoord ) + texture( texture1, vs_texcoord )) * vec4(vs_color, 1.f);
+	
+	vec3 ambientFinal = calculateAmbient( material );
+	vec3 diffuseFinal = calculateDiffuse( material, vs_position, vs_normal, lightPos0);
+	vec3 SpecularFinal = calculateSpecular( material, vs_position, vs_normal, lightPos0, cameraPosition);
+
 	/* Attenuation */
 
+	/* FINAL LIGHT */
 	fs_color = 
 		texture(material.diffuseTex, vs_texcoord) * vec4(vs_color,1.f)
-		 * ( vec4(ambientLight, 1.f) + vec4(diffuseFinal, 1.f) + vec4(SpecularFinal, 1.f));
+		 * ( vec4(ambientFinal, 1.f) + vec4(diffuseFinal, 1.f) + vec4(SpecularFinal, 1.f));
 }
