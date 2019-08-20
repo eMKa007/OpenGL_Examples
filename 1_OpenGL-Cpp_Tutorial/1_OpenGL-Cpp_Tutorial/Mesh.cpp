@@ -1,10 +1,15 @@
 #include "Mesh.h"
 
-Mesh::Mesh(Vertex* vertexArray, const unsigned& nrOfVertices, GLuint* indexArray, const unsigned& nrOfIndices)
+Mesh::Mesh(Vertex* vertexArray, const unsigned& nrOfVertices, GLuint* indexArray, const unsigned& nrOfIndices, 
+			glm::vec3 position, glm::vec3 rotation, glm::vec3 scale)
 {
-	this->initVertexData(vertexArray, nrOfVertices, indexArray, nrOfIndices);
-	this->initVAO();
-	this->initModelMatrix();
+	this->position = position;
+	this->rotation = rotation;
+	this->scale = scale;
+
+	this->initVAO(vertexArray, nrOfVertices, indexArray, nrOfIndices);	
+	
+	this->updateModelMatrix();
 }
 
 Mesh::~Mesh()
@@ -14,21 +19,12 @@ Mesh::~Mesh()
 	glDeleteBuffers(1, &this->EBO);
 }
 
-void Mesh::initVertexData(Vertex* vertexArray, const unsigned& nrOfVertices, GLuint* indexArray, const unsigned& nrOfIndices)
+void Mesh::initVAO(Vertex* vertexArray, const unsigned& nrOfVertices, GLuint* indexArray, const unsigned& nrOfIndices)
 {
-	for( int i = 0; i< nrOfVertices; i++)
-	{
-		this->vertices.push_back(vertexArray[i]);
-	}
+	// Set Variables
+	this->nrOfVertices = nrOfVertices;
+	this->nrOfIndices = nrOfIndices;
 
-	for( int i = 0; i< nrOfIndices; i++)
-	{
-		this->indices.push_back(indexArray[i]);
-	}
-}
-
-void Mesh::initVAO()
-{
 	/* VAO, VBO, EBO */
 	/* GEN VAO AND BIND
 	 * VAO (Vertex Array Object) - big box to hold all model (all triangle)
@@ -43,14 +39,14 @@ void Mesh::initVAO()
 		// Make sure that VBO is put in the specific place inside VAO box. Bc can be more than one buffers inside VAO.
 	glBindBuffer( GL_ARRAY_BUFFER, this->VBO );	// Bind VBO as ARRAY_BUFFER inside VAO box. 
 		// Data we'll send to the graphics card. Target is ARRAY_BUFFER, send all vertices (size and pointer to data), STATIC_DRAW (as we'll not change vertices often)
-	glBufferData(GL_ARRAY_BUFFER, this->vertices.size()*sizeof(Vertex), this->vertices.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, this->nrOfVertices*sizeof(Vertex), vertexArray, GL_STATIC_DRAW);
 
 	/* GEN EBO AND BIND AND SEND DATA
 	 * EBO (Element Buffer Object) - is gonna send the indices data of object.
 	 */
 	glGenBuffers(1, &this->EBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->EBO );	// Bind Element Array Buffer (EBO) to specific place inside VAO box.
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, this->indices.size()*sizeof(GLuint), this->indices.data(), GL_STATIC_DRAW);	// Determine indices data to be sent to graphics card.
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, this->nrOfIndices*sizeof(GLuint), indexArray, GL_STATIC_DRAW);	// Determine indices data to be sent to graphics card.
 
 	/* SET VERTEXATTRIBPOINTERS AND ENABLE (INPUT ASSEMBLY)
 	 * Setting specific vertex attributes (position, color and texture coordinate) to determine in what order they are set inside memory.
@@ -82,25 +78,50 @@ void Mesh::initVAO()
 	glBindVertexArray( 0 );
 }
 
-void Mesh::initModelMatrix()
+void Mesh::updateUniforms(Shader* shader)
 {
-	this->position = glm::vec3(0.f);
-	this->rotation = glm::vec3(0.f);
-	this->scale = glm::vec3(1.f);
-	this->ModelMatrix = glm::mat4(1.f);	//Create identity matrix
+	shader->setMat4fv(this->ModelMatrix, "ModelMatrix");
+}
 
-	// Initialize all three modifications with zero values.
+void Mesh::updateModelMatrix()
+{
+	this->ModelMatrix = glm::mat4(1.f);
+
 	this->ModelMatrix = glm::translate(this->ModelMatrix, this->position);	// vec3 - translation vector
 	this->ModelMatrix = glm::rotate(this->ModelMatrix, glm::radians(this->rotation.x), glm::vec3(1.f, 0.f, 0.f));		// Choose angle of rotation and then rotation axis. (X)
 	this->ModelMatrix = glm::rotate(this->ModelMatrix, glm::radians(this->rotation.y), glm::vec3(0.f, 1.f, 0.f));		// Choose angle of rotation and then rotation axis. (Y)
 	this->ModelMatrix = glm::rotate(this->ModelMatrix, glm::radians(this->rotation.z), glm::vec3(0.f, 0.f, 1.f));		// Choose angle of rotation and then rotation axis. (Z)
 	this->ModelMatrix = glm::scale(this->ModelMatrix, this->scale);	// vec3 - scale vector ( 1 means = no scaling )
-
 }
 
-void Mesh::updateUniforms(Shader* shader)
+void Mesh::setPosition(const glm::vec3& position)
 {
-	shader->setMat4fv(this->ModelMatrix, "ModelMatrix");
+	this->position = position;
+}
+
+void Mesh::setRotation(const glm::vec3& rotation)
+{
+	this->rotation = rotation;
+}
+
+void Mesh::setScale(const glm::vec3& scale)
+{
+	this->scale = scale;
+}
+
+void Mesh::move(const glm::vec3& position)
+{
+	this->position += position;
+}
+
+void Mesh::rotate(const glm::vec3& rotation)
+{
+	this->rotation += rotation;
+}
+
+void Mesh::scaleUp(const glm::vec3& scale)
+{
+	this->scale += scale;
 }
 
 void Mesh::update()
@@ -109,6 +130,7 @@ void Mesh::update()
 
 void Mesh::render(Shader* shader)
 {
+	this->updateModelMatrix();
 	this->updateUniforms(shader);
 
 	// Bind Vertex Array Object (VAO) to the selected program (shaders).
@@ -118,5 +140,5 @@ void Mesh::render(Shader* shader)
 
 	// RENDER
 	// Draw triangles. made of nrOfIndices which are unsigned int, starting from 0 index.
-	glDrawElements(GL_TRIANGLES, this->indices.size(), GL_UNSIGNED_INT, 0);	
+	glDrawElements(GL_TRIANGLES, this->nrOfIndices, GL_UNSIGNED_INT, 0);	
 }

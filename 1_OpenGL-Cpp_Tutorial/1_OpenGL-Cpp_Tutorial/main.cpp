@@ -11,46 +11,46 @@ void updateInput( GLFWwindow* window )
 	}
 }
 
-void updateInput( GLFWwindow* window, glm::vec3& position, glm::vec3& rotation, glm::vec3& scale)
+void updateInput( GLFWwindow* window, Mesh& mesh )
 {
 	if( glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS )
 	{
-		position.z += -0.05f;
+		mesh.move(glm::vec3(0.f, 0.f, -0.05f));
 	}
 
 	if( glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS )
 	{
-		position.x += -0.05f;	
+		mesh.move(glm::vec3(-0.05f, 0.f, 0.f));
 	}
 
 	if( glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS )
 	{
-		position.z += 0.05f;	
+		mesh.move(glm::vec3(0.f, 0.f, 0.05f));
 	}
 
 	if( glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS )
 	{
-		position.x += 0.05f;	
+		mesh.move(glm::vec3(0.05f, 0.f, 0.f));
 	}
 
 	if( glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS )
 	{
-		rotation.y += -1.f;	
+		mesh.rotate(glm::vec3(0.f, -1.f, 0.f));
 	}
 
 	if( glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS )
 	{
-		rotation.y += 1.f;	
+		mesh.rotate(glm::vec3(0.f, 1.f, 0.f));
 	}
 
 	if( glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS )
 	{
-		scale += 0.1f;
+		mesh.scaleUp(glm::vec3(0.1f));
 	}
 
 	if( glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS )
 	{
-		scale += -0.1f;
+		mesh.scaleUp(glm::vec3(-0.1f));
 	}
 }
 
@@ -141,62 +141,7 @@ int main( int argc, char* argv[] )
 	Shader core_program("vertex_core.glsl", "fragment_core.glsl");
 
 	/* MODEL MESH */
-	Mesh test(vertices, nrOfVertices, indices, nrOfIndices);
-
-	/* VAO, VBO, EBO */
-	/* GEN VAO AND BIND
-	 * VAO (Vertex Array Object) - big box to hold all model (all triangle)
-	 */
-	GLuint VAO;
-	glCreateVertexArrays(1, &VAO);
-	glBindVertexArray( VAO );	// Activate the box! Anything we'll do to the others buffers it will bind to this VAO. 
-
-	/* GEN VBO AND BIND AND SEND DATA
-	 * VBO (Vertex Buffer Object) - is gonna send the vertex data of object.
-	 */
-	GLuint VBO;
-	glGenBuffers(1, &VBO);
-		// Make sure that VBO is put in the specific place inside VAO box. Bc can be more than one buffers inside VAO.
-	glBindBuffer( GL_ARRAY_BUFFER, VBO );	// Bind VBO as ARRAY_BUFFER inside VAO box. 
-		// Data we'll send to the graphics card. Target is ARRAY_BUFFER, send all vertices (size and pointer to data), STATIC_DRAW (as we'll not change vertices often)
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-	/* GEN EBO AND BIND AND SEND DATA
-	 * EBO (Element Buffer Object) - is gonna send the indices data of object.
-	 */
-	GLuint EBO;
-	glGenBuffers(1, &EBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO );	// Bind Element Array Buffer (EBO) to specific place inside VAO box.
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);	// Determine indices data to be sent to graphics card.
-
-	/* SET VERTEXATTRIBPOINTERS AND ENABLE (INPUT ASSEMBLY)
-	 * Setting specific vertex attributes (position, color and texture coordinate) to determine in what order they are set inside memory.
-	 */
-	// Position Attribute	// Get position (location) of that attribute inside core_program.
-	// 0 - is location inside vertex shader. So we assume to let graphics card to know order of position coordinates inside big table of vertexes.
-	// 3 - is size of single data pack used by location 0 (inside vertex shader). 3 floats.
-	// GL_FLOAT - data type, 
-	// stride = sizeof(Vertex) - how many bytes to move forwart on table to get into next vertex position
-	// offsetof - to store offset from first vertex attribute
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, position));
-	glEnableVertexAttribArray(0);	// Need to be same number (location) as inside vertex shader (used by core_program).
-
-		// Color Attribute
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, color));
-	glEnableVertexAttribArray(1);	// Need to be same number (location) as inside vertex shader (used by core_program).
-
-		// Texture Coordinates Attribute
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, texcoord));
-	glEnableVertexAttribArray(2);	// Need to be same number (location) as inside vertex shader (used by core_program).
-
-		// Normal Vectors Attribute
-	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, normal));
-	glEnableVertexAttribArray(3);
-
-	/* BIND VAO 0 (unbind previously active one)
-	 * Unbind previously active VAO. To make sure no VAO is active now.
-	 */
-	glBindVertexArray( 0 );
+	Mesh test(vertices, nrOfVertices, indices, nrOfIndices, glm::vec3(0.f), glm::vec3(0.f), glm::vec3(1.f));
 
 	/* INIT TEXTURE 0 and 1 */
 	Texture texture0("Images/atom.png", GL_TEXTURE_2D, GL_TEXTURE0);
@@ -208,19 +153,6 @@ int main( int argc, char* argv[] )
 	/* INIT MATRICES
 	 * Adapt local coordinates to global ones.
 	 */
-	glm::vec3 position(0.f);
-	glm::vec3 rotation(0.f);
-	glm::vec3 scale(1.f);
-
-	glm::mat4 ModelMatrix(1.f);	//Create identity matrix
-
-		// Initialize all three modifications with zero values.
-	ModelMatrix = glm::translate(ModelMatrix, position);	// vec3 - translation vector
-	ModelMatrix = glm::rotate(ModelMatrix, glm::radians(rotation.x), glm::vec3(1.f, 0.f, 0.f));		// Choose angle of rotation and then rotation axis. (X)
-	ModelMatrix = glm::rotate(ModelMatrix, glm::radians(rotation.y), glm::vec3(0.f, 1.f, 0.f));		// Choose angle of rotation and then rotation axis. (Y)
-	ModelMatrix = glm::rotate(ModelMatrix, glm::radians(rotation.z), glm::vec3(0.f, 0.f, 1.f));		// Choose angle of rotation and then rotation axis. (Z)
-	ModelMatrix = glm::scale(ModelMatrix, scale);	// vec3 - scale vector ( 1 means = no scaling )
-
 		//Initialize ViewMatrix
 	glm::vec3 worldUp(0.f, 1.f, 0.f);	// Camera coordinates.
 	glm::vec3 camFront(0.f, 0.f, -1.f);
@@ -245,7 +177,6 @@ int main( int argc, char* argv[] )
 	glm::vec3 lightPos0(0.f, 0.f, 1.f);
 
 	   	//Init Uniforms
-	core_program.setMat4fv(ModelMatrix, "ModelMatrix");
 	core_program.setMat4fv(ViewMatrix, "ViewMatrix");
 	core_program.setMat4fv(ProjectionMatrix, "ProjectionMatrix");
 
@@ -257,7 +188,7 @@ int main( int argc, char* argv[] )
 	{
 		/* CHECK INPUT */
 		glfwPollEvents();
-		updateInput( window, position, rotation, scale);
+		updateInput( window, test );
 
 		/* UPDATE */
 		updateInput(window);
@@ -270,8 +201,7 @@ int main( int argc, char* argv[] )
 		/* ---------------   START OF CURRENT CORE_PROGRAM --------------- */
 			// Update uniforms (variables send to gpu [shader] from cpu)- every change they're updated.
 		material0.sendToShader(core_program);
-		core_program.setMat4fv(ModelMatrix, "ModelMatrix");	// Update uniform ModelMatrix variable
-
+		
 				// Update frame buffers size, and send new Projection Matrix.
 		glfwGetFramebufferSize(window, &framebufferWidth, &framebufferHeight);
 		ProjectionMatrix = glm::perspective
@@ -283,15 +213,7 @@ int main( int argc, char* argv[] )
 		);
 		
 		core_program.setMat4fv(ProjectionMatrix, "ProjectionMatrix");
-
-			// Move, rotate & scale
-		ModelMatrix = glm::mat4(1.f);
-		ModelMatrix = glm::translate(ModelMatrix, position);	// vec3 - translation vector
-		ModelMatrix = glm::rotate(ModelMatrix, glm::radians(rotation.x), glm::vec3(1.f, 0.f, 0.f));		// Choose angle of rotation and then rotation axis. (X)
-		ModelMatrix = glm::rotate(ModelMatrix, glm::radians(rotation.y), glm::vec3(0.f, 1.f, 0.f));		// Choose angle of rotation and then rotation axis. (Y)
-		ModelMatrix = glm::rotate(ModelMatrix, glm::radians(rotation.z), glm::vec3(0.f, 0.f, 1.f));		// Choose angle of rotation and then rotation axis. (Z)
-		ModelMatrix = glm::scale(ModelMatrix, scale);	// vec3 - scale vector ( 1 means = no scaling )
-
+		
 			// Use a program (shader) - need to tell what shader we want to use.
 		core_program.use();
 
@@ -299,12 +221,7 @@ int main( int argc, char* argv[] )
 		texture0.bind();
 		texture1.bind();
 
-			// Bind Vertex Array Object (VAO) to the selected program (shaders).
-		glBindVertexArray( VAO );
-		
 			// Draw
-		//glDrawArrays( GL_TRIANGLES, 0, nrOfVertices);
-		glDrawElements(GL_TRIANGLES, nrOfIndices, GL_UNSIGNED_INT, 0);	// Draw triangles. made of nrOfIndices which are unsigned int, starting from 0 index.
 		test.render( &core_program );
 
 			// End Draw
