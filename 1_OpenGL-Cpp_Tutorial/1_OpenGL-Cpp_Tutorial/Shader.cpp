@@ -2,11 +2,15 @@
 
 /*	----------------------------------------------------------
 *	Default class constructor
-*	Parameters: const char* vertexFile - pointer to string consisting path to vertex shader source code
+*	Parameters: const int versionMajor - desired major OpenGL version 
+*			const int versionMinor - desired minor OpenGL version 
+*			const char* vertexFile - pointer to string consisting path to vertex shader source code
 *			const char* fragmentFile - pointer to string consisting path to vertex shader source code
 *			const char* geometryFile - pointer to string consisting path to vertex shader source code ( default value is "", not used )
 */
-Shader::Shader(const char* vertexFile, const char* fragmentFile, const char* geometryFile)
+Shader::Shader(const int versionMajor, const int versionMinor, 
+				const char* vertexFile, const char* fragmentFile, const char* geometryFile) 
+				: versionMajor(versionMajor), versionMinor(versionMinor)
 {
 	GLuint vertexShader = 0;
 	GLuint geometryShader = 0;
@@ -204,7 +208,13 @@ std::string Shader::loadShaderSource(const char* fileName)
 	{
 		std::cout << "ERROR::SHADER::COULD_NOT_OPEN_FILE:  " << fileName << "\n";
 	}
-	
+
+	std::string versionNr = 
+		std::to_string(this->versionMajor) + 
+		std::to_string(this->versionMinor) + 
+		"0";
+
+	src.replace(src.find("#version"), 12, "#version " + versionNr);
 	in_file.close();
 
 	return src;

@@ -54,31 +54,12 @@ void updateInput( GLFWwindow* window, Mesh& mesh )
 	}
 }
 
-/* 
- * Declare vertex positions/color/texture coordinates.
- * Will be used to draw triangle in this case.
- */
-Vertex vertices[] =
-{
-	// Position						// Color					// texcoord				// Normal
-	glm::vec3(-0.5f, 0.5f, 0.f),	glm::vec3(1.f, 0.f, 0.f),	glm::vec2(0.f, 1.f),	glm::vec3(0.f, 0.f, 1.f),	// Vertex 0
-	glm::vec3(-0.5f, -0.5f, 0.f),	glm::vec3(0.f, 1.f, 0.f),	glm::vec2(0.f, 0.f),	glm::vec3(0.f, 0.f, 1.f),	// Vertex 1
-	glm::vec3(0.5f, -0.5f, 0.f),	glm::vec3(0.f, 0.f, 1.f),	glm::vec2(1.f, 0.f),	glm::vec3(0.f, 0.f, 1.f),	// Vertex 2
-	glm::vec3(0.5f, 0.5f, 0.f),		glm::vec3(1.f, 1.f, 0.f),	glm::vec2(1.f, 1.f),	glm::vec3(0.f, 0.f, 1.f)	// Vertex 3
-	
-};
-unsigned nrOfVertices = sizeof(vertices) / sizeof(Vertex);
-
-/* 
- * Determine the sequence of vertices to be drawn.
- */
-GLuint indices[] =
-{
-	0, 1, 2,	// Triangle 1
-	0, 2, 3		// Triangle 2
-};
-unsigned nrOfIndices = sizeof(indices) / sizeof(GLuint);
-
+GLFWwindow* createWindow(
+	const char* title, 
+	const int width, const int height,
+	int& fbwidth, int& fbheight,
+	const int GLmajorVer, const int GLminorVer,
+	bool resizable = false );
 
 int main( int argc, char* argv[] )
 {
@@ -87,29 +68,14 @@ int main( int argc, char* argv[] )
 		return -1;
 
 	/* Create Window */
+	const int GLmajorVersion = 4;
+	const int GLminorVersion = 4;
 	const int WINDOW_WIDTH = 640;
 	const int WINDOW_HEIGHT = 480;
 	int framebufferWidth = 0;
 	int framebufferHeight = 0;
 
-	//Use OpenGL core profile, OpenGL version 4.4
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);
-	glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
-
-	GLFWwindow* window = glfwCreateWindow( WINDOW_WIDTH, WINDOW_HEIGHT, "Main_Window", NULL, NULL);
-
-	// Created frame buffer is the same as window. Created window is not resizeable
-	glfwGetFramebufferSize(window, &framebufferWidth, &framebufferHeight);
-	// Canvas size. From (0,0) to (framebufferWidth, framebufferHeight)
-	//glViewport(0, 0, framebufferWidth, framebufferHeight);
-
-	// Switched to resizeable window
-	glfwSetFramebufferSizeCallback(window, framebuffer_resize_callback);
-		
-	// Important!!! Bind created window to thread. !!!
-	glfwMakeContextCurrent(window);
+	GLFWwindow* window = createWindow("Tutorial_001", WINDOW_WIDTH, WINDOW_HEIGHT, framebufferWidth, framebufferHeight, GLmajorVersion, GLminorVersion, true);
 
 	/* Init GLEW (Needs the window and OpenGL context) */
 	glewExperimental = GL_TRUE;
@@ -138,7 +104,7 @@ int main( int argc, char* argv[] )
 	/* SHADER INIT
 	 * Create and compile shaders.
 	 */
-	Shader core_program("vertex_core.glsl", "fragment_core.glsl");
+	Shader core_program(GLmajorVersion, GLminorVersion,"vertex_core.glsl", "fragment_core.glsl");
 
 	/* MODEL MESH */
 	Quad tempQuad = Quad();
@@ -430,4 +396,29 @@ GLuint CreateAndBindTexture( const char* src_path )
 	glBindTexture(GL_TEXTURE_2D, 0);	// Unbound any texture!!! Tidy up purpose. 
 	SOIL_free_image_data(image);	// Image is loaded, not need to hold its raw data.
 	return texture0;
+}
+
+GLFWwindow* createWindow(const char* title, const int width, const int height, int& fbwidth, int& fbheight,
+	const int GLmajorVer, const int GLminorVer, bool resizable)
+{
+	//Use OpenGL core profile, OpenGL version 4.4
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, GLmajorVer);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, GLminorVer);
+	glfwWindowHint(GLFW_RESIZABLE, resizable);
+
+	GLFWwindow* window = glfwCreateWindow( width, height, title, NULL, NULL);
+
+	// Created frame buffer is the same as window. Created window is not resizeable
+	glfwGetFramebufferSize(window, &fbwidth, &fbheight);
+	// Canvas size. From (0,0) to (framebufferWidth, framebufferHeight)
+	//glViewport(0, 0, framebufferWidth, framebufferHeight);
+
+	// Switched to resizeable window
+	glfwSetFramebufferSizeCallback(window, framebuffer_resize_callback);
+		
+	// Important!!! Bind created window to thread. !!!
+	glfwMakeContextCurrent(window);
+
+	return window;
 }
