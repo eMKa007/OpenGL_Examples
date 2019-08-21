@@ -1,13 +1,29 @@
 #include "Primitives.h"
 
-Primitive::Primitive()
-{
-}
+/* --------------------------------------  PRIMITIVE CLASS  ---------------------------------------------------------*/
 
-Primitive::~Primitive()
-{
-}
+/*	----------------------------------------------------------
+*	Default class constructor
+*	Parameters: none
+*/
+Primitive::Primitive(){}
 
+/*	----------------------------------------------------------
+*	Default class destructor
+*	Parameters: none
+*		Used to: delete previously created primitive instance
+*/
+Primitive::~Primitive(){}
+
+/*	----------------------------------------------------------
+*	Function name: set()
+*	Parameters:	const Vertex* vertices - pointer to array of Vertices
+*				const unsigned nrOfVertices - number of vertices in given array
+				const GLuint* indices - pointer to array of indices
+				const unsigned nrOfIndice - number of indices in given array
+*	Used to: Set class variables: vertices and indices
+*	Return:	void
+*/
 void Primitive::set(const Vertex* vertices, const unsigned nrOfVertices, 
 						const GLuint* indices, const unsigned nrOfIndices)
 {
@@ -21,7 +37,14 @@ void Primitive::set(const Vertex* vertices, const unsigned nrOfVertices,
 		this->indices.push_back(indices[i]);
 	}
 }
-/* --------------------------------------  TRIANGLE CLASS  ---------------------------------------------------------*/
+
+/* --------------------------------------  TRIANGLE CLASS  --------------------------------------------------------- */
+
+/*	----------------------------------------------------------
+*	Default class constructor
+*	Parameters: none
+*		Temporary coordinates are hardcoded inside constructor.
+*/
 Triangle::Triangle()
 {
 	/* 
@@ -51,11 +74,22 @@ Triangle::Triangle()
 	this->set(vertices, nrOfVertices, indices, nrOfIndices);
 }
 
+/*	----------------------------------------------------------
+*	Default class destructor
+*	Parameters: none
+*	Used to: delete previously created class instance
+*/
 Triangle::~Triangle()
 {
 }
 
-/* --------------------------------------  QUAD CLASS  ---------------------------------------------------------*/
+/* --------------------------------------  QUAD CLASS  --------------------------------------------------------- */
+
+/*	----------------------------------------------------------
+*	Default class constructor
+*	Parameters: none
+*		Temporary coordinates are hardcoded inside constructor.
+*/
 Quad::Quad()
 {
 	/* 
@@ -86,6 +120,11 @@ Quad::Quad()
 	this->set(vertices, nrOfVertices, indices, nrOfIndices);
 }
 
+/*	----------------------------------------------------------
+*	Default class destructor
+*	Parameters: none
+*	Used to: delete previously created class instance
+*/
 Quad::~Quad()
 {
 

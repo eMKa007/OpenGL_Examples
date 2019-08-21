@@ -1,5 +1,15 @@
 #include "Mesh.h"
 
+/*	----------------------------------------------------------
+*	Class constructor
+*	Parameters: Vertex* vertexArray - pointer to array of Vertices
+*				const unsigned nrOfVertices - number of vertices in given array
+				GLuint* indices - pointer to array of indices
+				const unsigned nrOfIndice - number of indices in given array 
+				glm::vec3 position - vector3 containing mesh position (X/Y/Z)
+				glm::vec3 rotation - vector3 containing mesh rotation (Yaw/Pitch/Roll)
+				glm::vec3 scale - vector3 containing scale values (X/Y/Z)
+*/
 Mesh::Mesh(Vertex* vertexArray, const unsigned& nrOfVertices, GLuint* indexArray, const unsigned& nrOfIndices, 
 			glm::vec3 position, glm::vec3 rotation, glm::vec3 scale)
 {
@@ -12,6 +22,13 @@ Mesh::Mesh(Vertex* vertexArray, const unsigned& nrOfVertices, GLuint* indexArray
 	this->updateModelMatrix();
 }
 
+/*	----------------------------------------------------------
+*	Class constructor
+*	Parameters: Primitive* primitive - pointer to primitive class instance containing vertices and indices of mesh
+				glm::vec3 position - vector3 containing mesh position (X/Y/Z)
+				glm::vec3 rotation - vector3 containing mesh rotation (Yaw/Pitch/Roll)
+				glm::vec3 scale - vector3 containing scale values (X/Y/Z)
+*/
 Mesh::Mesh(Primitive* primitive, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale)
 {
 	this->position = position;
@@ -23,6 +40,11 @@ Mesh::Mesh(Primitive* primitive, glm::vec3 position, glm::vec3 rotation, glm::ve
 	this->updateModelMatrix();
 }
 
+/*	----------------------------------------------------------
+*	Default class destructor
+*	Parameters: none
+*		Used to: delete previously created mesh instance
+*/
 Mesh::~Mesh()
 {
 	glDeleteVertexArrays(1, &this->VAO);
@@ -30,6 +52,15 @@ Mesh::~Mesh()
 	glDeleteBuffers(1, &this->EBO);
 }
 
+/*	----------------------------------------------------------
+*	Function name: initVAO()
+*	Parameters:	Vertex* vertexArray - pointer to array of Vertices
+*				const unsigned& nrOfVertices - number of vertices in given array
+				GLuint* indices - pointer to array of indices
+				const unsigned& nrOfIndice - number of indices in given array
+*	Used to: Initialize class variables and buffers ( VAO, VBO, EBO ) for given arrays.
+*	Return:	void
+*/
 void Mesh::initVAO(Vertex* vertexArray, const unsigned& nrOfVertices, GLuint* indexArray, const unsigned& nrOfIndices)
 {
 	// Set Variables
@@ -89,6 +120,12 @@ void Mesh::initVAO(Vertex* vertexArray, const unsigned& nrOfVertices, GLuint* in
 	glBindVertexArray( 0 );
 }
 
+/*	----------------------------------------------------------
+*	Function name: initVAO()
+*	Parameters:	Primitive* primitive - pointer to primitive class instance
+*	Used to: Initialize class variables and buffers ( VAO, VBO, EBO ) for given primitive.
+*	Return:	void
+*/
 void Mesh::initVAO(Primitive* primitive)
 {
 	// Set Variables
@@ -148,11 +185,23 @@ void Mesh::initVAO(Primitive* primitive)
 	glBindVertexArray( 0 );
 }
 
+/*	----------------------------------------------------------
+*	Function name: updateUniforms()
+*	Parameters:	Shader* shader - pointer to created gpu program
+*	Used to: Send to shader Model Matrix which is stored inside class instance.
+*	Return:	void
+*/
 void Mesh::updateUniforms(Shader* shader)
 {
 	shader->setMat4fv(this->ModelMatrix, "ModelMatrix");
 }
 
+/*	----------------------------------------------------------
+*	Function name: updateModelMatrix()
+*	Parameters:	none
+*	Used to: Based on position, rotation and scale vectors new Model Matrix is calculated.
+*	Return:	void
+*/
 void Mesh::updateModelMatrix()
 {
 	this->ModelMatrix = glm::mat4(1.f);
@@ -164,40 +213,86 @@ void Mesh::updateModelMatrix()
 	this->ModelMatrix = glm::scale(this->ModelMatrix, this->scale);	// vec3 - scale vector ( 1 means = no scaling )
 }
 
+/*	----------------------------------------------------------
+*	Function name: setPosition()
+*	Parameters:	const glm::vec3& position - vector3 with coordinates of new position
+*	Used to: Set new position of mesh.
+*	Return:	void
+*/
 void Mesh::setPosition(const glm::vec3& position)
 {
 	this->position = position;
 }
 
+/*	----------------------------------------------------------
+*	Function name: setRotation()
+*	Parameters:	const glm::vec3& rotation - vector3 with new yaw/pitch/roll values
+*	Used to: Set new rotation of mesh.
+*	Return:	void
+*/
 void Mesh::setRotation(const glm::vec3& rotation)
 {
 	this->rotation = rotation;
 }
 
+/*	----------------------------------------------------------
+*	Function name: scale()
+*	Parameters:	const glm::vec3& scale - vector3 with new scale values
+*	Used to: Set new scale factor of mesh.
+*	Return:	void
+*/
 void Mesh::setScale(const glm::vec3& scale)
 {
 	this->scale = scale;
 }
 
+/*	----------------------------------------------------------
+*	Function name: move()
+*	Parameters:	const glm::vec3& position - vector3 with coordinates to be added to current position
+*	Used to: Move current mesh position by given vector.
+*	Return:	void
+*/
 void Mesh::move(const glm::vec3& position)
 {
 	this->position += position;
 }
 
+/*	----------------------------------------------------------
+*	Function name: rotate()
+*	Parameters:	const glm::vec3& rotation - vector3 values to be added to current mesh rotation
+*	Used to: Rotate mesh by given rotation values
+*	Return:	void
+*/
 void Mesh::rotate(const glm::vec3& rotation)
 {
 	this->rotation += rotation;
 }
 
+/*	----------------------------------------------------------
+*	Function name: scaleUp()
+*	Parameters:	const glm::vec3& scale - vector3 with with scale values to be added/subtracted to current mesh scale
+*	Used to: Add/Subtract scale values by given vector.
+*	Return:	void
+*/
 void Mesh::scaleUp(const glm::vec3& scale)
 {
 	this->scale += scale;
 }
 
-void Mesh::update()
-{
-}
+/*	----------------------------------------------------------
+*	Function name: update()
+*	Parameters:	none
+*	Used to: 
+*	Return:	void
+*/
+void Mesh::update(){ }
 
+/*	----------------------------------------------------------
+*	Function name: render()
+*	Parameters:	Shader* shader - pointer to currently in use program
+*	Used to: Draw mesh with given shader.
+*	Return:	void
+*/
 void Mesh::render(Shader* shader)
 {
 	this->updateModelMatrix();
