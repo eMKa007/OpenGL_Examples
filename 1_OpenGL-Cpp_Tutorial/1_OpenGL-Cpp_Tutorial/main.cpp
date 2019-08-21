@@ -141,7 +141,8 @@ int main( int argc, char* argv[] )
 	Shader core_program("vertex_core.glsl", "fragment_core.glsl");
 
 	/* MODEL MESH */
-	Mesh test(vertices, nrOfVertices, indices, nrOfIndices, glm::vec3(0.f), glm::vec3(0.f), glm::vec3(1.f));
+	Quad tempQuad = Quad();
+	Mesh test(&tempQuad, glm::vec3(0.f), glm::vec3(0.f), glm::vec3(1.f));
 
 	/* INIT TEXTURE 0 and 1 */
 	Texture texture0("Images/atom.png", GL_TEXTURE_2D, GL_TEXTURE0);

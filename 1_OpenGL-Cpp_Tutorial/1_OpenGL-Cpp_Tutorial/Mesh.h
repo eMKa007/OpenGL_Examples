@@ -7,6 +7,7 @@
 #include "Shader.h"
 #include "Texture.h"
 #include "Material.h"
+#include "Primitives.h"
 
 class Mesh
 {
@@ -24,12 +25,14 @@ private:
 	glm::mat4 ModelMatrix;
 
 	void initVAO(Vertex* vertexArray, const unsigned& nrOfVertices, GLuint* indexArray, const unsigned& nrOfIndices);
+	void initVAO(Primitive* primitive);
 	void updateUniforms( Shader* shader );
 	void updateModelMatrix();
 
 public:
 	Mesh(Vertex* vertexArray, const unsigned& nrOfVertices, GLuint* indexArray,	const unsigned& nrOfIndices, 
 			glm::vec3 position = glm::vec3(0.f), glm::vec3 rotation = glm::vec3(0.f), glm::vec3 scale = glm::vec3(1.f));
+	Mesh(Primitive* primitive, glm::vec3 position = glm::vec3(0.f), glm::vec3 rotation = glm::vec3(0.f), glm::vec3 scale = glm::vec3(1.f));
 	~Mesh();
 
 	void update();
