@@ -1,6 +1,5 @@
-#include "libs.h"
+#include "game.h"
 
-void framebuffer_resize_callback(GLFWwindow* window, int framebufferWidth, int framebufferHeight );
 bool loadShaders( GLuint& program );
 GLuint CreateAndBindTexture( const char* src_path );
 void updateInput( GLFWwindow* window )
@@ -212,19 +211,6 @@ int main( int argc, char* argv[] )
 }
 
 /*	----------------------------------------------------------
-*	Function name:	framebuffer_resize_callback()
-*	Parameters:	GLFWwindow* window - window to be used in resize
-*			int framebufferWidth - new frame buffer width
-*			int framebufferHeight - new frame buffer height
-*	Used to:		Set new size of viewport baser on given width and height values.
-*	Return:		none
-*/
-void framebuffer_resize_callback(GLFWwindow* window, int framebufferWidth, int framebufferHeight )
-{
-	glViewport(0, 0, framebufferWidth, framebufferHeight);
-}
-
-/*	----------------------------------------------------------
 *	Function name:	loadShaders()
 *	Parameters:	GLuint& program - reference to program which shaders need to be linked in.
 *	Used to:		Load and compile vertex and fragment shader.
@@ -415,7 +401,7 @@ GLFWwindow* createWindow(const char* title, const int width, const int height, i
 	//glViewport(0, 0, framebufferWidth, framebufferHeight);
 
 	// Switched to resizeable window
-	glfwSetFramebufferSizeCallback(window, framebuffer_resize_callback);
+	glfwSetFramebufferSizeCallback(window, Game::framebuffer_resize_callback);
 		
 	// Important!!! Bind created window to thread. !!!
 	glfwMakeContextCurrent(window);
