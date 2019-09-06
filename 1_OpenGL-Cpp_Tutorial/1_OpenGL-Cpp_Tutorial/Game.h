@@ -22,6 +22,7 @@ private:
 	void initGLFW();
 	void initWindow( const char* title, bool resizable );
 	void initGLEW(); //AFTER CONTEXT CREATION
+	void initOpenGLOptions();
 
 public:
 	/* CONSTRUCTORS/DESTRUCTORS */
@@ -32,8 +33,10 @@ public:
 	virtual ~Game();
 	
 	/* ACCESSORS */
+	int getWindodShouldClose();
 
 	/* MODIFIERS */
+	void setWindowShouldClose();
 
 	/* FUNCTIONS */
 	void update();

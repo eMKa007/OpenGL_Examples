@@ -1,6 +1,17 @@
 #include "Game.h"
 
 
+void Game::initGLFW()
+{
+	/* Init GLFW */
+	if( glfwInit() == GLFW_FALSE )
+	{
+		std::cout << "ERROR::GLFW_INIT_FAILED  \n";
+		glfwTerminate();
+	}
+		
+}
+
 void Game::initWindow( const char* title, bool resizable)
 {
 	//Use OpenGL core profile, OpenGL version 4.4
@@ -9,20 +20,55 @@ void Game::initWindow( const char* title, bool resizable)
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, this->GL_VERSION_MINOR);
 	glfwWindowHint(GLFW_RESIZABLE, resizable);
 
-	GLFWwindow* window = glfwCreateWindow( this->WINDOW_WIDTH, this->WINDOW_HEIGHT, title, NULL, NULL);
+	this->window = glfwCreateWindow( this->WINDOW_WIDTH, this->WINDOW_HEIGHT, title, NULL, NULL);
 
+	if( this->window == nullptr)
+	{
+		std::cout << "ERROR::GLFW_WINDOW_INIT_FAILED  \n";
+		glfwTerminate();
+	}
 	// Created frame buffer is the same as window. Created window is not resizeable
-	glfwGetFramebufferSize(window, &this->framebufferWidth, &this->framebufferHeight);
+	glfwGetFramebufferSize(this->window, &this->framebufferWidth, &this->framebufferHeight);
 	// Canvas size. From (0,0) to (framebufferWidth, framebufferHeight)
 	//glViewport(0, 0, framebufferWidth, framebufferHeight);
 
 	// Switched to resizeable window
-	glfwSetFramebufferSizeCallback(window, framebuffer_resize_callback);
+	glfwSetFramebufferSizeCallback(this->window, Game::framebuffer_resize_callback);
 		
 	// Important!!! Bind created window to thread. !!!
-	glfwMakeContextCurrent(window);
+	glfwMakeContextCurrent(this->window);
 
-	this->window = window;
+}
+
+void Game::initGLEW()
+{
+	/* Init GLEW (Needs the window and OpenGL context) */
+	glewExperimental = GL_TRUE;
+
+	//Error
+	if( glewInit() != GLEW_OK )
+	{
+		std::cout << "ERROR::GAME::GLEW_INIT_FAILED" << std::endl;
+		glfwTerminate();
+	}
+}
+
+void Game::initOpenGLOptions()
+{
+	/* OPENGL OPTIONS  
+	 * OpenGL is a state machine. Before we draw something, we want to enable some options.
+	 */
+	glEnable(GL_DEPTH_TEST); // Lock Z-coordinate. Impossible to use Z-values.
+
+	glEnable(GL_CULL_FACE); // Remove (do not draw) object that are not seen. (Face culling)
+	glCullFace(GL_BACK);	// Back side of object will not be drawn
+	glFrontFace(GL_CCW);	// Front face- which will be drawn - is that with counter-clock wise vertex order. 
+
+	glPolygonMode( GL_FRONT_AND_BACK, GL_FILL); // Fill drawn shape with full color. Could be GL_LINE etc.
+
+	glEnable(GL_BLEND); // Enable color blending.
+	glBlendFunc(GL_SRC0_ALPHA, GL_ONE_MINUS_SRC_ALPHA); // Color blending function. 
+
 }
 
 /* CONSTRUCTORS/DESTRUCTORS */
@@ -38,20 +84,44 @@ Game::Game(const char* title, const int WINDOW_WIDTH, const int WINDOW_HEIGHT,
 	this->framebufferWidth = WINDOW_WIDTH;
 	this->framebufferHeight = WINDOW_HEIGHT;
 
+	this->initGLFW();
 	this->initWindow(title, resizable);
+	this->initGLEW();
+	this->initOpenGLOptions();
 }
-
 
 Game::~Game()
 {
+	glfwDestroyWindow(this->window);
+	glfwTerminate();
+}
+
+int Game::getWindodShouldClose()
+{
+	return glfwWindowShouldClose(this->window);
+}
+
+void Game::setWindowShouldClose()
+{
+	glfwSetWindowShouldClose(this->window, GLFW_TRUE);
+}
+
+void Game::update()
+{
+	
+}
+
+void Game::render()
+{
+
 }
 
 
 /*	----------------------------------------------------------
 *	Function name:	framebuffer_resize_callback()
 *	Parameters:	GLFWwindow* window - window to be used in resize
-*			int framebufferWidth - new frame buffer width
-*			int framebufferHeight - new frame buffer height
+*			int fbW - new frame buffer width
+*			int fbH - new frame buffer height
 *	Used to:		Set new size of viewport baser on given width and height values.
 *	Return:		none
 */
