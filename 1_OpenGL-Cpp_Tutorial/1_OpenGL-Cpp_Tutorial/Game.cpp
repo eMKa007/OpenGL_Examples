@@ -71,6 +71,20 @@ void Game::initOpenGLOptions()
 
 }
 
+void Game::initMatrices()
+{
+	this->ViewMatrix = glm::mat4(1.f);
+	this->ViewMatrix = glm::lookAt(this->camPosition, this->camPosition + this->camFront, this->worldUp);
+
+	this->ProjectionMatrix = glm::mat4(1.f);
+	ProjectionMatrix = glm::perspective(
+		glm::radians(this->fov),
+		static_cast<float>(this->framebufferWidth) / static_cast<float>(this->framebufferHeight), 
+		this->nearPlane, 
+		this->farPlane
+	);
+}
+
 /* CONSTRUCTORS/DESTRUCTORS */
 Game::Game(const char* title, const int WINDOW_WIDTH, const int WINDOW_HEIGHT,
 	const int GL_VERSION_MAJOR, const int GL_VERSION_MINOR, bool resizable 
@@ -84,10 +98,19 @@ Game::Game(const char* title, const int WINDOW_WIDTH, const int WINDOW_HEIGHT,
 	this->framebufferWidth = WINDOW_WIDTH;
 	this->framebufferHeight = WINDOW_HEIGHT;
 
+	this->worldUp = glm::vec3(0.f, 1.f, 0.f);
+	this->camFront = glm::vec3(0.f, 0.f, -1.f);
+	this->camPosition = glm::vec3(0.f, 0.f, 1.f);
+
+	this->fov = 90.f;	// Field of view. 90 degrees.
+	this->nearPlane = 0.1f;
+	this->farPlane = 1000.f;
+
 	this->initGLFW();
 	this->initWindow(title, resizable);
 	this->initGLEW();
 	this->initOpenGLOptions();
+	this->initMatrices();
 }
 
 Game::~Game()
@@ -108,12 +131,37 @@ void Game::setWindowShouldClose()
 
 void Game::update()
 {
-	
+	/* CHECK INPUT */
+	glfwPollEvents();
 }
 
 void Game::render()
 {
+	/* DRAW */
+		// Clear
+	glClearColor(0.f, 0.f, 0.f, 1.f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);		//Clear all three buffers.
 
+	/* ---------------   START OF CURRENT CORE_PROGRAM --------------- */
+		// Update uniforms (variables send to gpu [shader] from cpu)- every change they're updated.
+	
+		// Update frame buffers size, and send new Projection Matrix.
+	
+		// Use a program (shader) - need to tell what shader we want to use.
+
+		// Activate Texture
+
+		// Draw
+
+		// End Draw
+
+		// Unbind the current program | Reset 
+	glBindVertexArray(0);
+	glUseProgram(0);
+	glActiveTexture(0);
+	glBindTexture(GL_TEXTURE_2D,0);
+
+	/* ---------------   END OF CURRENT CORE_PROGRAM --------------- */
 }
 
 
