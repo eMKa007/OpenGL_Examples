@@ -6,13 +6,12 @@
 *	Parameters: const char* fileName - path to image source
 *			GLenum type - type of desired texture
 */
-Texture::Texture(const char* fileName, GLenum type, GLint texture_unit)
+Texture::Texture(const char* fileName, GLenum type)
 {
 	/* INIT TEXTURE
 	 * Load an input image using SOIL library. Generate and bind texture object.
 	 */
 	this->type = type;
-	this->textureUnit = texture_unit;
 
 	unsigned char* image = SOIL_load_image( fileName, &this->width, &this->height, NULL, SOIL_LOAD_RGBA);
 
@@ -60,9 +59,9 @@ Texture::~Texture()
 *	Used to: Bind texture to specified texture unit and type for further work.
 *	Return:	void
 */
-void Texture::bind()
+void Texture::bind(const GLint texture_unit)
 {
-	glActiveTexture(this->textureUnit);	// Put created texture to selected texture unit.
+	glActiveTexture(GL_TEXTURE0+texture_unit);	// Put created texture to selected texture unit.
 	glBindTexture(this->type, this->id);		// Bind a texture object to that activated texture unit.
 }
 

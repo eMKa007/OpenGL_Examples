@@ -17,16 +17,14 @@ private:
 	int width;
 	int height;
 	unsigned int type;
-	GLint textureUnit;
 
 public:
 	/* ------ CONSTRUCTORS/DESTRUCTORS ------ */
-	Texture(const char* fileName, GLenum type,  GLint texture_unit);
+	Texture(const char* fileName, GLenum type);
 	~Texture();
 
 	GLuint getID() const { return this->id; }
-	GLint getTextureUnit() const { return this->textureUnit-GL_TEXTURE0; }
-	void bind();
+	void bind(const GLint texture_unit);
 	void unbind();
 	void loadFromFile( const char* fileName );
 };
