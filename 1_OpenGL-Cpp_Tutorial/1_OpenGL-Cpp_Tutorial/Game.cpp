@@ -85,6 +85,75 @@ void Game::initMatrices()
 	);
 }
 
+void Game::initShaders()
+{
+	/* SHADER INIT
+	 * Create and compile shaders.
+	 */
+	this->shaders.push_back(
+		new Shader(this->GL_VERSION_MAJOR, this->GL_VERSION_MINOR, 
+			"vertex_core.glsl", 
+			"fragment_core.glsl")
+	);
+}
+
+void Game::initTextures()
+{
+	/* INIT TEXTURE 0 */
+	this->textures.push_back(
+		new Texture("Images/atom.png", 
+			GL_TEXTURE_2D, 
+			GL_TEXTURE0)
+	);
+
+	/* INIT TEXTURE 1 */
+	this->textures.push_back(
+		new Texture("Images/floor.png", 
+			GL_TEXTURE_2D, 
+			GL_TEXTURE1)
+	);
+}
+
+void Game::initMaterials()
+{
+	/* INIT MATERIAL OBJECTS */
+	this->materials.push_back( 
+		new Material (glm::vec3(0.1f), 
+			glm::vec3(1.f), 
+			glm::vec3(1.f), 
+			this->textures[TEX_ATOM0]->getTextureUnit(), 
+			this->textures[TEX_CONTAINER1]->getTextureUnit())
+	);
+
+}
+
+void Game::initMeshes()
+{
+	/* MODEL MESH */
+	this->meshes.push_back( 
+		new Mesh( &Quad(),
+		glm::vec3(0.f),
+		glm::vec3(0.f),
+		glm::vec3(1.f) )
+	);
+}
+
+void Game::initLights()
+{
+	// LIGHTS
+	this->lights.push_back( new glm::vec3 (0.f, 0.f, 1.f) );
+}
+
+void Game::initUniforms()
+{
+	//Init Uniforms
+	this->shaders[SHADER_CORE_PROGRAM]->setMat4fv(this->ViewMatrix, "ViewMatrix");
+	this->shaders[SHADER_CORE_PROGRAM]->setMat4fv(this->ProjectionMatrix, "ProjectionMatrix");
+
+	this->shaders[SHADER_CORE_PROGRAM]->setVec3f(*this->lights[0], "lightPos0");
+	this->shaders[SHADER_CORE_PROGRAM]->setVec3f(this->camPosition, "cameraPosition");
+}
+
 /* CONSTRUCTORS/DESTRUCTORS */
 Game::Game(const char* title, const int WINDOW_WIDTH, const int WINDOW_HEIGHT,
 	const int GL_VERSION_MAJOR, const int GL_VERSION_MINOR, bool resizable 
@@ -111,12 +180,33 @@ Game::Game(const char* title, const int WINDOW_WIDTH, const int WINDOW_HEIGHT,
 	this->initGLEW();
 	this->initOpenGLOptions();
 	this->initMatrices();
+	this->initShaders();
+	this->initTextures();
+	this->initMaterials();
+	this->initMeshes();
+	this->initLights();
+	this->initUniforms();
 }
 
 Game::~Game()
 {
 	glfwDestroyWindow(this->window);
 	glfwTerminate();
+
+	for( size_t i = 0; i < this->shaders.size(); i++)
+		delete this->shaders[i];
+
+	for( size_t i = 0; i < this->textures.size(); i++)
+		delete this->textures[i];
+
+	for( size_t i = 0; i < this->meshes.size(); i++)
+		delete this->meshes[i];
+
+	for( size_t i = 0; i < this->materials.size(); i++)
+		delete this->materials[i];
+
+	for( size_t i = 0; i < this->lights.size(); i++)
+		delete this->lights[i];
 }
 
 int Game::getWindodShouldClose()
@@ -137,6 +227,9 @@ void Game::update()
 
 void Game::render()
 {
+	/* UPDATE */
+	//updateInput(window);
+
 	/* DRAW */
 		// Clear
 	glClearColor(0.f, 0.f, 0.f, 1.f);
@@ -144,18 +237,38 @@ void Game::render()
 
 	/* ---------------   START OF CURRENT CORE_PROGRAM --------------- */
 		// Update uniforms (variables send to gpu [shader] from cpu)- every change they're updated.
+	this->shaders[SHADER_CORE_PROGRAM]->set1i( this->textures[TEX_ATOM0]->getTextureUnit(), "texture0");
+	this->shaders[SHADER_CORE_PROGRAM]->set1i( this->textures[TEX_CONTAINER1]->getTextureUnit(), "texture1");
+	this->materials[MAT_1]->sendToShader(*this->shaders[SHADER_CORE_PROGRAM]);
 	
-		// Update frame buffers size, and send new Projection Matrix.
+			// Update frame buffers size, and send new Projection Matrix.
+	glfwGetFramebufferSize(this->window, &this->framebufferWidth, &this->framebufferHeight);
+	
+	ProjectionMatrix = glm::perspective
+	(
+		glm::radians(fov), 
+		static_cast<float>(framebufferWidth)/framebufferHeight, 
+		nearPlane, 
+		farPlane
+	);
+	
+	this->shaders[SHADER_CORE_PROGRAM]->setMat4fv(this->ProjectionMatrix, "ProjectionMatrix");
 	
 		// Use a program (shader) - need to tell what shader we want to use.
+	this->shaders[SHADER_CORE_PROGRAM]->use();
 
 		// Activate Texture
+	this->textures[TEX_ATOM0]->bind();
+	this->textures[TEX_CONTAINER1]->bind();
 
 		// Draw
+	this->meshes[MESH_QUAD]->render( this->shaders[SHADER_CORE_PROGRAM] );
 
 		// End Draw
+	glfwSwapBuffers(window);
+	glFlush();
 
-		// Unbind the current program | Reset 
+		// Unbind the current program
 	glBindVertexArray(0);
 	glUseProgram(0);
 	glActiveTexture(0);

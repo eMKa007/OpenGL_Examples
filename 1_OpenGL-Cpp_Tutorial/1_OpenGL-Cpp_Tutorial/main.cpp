@@ -62,150 +62,19 @@ GLFWwindow* createWindow(
 
 int main( int argc, char* argv[] )
 {
-	/* Init GLFW */
-	if( !glfwInit() ) 
-		return -1;
-
-	/* Create Window */
-	const int GLmajorVersion = 4;
-	const int GLminorVersion = 4;
-	const int WINDOW_WIDTH = 640;
-	const int WINDOW_HEIGHT = 480;
-	int framebufferWidth = 0;
-	int framebufferHeight = 0;
-
-	GLFWwindow* window = createWindow("Tutorial_001", WINDOW_WIDTH, WINDOW_HEIGHT, framebufferWidth, framebufferHeight, GLmajorVersion, GLminorVersion, true);
-
-	/* Init GLEW (Needs the window and OpenGL context) */
-	glewExperimental = GL_TRUE;
-
-	//Error
-	if( glewInit() != GLEW_OK )
-	{
-		std::cout << "ERROR::MAIN.CPP::GLEW_INIT_FAILED" << std::endl;
-		glfwTerminate();
-	}
-
-	/* OPENGL OPTIONS  
-	 * OpenGL is a state machine. Before we draw something, we want to enable some options.
-	 */
-	glEnable(GL_DEPTH_TEST); // Lock Z-coordinate. Impossible to use Z-values.
-
-	glEnable(GL_CULL_FACE); // Remove (do not draw) object that are not seen. (Face culling)
-	glCullFace(GL_BACK);	// Back side of object will not be drawn
-	glFrontFace(GL_CCW);	// Front face- which will be drawn - is that with counter-clock wise vertex order. 
-
-	glPolygonMode( GL_FRONT_AND_BACK, GL_FILL); // Fill drawn shape with full color. Could be GL_LINE etc.
-
-	glEnable(GL_BLEND); // Enable color blending.
-	glBlendFunc(GL_SRC0_ALPHA, GL_ONE_MINUS_SRC_ALPHA); // Color blending function. 
-
-	/* SHADER INIT
-	 * Create and compile shaders.
-	 */
-	Shader core_program(GLmajorVersion, GLminorVersion,"vertex_core.glsl", "fragment_core.glsl");
-
-	/* MODEL MESH */
-	Quad tempQuad = Quad();
-	Mesh test(&tempQuad, glm::vec3(0.f), glm::vec3(0.f), glm::vec3(1.f));
-
-	/* INIT TEXTURE 0 and 1 */
-	Texture texture0("Images/atom.png", GL_TEXTURE_2D, GL_TEXTURE0);
-	Texture texture1("Images/floor.png", GL_TEXTURE_2D, GL_TEXTURE1);
-	 
-	/* INIT MATERIAL OBJECTS */
-	Material material0(glm::vec3(0.1f), glm::vec3(1.f), glm::vec3(1.f), texture0.getTextureUnit(), texture1.getTextureUnit());
-
-	/* INIT MATRICES
-	 * Adapt local coordinates to global ones.
-	 */
-		//Initialize ViewMatrix
-	glm::vec3 worldUp(0.f, 1.f, 0.f);	// Camera coordinates.
-	glm::vec3 camFront(0.f, 0.f, -1.f);
-	glm::vec3 camPosition(0.f, 0.f, 1.f);
-	glm::mat4 ViewMatrix(1.f);
-	ViewMatrix = glm::lookAt(camPosition, camPosition + camFront, worldUp);
-
-		// Initialize Perspective matrix
-	float fov = 90.f;	// Field of view. 90 degrees.
-	float nearPlane = 0.1f;
-	float farPlane = 1000.f;
-	glm::mat4 ProjectionMatrix(1.f);
-
-	ProjectionMatrix = glm::perspective(
-		glm::radians(fov),
-		static_cast<float>(framebufferWidth) / static_cast<float>(framebufferHeight), 
-		nearPlane, 
-		farPlane
-	);
-
-		// LIGHTS
-	glm::vec3 lightPos0(0.f, 0.f, 1.f);
-
-	   	//Init Uniforms
-	core_program.setMat4fv(ViewMatrix, "ViewMatrix");
-	core_program.setMat4fv(ProjectionMatrix, "ProjectionMatrix");
-
-	core_program.setVec3f(lightPos0, "lightPos0");
-	core_program.setVec3f(camPosition, "cameraPosition");
+	Game game("Tutorial_001", 
+		640,
+		480,
+		4,
+		4,
+		false);
 
 	/* Main Loop */
-	while( !glfwWindowShouldClose(window) )
+	while( !game.getWindodShouldClose() )
 	{
-		/* CHECK INPUT */
-		glfwPollEvents();
-		updateInput( window, test );
-
-		/* UPDATE */
-		updateInput(window);
-
-		/* DRAW */
-			// Clear
-		glClearColor(0.f, 0.f, 0.f, 1.f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);		//Clear all three buffers.
-
-		/* ---------------   START OF CURRENT CORE_PROGRAM --------------- */
-			// Update uniforms (variables send to gpu [shader] from cpu)- every change they're updated.
-		material0.sendToShader(core_program);
-		
-				// Update frame buffers size, and send new Projection Matrix.
-		glfwGetFramebufferSize(window, &framebufferWidth, &framebufferHeight);
-		ProjectionMatrix = glm::perspective
-		(
-			glm::radians(fov), 
-			static_cast<float>(framebufferWidth)/framebufferHeight, 
-			nearPlane, 
-			farPlane
-		);
-		
-		core_program.setMat4fv(ProjectionMatrix, "ProjectionMatrix");
-		
-			// Use a program (shader) - need to tell what shader we want to use.
-		core_program.use();
-
-			// Activate Texture
-		texture0.bind();
-		texture1.bind();
-
-			// Draw
-		test.render( &core_program );
-
-			// End Draw
-		glfwSwapBuffers(window);
-		glFlush();
-
-			// Unbind the current program
-		glBindVertexArray(0);
-		glUseProgram(0);
-		glActiveTexture(0);
-		glBindTexture(GL_TEXTURE_2D,0);
-
-		/* ---------------   END OF CURRENT CORE_PROGRAM --------------- */
+		game.update();
+		game.render();
 	}
-
-	/* End of program */
-	glfwDestroyWindow( window );
-	glfwTerminate();
 
 	return 0;
 }

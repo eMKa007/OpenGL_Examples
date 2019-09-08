@@ -2,6 +2,28 @@
 
 #include "libs.h"
 
+/* ENUMERATIONS */
+enum shaders_enum
+{
+	SHADER_CORE_PROGRAM = 0
+};
+
+enum textureUnit_enum
+{
+	TEX_ATOM0 = 0,
+	TEX_CONTAINER1
+};
+
+enum material_enum
+{
+	MAT_1 = 0
+};
+
+enum mesh_enum
+{
+	MESH_QUAD = 0
+};
+
 class Game
 {
 private:
@@ -27,6 +49,21 @@ private:
 	float nearPlane;
 	float farPlane;
 
+	// Shaders
+	std::vector<Shader*> shaders;
+
+	// Textures
+	std::vector<Texture*> textures;
+
+	// Meshes
+	std::vector<Mesh*> meshes;
+
+	// Materials
+	std::vector<Material*> materials;
+
+	// Lights
+	std::vector<glm::vec3*> lights;
+
 	/* STATIC VARIABLES */
 
 	/* PRIVATE FUNCTIONS */
@@ -35,6 +72,12 @@ private:
 	void initGLEW(); //AFTER CONTEXT CREATION
 	void initOpenGLOptions();
 	void initMatrices();
+	void initShaders();
+	void initTextures();
+	void initMaterials();
+	void initMeshes();
+	void initLights();
+	void initUniforms();
 
 public:
 	/* CONSTRUCTORS/DESTRUCTORS */
