@@ -53,7 +53,7 @@ vec3 calculateSpecular( Material material, vec3 vs_position, vec3 vs_normal, vec
 	vec3 reflectDirVec = normalize( reflect(lightToPosDirVec, normalize(vs_normal) ) );
 	vec3 posToViewDirVec = normalize(  cameraPosition - vs_position );
 	float SpecularConstant = pow( max( dot( posToViewDirVec, reflectDirVec), 0), 35);
-	vec3 SpecularFinal = material.specular * SpecularConstant;
+	vec3 SpecularFinal = material.specular * SpecularConstant * texture(material.specularTex, vs_texcoord).rgb;
 
 	return SpecularFinal;
 }
@@ -71,6 +71,6 @@ void main()
 
 	/* FINAL LIGHT */
 	fs_color = 
-		texture(material.diffuseTex, vs_texcoord) * vec4(vs_color,1.f)
+		texture(material.diffuseTex, vs_texcoord) /* vec4(vs_color,1.f)*/
 		 * ( vec4(ambientFinal, 1.f) + vec4(diffuseFinal, 1.f) + vec4(SpecularFinal, 1.f));
 }

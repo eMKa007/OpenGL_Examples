@@ -7,7 +7,7 @@ int main( int argc, char* argv[] )
 		480,
 		4,
 		4,
-		false);
+		true);
 
 	/* Main Loop */
 	while( !game.getWindodShouldClose() )

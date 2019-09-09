@@ -162,7 +162,7 @@ void Game::initOpenGLOptions()
 	glPolygonMode( GL_FRONT_AND_BACK, GL_FILL); // Fill drawn shape with full color. Could be GL_LINE etc.
 
 	glEnable(GL_BLEND); // Enable color blending.
-	glBlendFunc(GL_SRC0_ALPHA, GL_ONE_MINUS_SRC_ALPHA); // Color blending function. 
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); // Color blending function. 
 
 }
 
@@ -218,9 +218,19 @@ void Game::initTextures()
 			GL_TEXTURE_2D)
 	);
 
+	this->textures.push_back(
+		new Texture("Images/atom_specular.png", 
+			GL_TEXTURE_2D)
+	);
+
 	/* INIT TEXTURE 1 */
 	this->textures.push_back(
 		new Texture("Images/floor.png", 
+			GL_TEXTURE_2D)
+	);
+
+	this->textures.push_back(
+		new Texture("Images/floor_specular.png", 
 			GL_TEXTURE_2D)
 	);
 }
@@ -253,13 +263,6 @@ void Game::initMaterials()
 void Game::initMeshes()
 {
 	/* MODEL MESH */
-	this->meshes.push_back( 
-		new Mesh( &Quad(),
-		glm::vec3(0.f),
-		glm::vec3(0.f),
-		glm::vec3(1.f) )
-	);
-
 	this->meshes.push_back( 
 		new Mesh( &Quad(),
 		glm::vec3(0.f),
@@ -306,9 +309,7 @@ void Game::initUniforms()
 */
 void Game::updateUniforms()
 {
-	this->materials[MAT_1]->sendToShader(*this->shaders[SHADER_CORE_PROGRAM]);
-	
-			// Update frame buffers size, and send new Projection Matrix.
+	// Update frame buffers size, and send new Projection Matrix.
 	glfwGetFramebufferSize(this->window, &this->framebufferWidth, &this->framebufferHeight);
 	
 	ProjectionMatrix = glm::perspective
@@ -379,19 +380,19 @@ void Game::render()
 
 	// Update uniforms (variables send to gpu [shader] from cpu)- every change they're updated.
 	this->updateUniforms();
+
+	// Update Uniforms
+	this->materials[MAT_1]->sendToShader(*this->shaders[SHADER_CORE_PROGRAM]);
+
 		// Use a program (shader) - need to tell what shader we want to use.
 	this->shaders[SHADER_CORE_PROGRAM]->use();
 
 		// Activate Texture
-	this->textures[TEX_ATOM0]->bind(0);
-	this->textures[TEX_CONTAINER1]->bind(1);
+	this->textures[TEX_CONTAINER1]->bind(0);
+	this->textures[TEX_CONTAINER1_SPECULAR]->bind(1);
 
 		// Draw
 	this->meshes[MESH_QUAD]->render( this->shaders[SHADER_CORE_PROGRAM] );
-
-	this->textures[TEX_ATOM0]->bind(1);
-	this->textures[TEX_CONTAINER1]->bind(0);
-	this->meshes[1]->render( this->shaders[SHADER_CORE_PROGRAM] );
 
 		// End Draw
 	glfwSwapBuffers(window);
@@ -463,6 +464,16 @@ void Game::updateInput(GLFWwindow* window, Mesh& mesh)
 	if( glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS )
 	{
 		mesh.move(glm::vec3(0.05f, 0.f, 0.f));
+	}
+
+	if( glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS )
+	{
+		mesh.move(glm::vec3(0.f, 0.05f, 0.f));
+	}
+
+	if( glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS )
+	{
+		mesh.move(glm::vec3(0.f, -0.05f, 0.f));
 	}
 
 	if( glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS )

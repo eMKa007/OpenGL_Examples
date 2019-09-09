@@ -11,7 +11,9 @@ enum shaders_enum
 enum textureUnit_enum
 {
 	TEX_ATOM0 = 0,
-	TEX_CONTAINER1
+	TEX_ATOM_SPECULAR,
+	TEX_CONTAINER1,
+	TEX_CONTAINER1_SPECULAR
 };
 
 enum material_enum
