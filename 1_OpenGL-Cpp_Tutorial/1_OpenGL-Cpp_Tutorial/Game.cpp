@@ -32,6 +32,18 @@ Game::Game(const char* title, const int WINDOW_WIDTH, const int WINDOW_HEIGHT,
 	this->nearPlane = 0.1f;
 	this->farPlane = 1000.f;
 
+	this->dt = 0.0f;
+	this->currTime = 0.f;
+	this->lastTime = 0.f;
+
+	this->lastMouseX = 0.0;
+	this->lastMouseY = 0.0;
+	this->mouseX = 0.0;
+	this->mouseY = 0.0;
+	this->mouseOffsetX = 0.0;
+	this->mouseOffsetY = 0.0;
+	this->firstMouse = true;
+
 	this->initGLFW();
 	this->initWindow(title, resizable);
 	this->initGLEW();
@@ -44,6 +56,8 @@ Game::Game(const char* title, const int WINDOW_WIDTH, const int WINDOW_HEIGHT,
 	this->initLights();
 	this->initUniforms();
 }
+
+
 
 /*	----------------------------------------------------------
 *	Default class destructor
@@ -72,6 +86,8 @@ Game::~Game()
 		delete this->lights[i];
 }
 
+
+
 /* ---------------------------- INITIALIZE FUNCTIONS ---------------------------- */
 
 /*	----------------------------------------------------------
@@ -89,6 +105,8 @@ void Game::initGLFW()
 		glfwTerminate();
 	}
 }
+
+
 
 /*	----------------------------------------------------------
 *	Function name: initWindow()
@@ -123,6 +141,8 @@ void Game::initWindow( const char* title, bool resizable)
 	glfwMakeContextCurrent(this->window);
 }
 
+
+
 /*	----------------------------------------------------------
 *	Function name: initGLEW()
 *	Parameters:	none
@@ -141,6 +161,8 @@ void Game::initGLEW()
 		glfwTerminate();
 	}
 }
+
+
 
 /*	----------------------------------------------------------
 *	Function name: initOpenGLOptions()
@@ -164,7 +186,12 @@ void Game::initOpenGLOptions()
 	glEnable(GL_BLEND); // Enable color blending.
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); // Color blending function. 
 
+	// Init input options
+	glfwSetInputMode(this->window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
 }
+
+
 
 /*	----------------------------------------------------------
 *	Function name: initMatrices()
@@ -186,6 +213,8 @@ void Game::initMatrices()
 	);
 }
 
+
+
 /*	----------------------------------------------------------
 *	Function name: initShaders()
 *	Parameters:	none
@@ -203,6 +232,8 @@ void Game::initShaders()
 			"fragment_core.glsl")
 	);
 }
+
+
 
 /*	----------------------------------------------------------
 *	Function name: initShaders()
@@ -235,6 +266,8 @@ void Game::initTextures()
 	);
 }
 
+
+
 /*	----------------------------------------------------------
 *	Function name: initShaders()
 *	Parameters:	none
@@ -254,6 +287,8 @@ void Game::initMaterials()
 
 }
 
+
+
 /*	----------------------------------------------------------
 *	Function name: initMeshes()
 *	Parameters:	none
@@ -271,6 +306,8 @@ void Game::initMeshes()
 	);
 }
 
+
+
 /*	----------------------------------------------------------
 *	Function name: initLights()
 *	Parameters:	none
@@ -282,6 +319,8 @@ void Game::initLights()
 	// LIGHTS
 	this->lights.push_back( new glm::vec3 (0.f, 0.f, 1.f) );
 }
+
+
 
 /*	----------------------------------------------------------
 *	Function name: initUniforms()
@@ -298,6 +337,8 @@ void Game::initUniforms()
 	this->shaders[SHADER_CORE_PROGRAM]->setVec3f(*this->lights[0], "lightPos0");
 	this->shaders[SHADER_CORE_PROGRAM]->setVec3f(this->camPosition, "cameraPosition");
 }
+
+
 
 /* ---------------------------- PRIVATE FUNCTIONS ---------------------------- */
 
@@ -326,6 +367,8 @@ void Game::updateUniforms()
 	this->shaders[SHADER_CORE_PROGRAM]->setMat4fv(this->ProjectionMatrix, "ProjectionMatrix");
 }
 
+
+
 /* ---------------------------- PUBLIC FUNCTIONS ---------------------------- */
 
 /*	----------------------------------------------------------
@@ -339,6 +382,8 @@ int Game::getWindodShouldClose()
 	return glfwWindowShouldClose(this->window);
 }
 
+
+
 /*	----------------------------------------------------------
 *	Function name: setWindowShouldClose()
 *	Parameters:	none
@@ -350,6 +395,111 @@ void Game::setWindowShouldClose()
 	glfwSetWindowShouldClose(this->window, GLFW_TRUE);
 }
 
+
+
+/*	Function name: updateInput()
+*	Parameters:	none
+*	Used to: Update input to interact with rendered scene.
+*	Return:	void
+*/
+void Game::updateInput()
+{
+	glfwPollEvents();
+
+	this->updateKeyboardInput();
+	this->updateMouseInput();
+}
+
+
+
+/*	Function name: updateInput()
+*	Parameters:	none
+*	Used to: Update keyboard input to interact with rendered scene.
+*	Return:	void
+*/
+void Game::updateKeyboardInput()
+{
+	// Application
+	if( glfwGetKey( this->window, GLFW_KEY_ESCAPE ) == GLFW_PRESS )
+	{
+		this->setWindowShouldClose();
+	}
+
+	// Camera
+	if( glfwGetKey( this->window, GLFW_KEY_W ) == GLFW_PRESS )
+	{
+		this->camPosition.z -= 0.05f;
+	}
+
+	if( glfwGetKey( this->window, GLFW_KEY_S ) == GLFW_PRESS )
+	{
+		this->camPosition.z += 0.05f;
+	}
+
+	if( glfwGetKey( this->window, GLFW_KEY_A ) == GLFW_PRESS )
+	{
+		this->camPosition.x -= 0.05f;
+	}
+
+	if( glfwGetKey( this->window, GLFW_KEY_D ) == GLFW_PRESS )
+	{
+		this->camPosition.x += 0.05f;
+	}
+
+	if( glfwGetKey( this->window, GLFW_KEY_SPACE ) == GLFW_PRESS )
+	{
+		this->camPosition.y += 0.05f;
+	}
+
+	if( glfwGetKey( this->window, GLFW_KEY_LEFT_CONTROL ) == GLFW_PRESS )
+	{
+		this->camPosition.y -= 0.05f;
+	}
+}
+
+
+
+/*	Function name: updateMouseInput()
+*	Parameters:	none
+*	Used to: Update mouse input to interact with rendered scene.
+*	Return:	void
+*/
+void Game::updateMouseInput()
+{
+	glfwGetCursorPos(this->window, &this->mouseX, &this->mouseY);
+
+	if( this->firstMouse )
+	{
+		this->lastMouseX = this->mouseX;
+		this->lastMouseY = this->mouseY;
+		this->firstMouse = false;
+	}
+
+	// Calculate Offset
+	this->mouseOffsetX = this->mouseX - this->lastMouseX;
+	this->mouseOffsetY = this->mouseY - this->lastMouseY;
+
+	// Set last X and Y
+	this->lastMouseX = this->mouseX;
+	this->lastMouseY = this->mouseY;
+}
+
+
+
+/*	Function name: updateDt()
+*	Parameters:	none
+*	Used to: Update delta time.
+*	Return:	void
+*/
+void Game::updateDt()
+{
+	this->currTime = static_cast<float>(glfwGetTime());
+	this->dt = this->currTime - this->lastTime;
+	this->lastTime = this->currTime;
+}
+
+
+
 /*	----------------------------------------------------------
 *	Function name: update()
 *	Parameters:	none
@@ -358,10 +508,17 @@ void Game::setWindowShouldClose()
 */
 void Game::update()
 {
+	this->updateDt();
+
 	/* CHECK INPUT */
-	glfwPollEvents();
 	this->updateInput();
+
+#ifdef DEBUG
+	std::cout << "DT: " << this->dt << "; Mouse offsetX: " << this->mouseOffsetX  <<  "; offsetY: "<< this->mouseOffsetY << std::endl;
+#endif
 }
+
+
 
 /*	----------------------------------------------------------
 *	Function name: render()
@@ -408,6 +565,8 @@ void Game::render()
 
 }
 
+
+
 /* ---------------------------- STATIC FUNCTIONS ---------------------------- */
 
 /*	----------------------------------------------------------
@@ -423,47 +582,3 @@ void Game::framebuffer_resize_callback(GLFWwindow* window, int fbW, int fbH)
 	glViewport(0, 0, fbW, fbH);
 }
 
-/*	Function name: updateInput()
-*	Parameters:	none
-*	Used to: Update kayboard input to interract with rendered scene.
-*	Return:	void
-*/
-void Game::updateInput()
-{
-	// Application
-	if( glfwGetKey( this->window, GLFW_KEY_ESCAPE ) == GLFW_PRESS )
-	{
-		this->setWindowShouldClose();
-	}
-
-	// Camera
-	if( glfwGetKey( this->window, GLFW_KEY_W ) == GLFW_PRESS )
-	{
-		this->camPosition.z -= 0.05f;
-	}
-
-	if( glfwGetKey( this->window, GLFW_KEY_S ) == GLFW_PRESS )
-	{
-		this->camPosition.z += 0.05f;
-	}
-
-	if( glfwGetKey( this->window, GLFW_KEY_A ) == GLFW_PRESS )
-	{
-		this->camPosition.x -= 0.05f;
-	}
-
-	if( glfwGetKey( this->window, GLFW_KEY_D ) == GLFW_PRESS )
-	{
-		this->camPosition.x += 0.05f;
-	}
-
-	if( glfwGetKey( this->window, GLFW_KEY_SPACE ) == GLFW_PRESS )
-	{
-		this->camPosition.y += 0.05f;
-	}
-
-	if( glfwGetKey( this->window, GLFW_KEY_LEFT_CONTROL ) == GLFW_PRESS )
-	{
-		this->camPosition.y -= 0.05f;
-	}
-}

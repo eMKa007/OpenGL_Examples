@@ -1,6 +1,7 @@
 #pragma once
 
 #include "libs.h"
+//#define DEBUG
 
 /* ENUMERATIONS */
 enum shaders_enum
@@ -51,6 +52,20 @@ private:
 	float nearPlane;
 	float farPlane;
 
+	// Delta Time
+	float dt;
+	float currTime;
+	float lastTime;
+
+	// Mouse Input
+	double lastMouseX;
+	double lastMouseY;
+	double mouseX;
+	double mouseY;
+	double mouseOffsetX;
+	double mouseOffsetY;
+	bool firstMouse;
+
 	// Shaders
 	std::vector<Shader*> shaders;
 
@@ -99,11 +114,13 @@ public:
 
 	/* FUNCTIONS */
 	void updateInput();
+	void updateKeyboardInput();
+	void updateMouseInput();
+	void updateDt();
+
 	void update();
 	void render();
 
 	/* STATIC FUNCTIONS */
 	static void framebuffer_resize_callback(GLFWwindow* window, int fbW, int fbH );
-	/*static void updateInput( GLFWwindow* window );
-	static void updateInput( GLFWwindow* window, Mesh& mesh );*/
 };
