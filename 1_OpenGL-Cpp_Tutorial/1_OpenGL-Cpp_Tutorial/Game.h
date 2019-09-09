@@ -1,6 +1,7 @@
 #pragma once
 
 #include "libs.h"
+#include "Camera.h"
 //#define DEBUG
 
 /* ENUMERATIONS */
