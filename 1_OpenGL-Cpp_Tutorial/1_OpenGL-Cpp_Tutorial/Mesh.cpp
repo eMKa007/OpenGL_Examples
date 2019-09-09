@@ -49,7 +49,9 @@ Mesh::~Mesh()
 {
 	glDeleteVertexArrays(1, &this->VAO);
 	glDeleteBuffers(1, &this->VBO);
-	glDeleteBuffers(1, &this->EBO);
+
+	if( this->nrOfIndices > 0 )
+		glDeleteBuffers(1, &this->EBO);
 }
 
 /*	----------------------------------------------------------
@@ -86,9 +88,12 @@ void Mesh::initVAO(Vertex* vertexArray, const unsigned& nrOfVertices, GLuint* in
 	/* GEN EBO AND BIND AND SEND DATA
 	 * EBO (Element Buffer Object) - is gonna send the indices data of object.
 	 */
-	glGenBuffers(1, &this->EBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->EBO );	// Bind Element Array Buffer (EBO) to specific place inside VAO box.
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, this->nrOfIndices*sizeof(GLuint), indexArray, GL_STATIC_DRAW);	// Determine indices data to be sent to graphics card.
+	if( this->nrOfIndices > 0 )
+	{
+		glGenBuffers(1, &this->EBO);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->EBO );	// Bind Element Array Buffer (EBO) to specific place inside VAO box.
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, this->nrOfIndices*sizeof(GLuint), indexArray, GL_STATIC_DRAW);	// Determine indices data to be sent to graphics card.
+	}
 
 	/* SET VERTEXATTRIBPOINTERS AND ENABLE (INPUT ASSEMBLY)
 	 * Setting specific vertex attributes (position, color and texture coordinate) to determine in what order they are set inside memory.
@@ -151,9 +156,12 @@ void Mesh::initVAO(Primitive* primitive)
 	/* GEN EBO AND BIND AND SEND DATA
 	 * EBO (Element Buffer Object) - is gonna send the indices data of object.
 	 */
-	glGenBuffers(1, &this->EBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->EBO );	// Bind Element Array Buffer (EBO) to specific place inside VAO box.
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, this->nrOfIndices*sizeof(GLuint), primitive->getIndices(), GL_STATIC_DRAW);	// Determine indices data to be sent to graphics card.
+	if( this->nrOfIndices > 0 )
+	{	
+		glGenBuffers(1, &this->EBO);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->EBO );	// Bind Element Array Buffer (EBO) to specific place inside VAO box.
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, this->nrOfIndices*sizeof(GLuint), primitive->getIndices(), GL_STATIC_DRAW);	// Determine indices data to be sent to graphics card.
+	}
 
 	/* SET VERTEXATTRIBPOINTERS AND ENABLE (INPUT ASSEMBLY)
 	 * Setting specific vertex attributes (position, color and texture coordinate) to determine in what order they are set inside memory.
@@ -304,6 +312,9 @@ void Mesh::render(Shader* shader)
 	shader->use();
 
 	// RENDER
-	// Draw triangles. made of nrOfIndices which are unsigned int, starting from 0 index.
-	glDrawElements(GL_TRIANGLES, this->nrOfIndices, GL_UNSIGNED_INT, 0);	
+	if (this->nrOfIndices == 0 )
+		glDrawArrays(GL_TRIANGLES, 0, this->nrOfVertices);
+	else
+		// Draw triangles. made of nrOfIndices which are unsigned int, starting from 0 index.
+		glDrawElements(GL_TRIANGLES, this->nrOfIndices, GL_UNSIGNED_INT, 0);	
 }

@@ -7,7 +7,7 @@
 
 #include "Vertex.h"
 
-
+/* -------------------------  Primitive CLASS  ------------------------- */
 class Primitive
 {
 private:
@@ -27,6 +27,7 @@ public:
 
 };
 
+/* -------------------------  Triangle CLASS  ------------------------- */
 class Triangle : public Primitive
 {
 private:
@@ -36,6 +37,7 @@ public:
 	~Triangle();
 };
 
+/* -------------------------  Quad CLASS  ------------------------- */
 class Quad : public Primitive
 {
 private:
@@ -43,4 +45,14 @@ private:
 public:
 	Quad();
 	~Quad();
+};
+
+/* -------------------------  Pyramid CLASS  ------------------------- */
+class Pyramid : public Primitive
+{
+private:
+
+public:
+	Pyramid();
+	~Pyramid();
 };
