@@ -309,17 +309,20 @@ void Game::initUniforms()
 */
 void Game::updateUniforms()
 {
+	// update View Matrix as we'll move the camera
+	this->ViewMatrix = glm::lookAt(this->camPosition, this->camPosition + this->camFront, this->worldUp);
+	this->shaders[SHADER_CORE_PROGRAM]->setMat4fv(this->ViewMatrix, "ViewMatrix");
+
 	// Update frame buffers size, and send new Projection Matrix.
 	glfwGetFramebufferSize(this->window, &this->framebufferWidth, &this->framebufferHeight);
-	
-	ProjectionMatrix = glm::perspective
+
+	this->ProjectionMatrix = glm::perspective
 	(
-		glm::radians(fov), 
-		static_cast<float>(framebufferWidth)/framebufferHeight, 
-		nearPlane, 
-		farPlane
+		glm::radians(this->fov), 
+		static_cast<float>(this->framebufferWidth)/this->framebufferHeight, 
+		this->nearPlane,
+		this->farPlane
 	);
-	
 	this->shaders[SHADER_CORE_PROGRAM]->setMat4fv(this->ProjectionMatrix, "ProjectionMatrix");
 }
 
@@ -357,6 +360,7 @@ void Game::update()
 {
 	/* CHECK INPUT */
 	glfwPollEvents();
+	this->updateInput();
 }
 
 /*	----------------------------------------------------------
@@ -367,10 +371,6 @@ void Game::update()
 */
 void Game::render()
 {
-	/* UPDATE */
-	this->updateInput(window);
-	this->updateInput(this->window, *this->meshes[MESH_QUAD]);
-
 	/* DRAW */
 		// Clear
 	glClearColor(0.f, 0.f, 0.f, 1.f);
@@ -423,76 +423,47 @@ void Game::framebuffer_resize_callback(GLFWwindow* window, int fbW, int fbH)
 	glViewport(0, 0, fbW, fbH);
 }
 
-/*	----------------------------------------------------------
-*	Function name: updateInput()
-*	Parameters:	GLFWwindow* window - pointer to created window
-*	Used to: Determine if specified window should be closed.
+/*	Function name: updateInput()
+*	Parameters:	none
+*	Used to: Update kayboard input to interract with rendered scene.
 *	Return:	void
 */
-void Game::updateInput(GLFWwindow* window)
+void Game::updateInput()
 {
-	if( glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS )
+	// Application
+	if( glfwGetKey( this->window, GLFW_KEY_ESCAPE ) == GLFW_PRESS )
 	{
-		glfwSetWindowShouldClose(window, true);
-	}
-}
-
-/*	----------------------------------------------------------
-*	Function name: updateInput()
-*	Parameters:	GLFWwindow* window - pointer to created window which holds mesh.
-*		Mesh& mesh - Mesh to be interracted via input.
-*	Used to: Update mesh properties based on glfs input.
-*	Return:	void
-*/
-void Game::updateInput(GLFWwindow* window, Mesh& mesh)
-{
-	if( glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS )
-	{
-		mesh.move(glm::vec3(0.f, 0.f, -0.05f));
+		this->setWindowShouldClose();
 	}
 
-	if( glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS )
+	// Camera
+	if( glfwGetKey( this->window, GLFW_KEY_W ) == GLFW_PRESS )
 	{
-		mesh.move(glm::vec3(-0.05f, 0.f, 0.f));
+		this->camPosition.z -= 0.05f;
 	}
 
-	if( glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS )
+	if( glfwGetKey( this->window, GLFW_KEY_S ) == GLFW_PRESS )
 	{
-		mesh.move(glm::vec3(0.f, 0.f, 0.05f));
+		this->camPosition.z += 0.05f;
 	}
 
-	if( glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS )
+	if( glfwGetKey( this->window, GLFW_KEY_A ) == GLFW_PRESS )
 	{
-		mesh.move(glm::vec3(0.05f, 0.f, 0.f));
+		this->camPosition.x -= 0.05f;
 	}
 
-	if( glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS )
+	if( glfwGetKey( this->window, GLFW_KEY_D ) == GLFW_PRESS )
 	{
-		mesh.move(glm::vec3(0.f, 0.05f, 0.f));
+		this->camPosition.x += 0.05f;
 	}
 
-	if( glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS )
+	if( glfwGetKey( this->window, GLFW_KEY_SPACE ) == GLFW_PRESS )
 	{
-		mesh.move(glm::vec3(0.f, -0.05f, 0.f));
+		this->camPosition.y += 0.05f;
 	}
 
-	if( glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS )
+	if( glfwGetKey( this->window, GLFW_KEY_LEFT_CONTROL ) == GLFW_PRESS )
 	{
-		mesh.rotate(glm::vec3(0.f, -1.f, 0.f));
-	}
-
-	if( glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS )
-	{
-		mesh.rotate(glm::vec3(0.f, 1.f, 0.f));
-	}
-
-	if( glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS )
-	{
-		mesh.scaleUp(glm::vec3(0.1f));
-	}
-
-	if( glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS )
-	{
-		mesh.scaleUp(glm::vec3(-0.1f));
+		this->camPosition.y -= 0.05f;
 	}
 }
