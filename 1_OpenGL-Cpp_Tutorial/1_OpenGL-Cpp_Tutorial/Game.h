@@ -2,7 +2,7 @@
 
 #include "libs.h"
 #include "Camera.h"
-//#define DEBUG
+#define DEBUG
 
 /* ENUMERATIONS */
 enum shaders_enum

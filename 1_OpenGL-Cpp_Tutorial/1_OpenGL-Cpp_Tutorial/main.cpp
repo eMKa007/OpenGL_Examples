@@ -3,8 +3,8 @@
 int main( int argc, char* argv[] )
 {
 	Game game("Tutorial_001", 
-		640,
-		480,
+		1280,
+		720,
 		4,
 		4,
 		true);

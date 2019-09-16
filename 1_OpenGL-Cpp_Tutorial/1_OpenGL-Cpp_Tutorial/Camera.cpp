@@ -3,7 +3,13 @@
 
 void Camera::updateCameraVectors()
 {
+	this->front.x = cos(glm::radians(this->yaw)) * cos(glm::radians(this->pitch));
+	this->front.y = sin(glm::radians(this->pitch));
+	this->front.z = sin(glm::radians(this->yaw)) * cos(glm::radians(this->pitch));
 
+	this->front = glm::normalize(this->front);
+	this->right = glm::normalize(glm::cross(this->front, this->worldUp));
+	this->up = glm::normalize(glm::cross(this->right, this->front));
 }
 
 Camera::Camera(glm::vec3 position, glm::vec3 direction, glm::vec3 worldUp)
@@ -30,7 +36,7 @@ Camera::~Camera()
 {
 }
 
-void Camera::updateKeyboardInput(const float& dt, const int direction, const double& offsetX, const double& offsetY)
+void Camera::move(const float& dt, const int direction)
 {
 	// Update Position vector
 	switch (direction)
@@ -51,15 +57,24 @@ void Camera::updateKeyboardInput(const float& dt, const int direction, const dou
 		this->position += this->right * this->movementSpeed * dt;
 		break;
 
+	case UPWARD:
+		this->position += this->up * this->movementSpeed * dt;
+		break;
+
+	case DOWNWARD:
+		this->position -= this->up * this->movementSpeed * dt;
+		break;
+
 	default:
 		break;
 	}
 }
 
+
 void Camera::updateMouseInput(const float& dt, const double& offsetX, const double& offsetY)
 {
 	// Update Pitch, Yaw and Roll
-	this->pitch += static_cast<GLfloat>(offsetY) * this->sensitivity * dt;
+	this->pitch -= static_cast<GLfloat>(offsetY) * this->sensitivity * dt;
 	this->yaw += static_cast<GLfloat>(offsetX) * this->sensitivity * dt;
 
 	if(this->pitch >= 80.f )
@@ -74,5 +89,6 @@ void Camera::updateMouseInput(const float& dt, const double& offsetX, const doub
 void Camera::updateInput(const float& dt, const int direction, const double& offsetX, const double& offsetY)
 {
 	this->updateMouseInput(dt, offsetX, offsetY);
-	this->updateKeyboardInput(dt, direction, offsetX, offsetY);
 }
+
+

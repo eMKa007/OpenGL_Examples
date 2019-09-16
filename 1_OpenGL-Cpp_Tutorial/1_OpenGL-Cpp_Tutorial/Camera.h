@@ -15,10 +15,12 @@
 
 enum direction
 {
-	UP = 0,
-	DOWN,
+	FORWARD = 0,
+	BACKWARD,
 	LEFT,
-	RIGTH
+	RIGTH,
+	UPWARD,
+	DOWNWARD,
 };
 
 class Camera
@@ -49,15 +51,15 @@ public:
 	/* ACCESSORS */
 	const glm::mat4 getViewMatrix()	{
 		this->updateCameraVectors();
-		glm::lookAt( this->position, this->position + this->front, this->worldUp);
+		this->ViewMatrix = glm::lookAt( this->position, this->position + this->front, this->worldUp);
 		return this->ViewMatrix;
 	}
 
 	const glm::vec3 getPosition() { return this->position; }
 
 	/* FUNCTIONS */
-	void updateKeyboardInput( const float& dt, const int direction, const double& offsetX, const double& offsetY);
 	void updateMouseInput(const float& dt, const double& offsetX, const double& offsetY); 
 	void updateInput( const float& dt, const int direction, const double& offsetX, const double& offsetY);
+	void move(const float& dt, const int direction );
 };
 

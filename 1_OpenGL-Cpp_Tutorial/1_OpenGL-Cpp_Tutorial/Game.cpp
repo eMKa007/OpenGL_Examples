@@ -432,32 +432,32 @@ void Game::updateKeyboardInput()
 	// Camera
 	if( glfwGetKey( this->window, GLFW_KEY_W ) == GLFW_PRESS )
 	{
-		this->camPosition.z -= 0.05f;
+		camera.move(this->dt, FORWARD);
 	}
 
 	if( glfwGetKey( this->window, GLFW_KEY_S ) == GLFW_PRESS )
 	{
-		this->camPosition.z += 0.05f;
+		camera.move(this->dt, BACKWARD);
 	}
 
 	if( glfwGetKey( this->window, GLFW_KEY_A ) == GLFW_PRESS )
 	{
-		this->camPosition.x -= 0.05f;
+		camera.move(this->dt, LEFT);
 	}
 
 	if( glfwGetKey( this->window, GLFW_KEY_D ) == GLFW_PRESS )
 	{
-		this->camPosition.x += 0.05f;
+		camera.move(this->dt, RIGTH);
 	}
 
 	if( glfwGetKey( this->window, GLFW_KEY_SPACE ) == GLFW_PRESS )
 	{
-		this->camPosition.y += 0.05f;
+		camera.move(this->dt, UPWARD);
 	}
 
 	if( glfwGetKey( this->window, GLFW_KEY_LEFT_CONTROL ) == GLFW_PRESS )
 	{
-		this->camPosition.y -= 0.05f;
+		camera.move(this->dt, DOWNWARD);
 	}
 }
 
