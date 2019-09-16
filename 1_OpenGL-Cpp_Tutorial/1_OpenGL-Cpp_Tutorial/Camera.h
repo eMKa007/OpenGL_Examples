@@ -13,6 +13,14 @@
 #include <mat4x4.hpp>
 #include <gtc/matrix_transform.hpp>
 
+enum direction
+{
+	UP = 0,
+	DOWN,
+	LEFT,
+	RIGTH
+};
+
 class Camera
 {
 private:
