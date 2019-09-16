@@ -18,7 +18,8 @@ Game::Game(const char* title, const int WINDOW_WIDTH, const int WINDOW_HEIGHT,
 	WINDOW_WIDTH(WINDOW_WIDTH), 
 	WINDOW_HEIGHT(WINDOW_HEIGHT), 
 	GL_VERSION_MAJOR(GL_VERSION_MAJOR), 
-	GL_VERSION_MINOR(GL_VERSION_MINOR)
+	GL_VERSION_MINOR(GL_VERSION_MINOR),
+	camera(glm::vec3(0.f, 0.f, 1.f), glm::vec3(0.f, 0.f, 1.f), glm::vec3(0.f, 1.f, 0.f))
 {
 	this->window = nullptr;
 	this->framebufferWidth = WINDOW_WIDTH;
@@ -350,11 +351,11 @@ void Game::initUniforms()
 void Game::updateUniforms()
 {
 	// update View Matrix as we'll move the camera
-	this->ViewMatrix = glm::lookAt(this->camPosition, this->camPosition + this->camFront, this->worldUp);
+	this->ViewMatrix = this->camera.getViewMatrix();
 	this->shaders[SHADER_CORE_PROGRAM]->setMat4fv(this->ViewMatrix, "ViewMatrix");
 
 	// Update Camera Position
-	this->shaders[SHADER_CORE_PROGRAM]->setVec3f(this->camPosition, "cameraPosition");
+	this->shaders[SHADER_CORE_PROGRAM]->setVec3f(this->camera.getPosition(), "cameraPosition");
 
 	// Update frame buffers size, and send new Projection Matrix.
 	glfwGetFramebufferSize(this->window, &this->framebufferWidth, &this->framebufferHeight);
@@ -410,6 +411,7 @@ void Game::updateInput()
 
 	this->updateKeyboardInput();
 	this->updateMouseInput();
+	this->camera.updateInput(this->dt, -1, this->mouseOffsetX, this->mouseOffsetY);
 }
 
 

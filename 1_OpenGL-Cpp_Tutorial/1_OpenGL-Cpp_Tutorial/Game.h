@@ -58,6 +58,9 @@ private:
 	float currTime;
 	float lastTime;
 
+	//Camera
+	Camera camera;
+
 	// Mouse Input
 	double lastMouseX;
 	double lastMouseY;
