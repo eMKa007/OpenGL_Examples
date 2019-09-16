@@ -79,6 +79,9 @@ private:
 	// Meshes
 	std::vector<Mesh*> meshes;
 
+	//Models
+	std::vector<Model*> models;
+
 	// Materials
 	std::vector<Material*> materials;
 
@@ -97,6 +100,7 @@ private:
 	void initTextures();
 	void initMaterials();
 	void initMeshes();
+	void initModels();
 	void initLights();
 	void initUniforms();
 

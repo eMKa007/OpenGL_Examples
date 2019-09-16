@@ -54,6 +54,7 @@ Game::Game(const char* title, const int WINDOW_WIDTH, const int WINDOW_HEIGHT,
 	this->initTextures();
 	this->initMaterials();
 	this->initMeshes();
+	this->initModels();
 	this->initLights();
 	this->initUniforms();
 }
@@ -82,6 +83,9 @@ Game::~Game()
 
 	for( size_t i = 0; i < this->materials.size(); i++)
 		delete this->materials[i];
+
+	for( auto *&i : this->models)
+		delete i;
 
 	for( size_t i = 0; i < this->lights.size(); i++)
 		delete this->lights[i];
@@ -308,6 +312,22 @@ void Game::initMeshes()
 }
 
 
+/*	----------------------------------------------------------
+*	Function name: initModels()
+*	Parameters:	none
+*	Used to: Create Model objects.
+*	Return:	void
+*/
+void Game::initModels()
+{
+	this->models.push_back(new Model(
+		glm::vec3(0.f),
+		this->materials[0],
+		this->textures[TEX_CONTAINER1],
+		this->textures[TEX_CONTAINER1_SPECULAR],
+		this->meshes));
+}
+
 
 /*	----------------------------------------------------------
 *	Function name: initLights()
@@ -517,7 +537,7 @@ void Game::update()
 	/* CHECK INPUT */
 	this->updateInput();
 
-	this->meshes[0]->rotate(glm::vec3(0.f, 1.f, 0.f));
+	//this->meshes[0]->rotate(glm::vec3(0.f, 1.f, 0.f));
 
 #ifdef DEBUG
 	std::cout << "DT: " << this->dt << "; Mouse offsetX: " << this->mouseOffsetX  <<  "; offsetY: "<< this->mouseOffsetY << std::endl;
@@ -541,21 +561,11 @@ void Game::render()
 
 	/* ---------------   START OF CURRENT CORE_PROGRAM --------------- */
 
-	// Update uniforms (variables send to gpu [shader] from cpu)- every change they're updated.
+		// Update uniforms (variables send to gpu [shader] from cpu)- every change they're updated.
 	this->updateUniforms();
 
-	// Update Uniforms
-	this->materials[MAT_1]->sendToShader(*this->shaders[SHADER_CORE_PROGRAM]);
-
-		// Use a program (shader) - need to tell what shader we want to use.
-	this->shaders[SHADER_CORE_PROGRAM]->use();
-
-		// Activate Texture
-	this->textures[TEX_CONTAINER1]->bind(0);
-	this->textures[TEX_CONTAINER1_SPECULAR]->bind(1);
-
-		// Draw
-	this->meshes[MESH_QUAD]->render( this->shaders[SHADER_CORE_PROGRAM] );
+		// Render Models
+	this->models[0]->render(this->shaders[SHADER_CORE_PROGRAM]);
 
 		// End Draw
 	glfwSwapBuffers(window);
