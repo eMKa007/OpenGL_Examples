@@ -53,7 +53,6 @@ Game::Game(const char* title, const int WINDOW_WIDTH, const int WINDOW_HEIGHT,
 	this->initShaders();
 	this->initTextures();
 	this->initMaterials();
-	this->initMeshes();
 	this->initModels();
 	this->initLights();
 	this->initUniforms();
@@ -77,9 +76,6 @@ Game::~Game()
 
 	for( size_t i = 0; i < this->textures.size(); i++)
 		delete this->textures[i];
-
-	for( size_t i = 0; i < this->meshes.size(); i++)
-		delete this->meshes[i];
 
 	for( size_t i = 0; i < this->materials.size(); i++)
 		delete this->materials[i];
@@ -293,25 +289,6 @@ void Game::initMaterials()
 }
 
 
-
-/*	----------------------------------------------------------
-*	Function name: initMeshes()
-*	Parameters:	none
-*	Used to: Create Mesh objects to hold primitives used by render.
-*	Return:	void
-*/
-void Game::initMeshes()
-{
-	/* MODEL MESH */
-	this->meshes.push_back( 
-		new Mesh( &Pyramid(),
-		glm::vec3(0.f),
-		glm::vec3(0.f),
-		glm::vec3(1.f) )
-	);
-}
-
-
 /*	----------------------------------------------------------
 *	Function name: initModels()
 *	Parameters:	none
@@ -320,12 +297,29 @@ void Game::initMeshes()
 */
 void Game::initModels()
 {
+	// Create Meshes
+	this->meshes.push_back( 
+		new Mesh( &Pyramid(),
+		glm::vec3(0.f),
+		glm::vec3(0.f),
+		glm::vec3(1.f) )
+	);
+
+	// Create Models
 	this->models.push_back(new Model(
 		glm::vec3(0.f),
 		this->materials[0],
 		this->textures[TEX_CONTAINER1],
 		this->textures[TEX_CONTAINER1_SPECULAR],
 		this->meshes));
+
+	// Remove unnecessary meshes
+	for( auto *& i : meshes )
+	{
+		delete i;
+	}
+
+	this->meshes.clear();
 }
 
 
@@ -537,7 +531,8 @@ void Game::update()
 	/* CHECK INPUT */
 	this->updateInput();
 
-	//this->meshes[0]->rotate(glm::vec3(0.f, 1.f, 0.f));
+	// Rotate Meshes
+	this->models[0]->rotate(glm::vec3(0.f, 0.5f, 0.f));
 
 #ifdef DEBUG
 	std::cout << "DT: " << this->dt << "; Mouse offsetX: " << this->mouseOffsetX  <<  "; offsetY: "<< this->mouseOffsetY << std::endl;

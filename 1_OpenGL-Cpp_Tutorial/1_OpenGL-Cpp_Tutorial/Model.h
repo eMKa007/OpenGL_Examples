@@ -30,5 +30,6 @@ public:
 	/* FUNCTIONS */
 	void update();
 	void render(Shader* shader);
+	void rotate(const glm::vec3 rotation);
 };
 

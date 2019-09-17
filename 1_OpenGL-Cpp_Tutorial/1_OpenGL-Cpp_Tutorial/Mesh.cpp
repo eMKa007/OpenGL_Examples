@@ -77,6 +77,39 @@ Mesh::Mesh(Primitive* primitive, glm::vec3 position, glm::vec3 rotation, glm::ve
 }
 
 /*	----------------------------------------------------------
+*	Copy constructor
+*	Parameters: Mesh& obj - reference to new Mesh object
+*/
+Mesh::Mesh(const Mesh& obj)
+{
+	// Set Variables
+	this->position = obj.position;
+	this->rotation = obj.rotation;
+	this->scale = obj.scale;
+
+	this->nrOfVertices = obj.nrOfVertices;
+	this->nrOfIndices = obj.nrOfIndices;
+
+	// Copy every Vertex data to Mesh Vertex array
+	this->vertexArray = new Vertex[this->nrOfVertices];
+	for( size_t i = 0; i < this->nrOfVertices; i++)
+	{
+		this->vertexArray[i] = obj.vertexArray[i];
+	}
+
+	// Copy every index data to Mesh index array
+	this->indexArray = new GLuint[this->nrOfIndices];
+	for( size_t i = 0; i < this->nrOfIndices; i++)
+	{
+		this->indexArray[i] = obj.indexArray[i];
+	}
+
+	this->initVAO();	
+	
+	this->updateModelMatrix();
+}
+
+/*	----------------------------------------------------------
 *	Default class destructor
 *	Parameters: none
 *		Used to: delete previously created mesh instance

@@ -2,7 +2,7 @@
 
 #include "libs.h"
 #include "Camera.h"
-#define DEBUG
+//#define DEBUG
 
 /* ENUMERATIONS */
 enum shaders_enum
@@ -99,7 +99,6 @@ private:
 	void initShaders();
 	void initTextures();
 	void initMaterials();
-	void initMeshes();
 	void initModels();
 	void initLights();
 	void initUniforms();

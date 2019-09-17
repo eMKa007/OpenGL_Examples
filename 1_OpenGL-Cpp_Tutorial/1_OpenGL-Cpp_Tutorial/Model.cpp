@@ -53,3 +53,11 @@ void Model::render(Shader* shader)
 		i->render(shader);
 	}
 }
+
+void Model::rotate(const glm::vec3 rotation)
+{
+	for( auto & i : this->meshes )
+	{
+		i->rotate(rotation);
+	}
+}
