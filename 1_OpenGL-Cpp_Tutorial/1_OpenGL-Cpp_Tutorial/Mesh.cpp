@@ -88,6 +88,9 @@ Mesh::~Mesh()
 
 	if( this->nrOfIndices > 0 )
 		glDeleteBuffers(1, &this->EBO);
+
+	delete this->vertexArray;
+	delete this->indexArray;
 }
 
 /*	----------------------------------------------------------
