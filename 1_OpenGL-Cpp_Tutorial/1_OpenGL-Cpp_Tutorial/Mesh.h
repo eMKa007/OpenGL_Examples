@@ -12,7 +12,9 @@
 class Mesh
 {
 private:
+	Vertex* vertexArray;
 	unsigned nrOfVertices;
+	GLuint* indexArray;
 	unsigned nrOfIndices;
 
 	GLuint VAO;
@@ -24,8 +26,7 @@ private:
 	glm::vec3 scale;
 	glm::mat4 ModelMatrix;
 
-	void initVAO(Vertex* vertexArray, const unsigned& nrOfVertices, GLuint* indexArray, const unsigned& nrOfIndices);
-	void initVAO(Primitive* primitive);
+	void initVAO();
 	void updateUniforms( Shader* shader );
 	void updateModelMatrix();
 
