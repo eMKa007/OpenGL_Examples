@@ -76,9 +76,6 @@ private:
 	// Textures
 	std::vector<Texture*> textures;
 
-	// Meshes
-	std::vector<Mesh*> meshes;
-
 	//Models
 	std::vector<Model*> models;
 

@@ -10,11 +10,12 @@
 				glm::vec3 rotation - vector3 containing mesh rotation (Yaw/Pitch/Roll)
 				glm::vec3 scale - vector3 containing scale values (X/Y/Z)
 */
-Mesh::Mesh(Vertex* vertexArray, const unsigned& nrOfVertices, GLuint* indexArray, const unsigned& nrOfIndices, 
-			glm::vec3 position, glm::vec3 rotation, glm::vec3 scale)
+Mesh::Mesh(Vertex* vertexArray, const unsigned& nrOfVertices, GLuint* indexArray,	const unsigned& nrOfIndices, 
+			glm::vec3 position, glm::vec3 origin, glm::vec3 rotation, glm::vec3 scale)
 {
 	// Set Variables
 	this->position = position;
+	this->origin = origin;
 	this->rotation = rotation;
 	this->scale = scale;
 	
@@ -40,6 +41,7 @@ Mesh::Mesh(Vertex* vertexArray, const unsigned& nrOfVertices, GLuint* indexArray
 	this->updateModelMatrix();
 }
 
+
 /*	----------------------------------------------------------
 *	Class constructor
 *	Parameters: Primitive* primitive - pointer to primitive class instance containing vertices and indices of mesh
@@ -47,10 +49,11 @@ Mesh::Mesh(Vertex* vertexArray, const unsigned& nrOfVertices, GLuint* indexArray
 				glm::vec3 rotation - vector3 containing mesh rotation (Yaw/Pitch/Roll)
 				glm::vec3 scale - vector3 containing scale values (X/Y/Z)
 */
-Mesh::Mesh(Primitive* primitive, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale)
+Mesh::Mesh(Primitive* primitive, glm::vec3 position, glm::vec3 origin, glm::vec3 rotation, glm::vec3 scale)
 {
 	// Set Variables
 	this->position = position;
+	this->origin = origin;
 	this->rotation = rotation;
 	this->scale = scale;
 
@@ -76,6 +79,7 @@ Mesh::Mesh(Primitive* primitive, glm::vec3 position, glm::vec3 rotation, glm::ve
 	this->updateModelMatrix();
 }
 
+
 /*	----------------------------------------------------------
 *	Copy constructor
 *	Parameters: Mesh& obj - reference to new Mesh object
@@ -84,6 +88,7 @@ Mesh::Mesh(const Mesh& obj)
 {
 	// Set Variables
 	this->position = obj.position;
+	this->origin = obj.origin;
 	this->rotation = obj.rotation;
 	this->scale = obj.scale;
 
@@ -109,6 +114,7 @@ Mesh::Mesh(const Mesh& obj)
 	this->updateModelMatrix();
 }
 
+
 /*	----------------------------------------------------------
 *	Default class destructor
 *	Parameters: none
@@ -125,6 +131,7 @@ Mesh::~Mesh()
 	delete this->vertexArray;
 	delete this->indexArray;
 }
+
 
 /*	----------------------------------------------------------
 *	Function name: initVAO()
@@ -190,6 +197,7 @@ void Mesh::initVAO()
 	glBindVertexArray( 0 );
 }
 
+
 /*	----------------------------------------------------------
 *	Function name: updateUniforms()
 *	Parameters:	Shader* shader - pointer to created gpu program
@@ -201,6 +209,7 @@ void Mesh::updateUniforms(Shader* shader)
 	shader->setMat4fv(this->ModelMatrix, "ModelMatrix");
 }
 
+
 /*	----------------------------------------------------------
 *	Function name: updateModelMatrix()
 *	Parameters:	none
@@ -211,12 +220,14 @@ void Mesh::updateModelMatrix()
 {
 	this->ModelMatrix = glm::mat4(1.f);
 
-	this->ModelMatrix = glm::translate(this->ModelMatrix, this->position);	// vec3 - translation vector
+	this->ModelMatrix = glm::translate(this->ModelMatrix, this->origin);
 	this->ModelMatrix = glm::rotate(this->ModelMatrix, glm::radians(this->rotation.x), glm::vec3(1.f, 0.f, 0.f));		// Choose angle of rotation and then rotation axis. (X)
 	this->ModelMatrix = glm::rotate(this->ModelMatrix, glm::radians(this->rotation.y), glm::vec3(0.f, 1.f, 0.f));		// Choose angle of rotation and then rotation axis. (Y)
 	this->ModelMatrix = glm::rotate(this->ModelMatrix, glm::radians(this->rotation.z), glm::vec3(0.f, 0.f, 1.f));		// Choose angle of rotation and then rotation axis. (Z)
+	this->ModelMatrix = glm::translate(this->ModelMatrix,   this->position - this->origin);	// vec3 - translation vector
 	this->ModelMatrix = glm::scale(this->ModelMatrix, this->scale);	// vec3 - scale vector ( 1 means = no scaling )
 }
+
 
 /*	----------------------------------------------------------
 *	Function name: setPosition()
@@ -229,6 +240,19 @@ void Mesh::setPosition(const glm::vec3& position)
 	this->position = position;
 }
 
+
+/*	----------------------------------------------------------
+*	Function name: setOrigin()
+*	Parameters:	const glm::vec3& origin - vector3 with coordinates of new origin point position
+*	Used to: Set new origin position of mesh.
+*	Return:	void
+*/
+void Mesh::setOrigin(const glm::vec3& origin)
+{
+	this->origin = origin;
+}
+
+
 /*	----------------------------------------------------------
 *	Function name: setRotation()
 *	Parameters:	const glm::vec3& rotation - vector3 with new yaw/pitch/roll values
@@ -239,6 +263,7 @@ void Mesh::setRotation(const glm::vec3& rotation)
 {
 	this->rotation = rotation;
 }
+
 
 /*	----------------------------------------------------------
 *	Function name: scale()
@@ -251,6 +276,7 @@ void Mesh::setScale(const glm::vec3& scale)
 	this->scale = scale;
 }
 
+
 /*	----------------------------------------------------------
 *	Function name: move()
 *	Parameters:	const glm::vec3& position - vector3 with coordinates to be added to current position
@@ -261,6 +287,7 @@ void Mesh::move(const glm::vec3& position)
 {
 	this->position += position;
 }
+
 
 /*	----------------------------------------------------------
 *	Function name: rotate()
@@ -273,6 +300,7 @@ void Mesh::rotate(const glm::vec3& rotation)
 	this->rotation += rotation;
 }
 
+
 /*	----------------------------------------------------------
 *	Function name: scaleUp()
 *	Parameters:	const glm::vec3& scale - vector3 with with scale values to be added/subtracted to current mesh scale
@@ -284,6 +312,7 @@ void Mesh::scaleUp(const glm::vec3& scale)
 	this->scale += scale;
 }
 
+
 /*	----------------------------------------------------------
 *	Function name: update()
 *	Parameters:	none
@@ -291,6 +320,7 @@ void Mesh::scaleUp(const glm::vec3& scale)
 *	Return:	void
 */
 void Mesh::update(){ }
+
 
 /*	----------------------------------------------------------
 *	Function name: render()

@@ -298,8 +298,12 @@ void Game::initMaterials()
 void Game::initModels()
 {
 	// Create Meshes
-	this->meshes.push_back( 
+	std::vector<Mesh*> meshes;
+
+	// #1 Pyramid
+	meshes.push_back( 
 		new Mesh( &Pyramid(),
+		glm::vec3(0.f),
 		glm::vec3(0.f),
 		glm::vec3(0.f),
 		glm::vec3(1.f) )
@@ -311,15 +315,27 @@ void Game::initModels()
 		this->materials[0],
 		this->textures[TEX_CONTAINER1],
 		this->textures[TEX_CONTAINER1_SPECULAR],
-		this->meshes));
+		meshes));
+
+	this->models.push_back(new Model(
+		glm::vec3(0.f, 1.f, 1.f),
+		this->materials[0],
+		this->textures[TEX_ATOM0],
+		this->textures[TEX_ATOM_SPECULAR],
+		meshes));
+
+	this->models.push_back(new Model(
+		glm::vec3(2.f, 0.f, 2.f),
+		this->materials[0],
+		this->textures[TEX_CONTAINER1],
+		this->textures[TEX_CONTAINER1_SPECULAR],
+		meshes));
 
 	// Remove unnecessary meshes
 	for( auto *& i : meshes )
 	{
 		delete i;
 	}
-
-	this->meshes.clear();
 }
 
 
@@ -532,7 +548,9 @@ void Game::update()
 	this->updateInput();
 
 	// Rotate Meshes
-	this->models[0]->rotate(glm::vec3(0.f, 0.5f, 0.f));
+	this->models[0]->rotate(glm::vec3(0.f, 1.f, 0.f));
+	this->models[1]->rotate(glm::vec3(0.f, 1.f, 0.f));
+	this->models[2]->rotate(glm::vec3(0.f, 1.f, 0.f));
 
 #ifdef DEBUG
 	std::cout << "DT: " << this->dt << "; Mouse offsetX: " << this->mouseOffsetX  <<  "; offsetY: "<< this->mouseOffsetY << std::endl;
@@ -560,7 +578,8 @@ void Game::render()
 	this->updateUniforms();
 
 		// Render Models
-	this->models[0]->render(this->shaders[SHADER_CORE_PROGRAM]);
+	for( auto &i : this->models )
+		i->render(this->shaders[SHADER_CORE_PROGRAM]);
 
 		// End Draw
 	glfwSwapBuffers(window);

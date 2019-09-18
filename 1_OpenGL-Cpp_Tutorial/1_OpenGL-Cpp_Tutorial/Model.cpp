@@ -20,6 +20,13 @@ Model::Model(glm::vec3 position,
 	{
 		this->meshes.push_back(new Mesh(*i));
 	}
+
+	//Move every mesh of given offset
+	for( auto &i : this->meshes)
+	{
+		i->move(this->position);
+		i->setOrigin(this->position);
+	}
 }
 
 Model::~Model()
