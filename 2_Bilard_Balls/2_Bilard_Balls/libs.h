@@ -21,3 +21,11 @@
 
 /* SOIL2 - Simple OpenGL Image Library */
 #include <SOIL2.h>
+
+#include "Shader.h"
+#include "Texture.h"
+#include "Material.h"
+#include "Vertex.h"
+#include "Mesh.h"
+#include "Primitives.h"
+#include "Model.h"
