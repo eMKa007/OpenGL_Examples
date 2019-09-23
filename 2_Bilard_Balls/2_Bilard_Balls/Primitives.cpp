@@ -276,3 +276,31 @@ Box::~Box()
 {
 	
 }
+
+/* --------------------------------------  Sphere CLASS  --------------------------------------------------------- */
+
+/*	----------------------------------------------------------
+*	Default class constructor
+*	Parameters: none
+*		Temporary coordinates are hardcoded inside constructor.
+*/
+Sphere::Sphere()
+{
+	/*Vertex vertices[] =
+	{
+		
+	};
+	unsigned nrOfVertices = sizeof(vertices) / sizeof(Vertex);
+
+	this->set(vertices, nrOfVertices, nullptr, 0);*/
+}
+
+/*	----------------------------------------------------------
+*	Default class destructor
+*	Parameters: none
+*	Used to: delete previously created class instance
+*/
+Sphere::~Sphere()
+{
+	
+}

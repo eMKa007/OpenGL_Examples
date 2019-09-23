@@ -44,7 +44,12 @@ Model::~Model()
 	}
 }
 
-void Model::render(Shader* shader)
+void Model::update()
+{
+
+}
+
+void Model::render(Shader* shader, GLenum mode)
 {
 	// Update uniforms (variables send to gpu [shader] from cpu)- every change they're updated.
 	this->updateUniforms();
@@ -64,7 +69,7 @@ void Model::render(Shader* shader)
 		// Draw
 	for( auto &i : this->meshes )
 	{
-		i->render(shader);
+		i->render(shader, mode);
 	}
 }
 

@@ -66,3 +66,13 @@ public:
 	Box();
 	~Box();
 };
+
+/* -------------------------  Sphere CLASS  ------------------------- */
+class Sphere : public Primitive
+{
+private:
+
+public:
+	Sphere();
+	~Sphere();
+};

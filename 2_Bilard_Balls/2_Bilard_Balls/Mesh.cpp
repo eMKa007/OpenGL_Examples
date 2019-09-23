@@ -328,7 +328,7 @@ void Mesh::update(){ }
 *	Used to: Draw mesh with given shader.
 *	Return:	void
 */
-void Mesh::render(Shader* shader)
+void Mesh::render(Shader* shader, GLenum mode)
 {
 	this->updateModelMatrix();
 	this->updateUniforms(shader);
@@ -340,10 +340,10 @@ void Mesh::render(Shader* shader)
 
 	// RENDER
 	if (this->nrOfIndices == 0 )
-		glDrawArrays(GL_LINES, 0, this->nrOfVertices);
+		glDrawArrays(mode, 0, this->nrOfVertices);
 	else
 		// Draw triangles. made of nrOfIndices which are unsigned int, starting from 0 index.
-		glDrawElements(GL_LINES, this->nrOfIndices, GL_UNSIGNED_INT, 0);
+		glDrawElements(mode, this->nrOfIndices, GL_UNSIGNED_INT, 0);
 
 	// Unbind the current program
 	glBindVertexArray(0);

@@ -39,7 +39,7 @@ public:
 	~Mesh();
 
 	void update();
-	void render(Shader* shader);
+	void render(Shader* shader, GLenum mode);
 
 	/* ACCESSORS */
 

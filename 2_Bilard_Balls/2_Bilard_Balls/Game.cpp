@@ -272,8 +272,8 @@ void Game::initMaterials()
 */
 void Game::initModels()
 {
+	/* Initialize BOX */
 	std::vector<Mesh*> meshes;
-
 	meshes.push_back(
 		new Mesh( &Box(), 
 		glm::vec3(0.f),
@@ -281,13 +281,17 @@ void Game::initModels()
 		glm::vec3(0.f),
 		glm::vec3(1.f)));
 
-
 	models.push_back( new Model(
 		glm::vec3(0.f),
 		this->materials[MAT_BG],
 		nullptr,
 		nullptr,
 		meshes));
+
+	meshes.clear();
+
+	/* Initialize SPHERES */
+
 
 	// Remove unnecessary meshes
 	for( auto *& i : meshes )
@@ -531,7 +535,7 @@ void Game::render()
 
 		// Render Models
 	for( auto &i : this->models )
-		i->render(this->shaders[SHADER_BOX]);
+		i->render(this->shaders[SHADER_BOX], GL_LINES);
 
 		// End Draw
 	glfwSwapBuffers(window);

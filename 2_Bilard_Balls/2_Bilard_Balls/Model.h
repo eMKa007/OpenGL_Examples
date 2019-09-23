@@ -29,7 +29,7 @@ public:
 
 	/* FUNCTIONS */
 	void update();
-	void render(Shader* shader);
+	void render(Shader* shader, GLenum mode);
 	void rotate(const glm::vec3 rotation);
 };
 

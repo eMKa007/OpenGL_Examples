@@ -76,12 +76,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="fragment_core.glsl">
-      <Filter>Source Files</Filter>
-    </None>
-    <None Include="vertex_core.glsl">
-      <Filter>Source Files</Filter>
-    </None>
     <None Include="vertex_shader_box.glsl">
       <Filter>Source Files</Filter>
     </None>
