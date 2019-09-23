@@ -13,8 +13,15 @@ Model::Model(glm::vec3 position,
 {
 	this->position = position;
 	this->material = material;
-	this->overrideTextureDiffuse = ovTexDiff;
-	this->overrideTextureSpecular = ovTexSpec;
+	this->overrideTextureDiffuse = nullptr;
+	this->overrideTextureSpecular = nullptr;
+
+	if( ovTexDiff != nullptr )
+		this->overrideTextureDiffuse = ovTexDiff;
+
+	if( ovTexDiff != nullptr )
+		this->overrideTextureSpecular = ovTexSpec;
+
 	
 	for( auto *i: meshes)
 	{
@@ -49,8 +56,10 @@ void Model::render(Shader* shader)
 	shader->use();
 
 		// Activate Texture
-	overrideTextureDiffuse->bind(0);
-	overrideTextureSpecular->bind(1);
+	if( overrideTextureDiffuse != nullptr )
+		overrideTextureDiffuse->bind(0);
+	if( overrideTextureSpecular != nullptr )
+		overrideTextureSpecular->bind(1);
 
 		// Draw
 	for( auto &i : this->meshes )

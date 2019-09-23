@@ -32,10 +32,5 @@ Material::~Material(){}
 */
 void Material::sendToShader(Shader& programID)
 {
-	programID.setVec3f(this->ambient, "material.ambient");
-	programID.setVec3f(this->diffuse, "material.diffuse");
-	programID.setVec3f(this->specular, "material.specular");
-	programID.set1i(this->diffuseTex, "material.diffuseTex");
-	programID.set1i(this->specularTex, "material.specularTex");
 }
 

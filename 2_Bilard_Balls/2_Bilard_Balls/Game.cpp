@@ -19,7 +19,7 @@ Game::Game(const char* title, const int WINDOW_WIDTH, const int WINDOW_HEIGHT,
 	WINDOW_HEIGHT(WINDOW_HEIGHT), 
 	GL_VERSION_MAJOR(GL_VERSION_MAJOR), 
 	GL_VERSION_MINOR(GL_VERSION_MINOR),
-	camera(glm::vec3(0.f, 0.f, 1.f), glm::vec3(0.f, 0.f, 1.f), glm::vec3(0.f, 1.f, 0.f))
+	camera(glm::vec3(3.5f, 4.f, 5.f), glm::vec3(-30.f, -120.f, 0.f), glm::vec3(0.f, 1.f, 0.f))
 {
 	this->window = nullptr;
 	this->framebufferWidth = WINDOW_WIDTH;
@@ -182,7 +182,7 @@ void Game::initOpenGLOptions()
 	glCullFace(GL_BACK);	// Back side of object will not be drawn
 	glFrontFace(GL_CCW);	// Front face- which will be drawn - is that with counter-clock wise vertex order. 
 
-	glPolygonMode( GL_FRONT_AND_BACK, GL_LINE); // Fill drawn shape with full color. Could be GL_LINE etc.
+	glPolygonMode( GL_FRONT_AND_BACK, GL_FILL); // Fill drawn shape with full color. Could be GL_LINE etc.
 
 	glEnable(GL_BLEND); // Enable color blending.
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); // Color blending function. 
@@ -229,12 +229,6 @@ void Game::initShaders()
 	 */
 	this->shaders.push_back(
 		new Shader(this->GL_VERSION_MAJOR, this->GL_VERSION_MINOR, 
-			"vertex_core.glsl", 
-			"fragment_core.glsl")
-	);
-
-	this->shaders.push_back(
-		new Shader(this->GL_VERSION_MAJOR, this->GL_VERSION_MINOR, 
 			"vertex_shader_box.glsl", 
 			"fragment_shader_box.glsl")
 	);
@@ -251,8 +245,6 @@ void Game::initShaders()
 */
 void Game::initTextures()
 {
-	textures.push_back( new Texture(
-	"Images/background.jpg", GL_TEXTURE_2D));
 
 }
 
@@ -268,7 +260,7 @@ void Game::initMaterials()
 {
 	materials.push_back( new Material(
 	glm::vec3(1.f), glm::vec3(1.f), glm::vec3(1.f),
-		0, 1));
+		0, 0));
 }
 
 
@@ -293,8 +285,8 @@ void Game::initModels()
 	models.push_back( new Model(
 		glm::vec3(0.f),
 		this->materials[MAT_BG],
-		this->textures[TEX_BACKGROUD],
-		this->textures[TEX_BACKGROUD],
+		nullptr,
+		nullptr,
 		meshes));
 
 	// Remove unnecessary meshes
@@ -328,9 +320,6 @@ void Game::initLights()
 void Game::initUniforms()
 {
 	//Init Uniforms
-	this->shaders[SHADER_CORE_PROGRAM]->setMat4fv(this->ViewMatrix, "ViewMatrix");
-	this->shaders[SHADER_CORE_PROGRAM]->setMat4fv(this->ProjectionMatrix, "ProjectionMatrix");
-
 	this->shaders[SHADER_BOX]->setMat4fv(this->ViewMatrix, "ViewMatrix");
 	this->shaders[SHADER_BOX]->setMat4fv(this->ProjectionMatrix, "ProjectionMatrix");
 }
@@ -349,11 +338,9 @@ void Game::updateUniforms()
 {
 	// update View Matrix as we'll move the camera
 	this->ViewMatrix = this->camera.getViewMatrix();
-	this->shaders[SHADER_CORE_PROGRAM]->setMat4fv(this->ViewMatrix, "ViewMatrix");
 	this->shaders[SHADER_BOX]->setMat4fv(this->ViewMatrix, "ViewMatrix");
 
 	// Update Camera Position
-	this->shaders[SHADER_CORE_PROGRAM]->setVec3f(this->camera.getPosition(), "cameraPosition");
 	this->shaders[SHADER_BOX]->setVec3f(this->camera.getPosition(), "cameraPosition");
 
 	// Update frame buffers size, and send new Projection Matrix.
@@ -366,7 +353,6 @@ void Game::updateUniforms()
 		this->nearPlane,
 		this->farPlane
 	);
-	this->shaders[SHADER_CORE_PROGRAM]->setMat4fv(this->ProjectionMatrix, "ProjectionMatrix");
 	this->shaders[SHADER_BOX]->setMat4fv(this->ProjectionMatrix, "ProjectionMatrix");
 }
 
@@ -517,8 +503,6 @@ void Game::update()
 	/* CHECK INPUT */
 	this->updateInput();
 
-	models[0]->rotate(glm::vec3(0.5f, 0.5f, 0.f));
-
 #ifdef DEBUG
 	std::cout << "DT: " << this->dt << "; Mouse offsetX: " << this->mouseOffsetX  <<  "; offsetY: "<< this->mouseOffsetY << std::endl;
 #endif
@@ -538,27 +522,6 @@ void Game::render()
 		// Clear
 	glClearColor(1.f, 1.f, 1.f, 1.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);		//Clear all three buffers.
-
-	/* ---------------   START OF CURRENT CORE_PROGRAM --------------- */
-
-	//	// Update uniforms (variables send to gpu [shader] from cpu)- every change they're updated.
-	//this->updateUniforms();
-
-	//	// Render Models
-	////for( auto &i : this->models )
-	//	i->render(this->shaders[SHADER_CORE_PROGRAM]);
-
-	//	// End Draw
-	//glfwSwapBuffers(window);
-	//glFlush();
-
-	//	// Unbind the current program
-	//glBindVertexArray(0);
-	//glUseProgram(0);
-	//glActiveTexture(0);
-	//glBindTexture(GL_TEXTURE_2D,0);
-
-	/* ---------------   END OF CURRENT CORE_PROGRAM --------------- */
 
 
 	/* ---------------   START OF CURRENT BOX_PROGRAM --------------- */

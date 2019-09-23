@@ -61,5 +61,6 @@ public:
 	void updateMouseInput(const float& dt, const double& offsetX, const double& offsetY); 
 	void updateInput( const float& dt, const int direction, const double& offsetX, const double& offsetY);
 	void move(const float& dt, const int direction );
+
 };
 

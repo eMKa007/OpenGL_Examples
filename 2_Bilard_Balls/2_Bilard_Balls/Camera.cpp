@@ -24,9 +24,9 @@ Camera::Camera(glm::vec3 position, glm::vec3 direction, glm::vec3 worldUp)
 	this->right = glm::vec3(0.f);
 	this->up = worldUp;
 
-	this->pitch = 0.f;
-	this->yaw = -90.f;
-	this->roll = 0.f;
+	this->pitch = direction.x;
+	this->yaw = direction.y;
+	this->roll = direction.z;
 
 	this->updateCameraVectors();
 }
