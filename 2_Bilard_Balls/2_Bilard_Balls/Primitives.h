@@ -56,3 +56,13 @@ public:
 	Pyramid();
 	~Pyramid();
 };
+
+/* -------------------------  Box CLASS  ------------------------- */
+class Box : public Primitive
+{
+private:
+
+public:
+	Box();
+	~Box();
+};

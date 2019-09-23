@@ -39,8 +39,6 @@ Model::~Model()
 
 void Model::render(Shader* shader)
 {
-	this->updateUniforms();
-
 	// Update uniforms (variables send to gpu [shader] from cpu)- every change they're updated.
 	this->updateUniforms();
 

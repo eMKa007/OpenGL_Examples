@@ -7,20 +7,18 @@
 /* ENUMERATIONS */
 enum shaders_enum
 {
-	SHADER_CORE_PROGRAM = 0
+	SHADER_CORE_PROGRAM = 0,
+	SHADER_BOX
 };
 
 enum textureUnit_enum
 {
-	TEX_ATOM0 = 0,
-	TEX_ATOM_SPECULAR,
-	TEX_CONTAINER1,
-	TEX_CONTAINER1_SPECULAR
+	TEX_BACKGROUD = 0
 };
 
 enum material_enum
 {
-	MAT_1 = 0
+	MAT_BG = 0
 };
 
 enum mesh_enum
