@@ -291,7 +291,15 @@ void Game::initModels()
 	meshes.clear();
 
 	/* Initialize SPHERES */
+	meshes.push_back( new Mesh( 
+		&Sphere(1.f, 36, 18)));
 
+	models.push_back( new Model(
+		glm::vec3(0.f),
+		this->materials[MAT_BG],
+		nullptr,
+		nullptr,
+		meshes));
 
 	// Remove unnecessary meshes
 	for( auto *& i : meshes )
@@ -534,8 +542,11 @@ void Game::render()
 	this->updateUniforms();
 
 		// Render Models
-	for( auto &i : this->models )
-		i->render(this->shaders[SHADER_BOX], GL_LINES);
+	//for( auto &i : this->models )
+	//	i->render(this->shaders[SHADER_BOX], GL_LINES);
+	
+	this->models[1]->render(this->shaders[SHADER_BOX], GL_LINES);
+	this->models[0]->render(this->shaders[SHADER_BOX], GL_LINES);
 
 		// End Draw
 	glfwSwapBuffers(window);

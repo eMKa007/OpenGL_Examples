@@ -4,6 +4,7 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <cmath>
 
 /* OpenGL Extension Wrangler */
 #include <glew.h>

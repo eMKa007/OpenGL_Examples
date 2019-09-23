@@ -16,5 +16,5 @@ uniform vec3 cameraPosition;
 
 void main()
 {
-	fs_color = vec4(0.f, 0.f, 0.f, 1.f);
+	fs_color = vec4(vs_color, 1.f);
 }

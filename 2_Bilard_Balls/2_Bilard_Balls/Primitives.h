@@ -7,6 +7,8 @@
 
 #include "Vertex.h"
 
+#define PI 3.141592654
+
 /* -------------------------  Primitive CLASS  ------------------------- */
 class Primitive
 {
@@ -73,6 +75,6 @@ class Sphere : public Primitive
 private:
 
 public:
-	Sphere();
+	Sphere(float radius, int sectorCount, int stackCount );
 	~Sphere();
 };

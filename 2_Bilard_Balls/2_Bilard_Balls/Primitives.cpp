@@ -189,14 +189,14 @@ Box::Box()
 {
 	Vertex vertices[] =
 	{
-		glm::vec3(-2.f, 2.f, 2.f),		glm::vec3(0.f, 0.f, 0.f),	glm::vec2(0.f, 1.f),	glm::vec3(0.f, 0.f, 1.f),	// Vertex 0
-		glm::vec3(-2.f, -2.f, 2.f),		glm::vec3(0.f, 0.f, 0.f),	glm::vec2(0.f, 0.f),	glm::vec3(0.f, 0.f, 1.f),	// Vertex 1
-		glm::vec3(2.f, -2.f, 2.f),		glm::vec3(0.f, 0.f, 0.f),	glm::vec2(1.f, 0.f),	glm::vec3(0.f, 0.f, 1.f),	// Vertex 2
-		glm::vec3(2.f, 2.f, 2.f),		glm::vec3(0.f, 0.f, 0.f),	glm::vec2(1.f, 1.f),	glm::vec3(0.f, 0.f, 1.f),	// Vertex 3
-		glm::vec3(-2.f, 2.f, -2.f),		glm::vec3(0.f, 0.f, 0.f),	glm::vec2(0.f, 1.f),	glm::vec3(-1.f, 0.f, 0.f),	// Vertex 4
-		glm::vec3(-2.f, -2.f, -2.f),	glm::vec3(0.f, 0.f, 0.f),	glm::vec2(0.f, 0.f),	glm::vec3(-1.f, 0.f, 0.f),	// Vertex 5
-		glm::vec3(2.f, -2.f, -2.f),		glm::vec3(0.f, 0.f, 0.f),	glm::vec2(1.f, 0.f),	glm::vec3(1.f, 0.f, 0.f),	// Vertex 6
-		glm::vec3(2.f, 2.f, -2.f),		glm::vec3(0.f, 0.f, 0.f),	glm::vec2(1.f, 1.f),	glm::vec3(1.f, 0.f, 0.f),	// Vertex 7
+		glm::vec3(-2.f, 2.f, 2.f),		glm::vec3(1.f, 0.f, 0.f),	glm::vec2(0.f, 1.f),	glm::vec3(0.f, 0.f, 1.f),	// Vertex 0
+		glm::vec3(-2.f, -2.f, 2.f),		glm::vec3(0.f, 1.f, 0.f),	glm::vec2(0.f, 0.f),	glm::vec3(0.f, 0.f, 1.f),	// Vertex 1
+		glm::vec3(2.f, -2.f, 2.f),		glm::vec3(0.f, 0.f, 1.f),	glm::vec2(1.f, 0.f),	glm::vec3(0.f, 0.f, 1.f),	// Vertex 2
+		glm::vec3(2.f, 2.f, 2.f),		glm::vec3(1.f, 0.f, 0.f),	glm::vec2(1.f, 1.f),	glm::vec3(0.f, 0.f, 1.f),	// Vertex 3
+		glm::vec3(-2.f, 2.f, -2.f),		glm::vec3(0.f, 1.f, 0.f),	glm::vec2(0.f, 1.f),	glm::vec3(-1.f, 0.f, 0.f),	// Vertex 4
+		glm::vec3(-2.f, -2.f, -2.f),	glm::vec3(0.f, 0.f, 1.f),	glm::vec2(0.f, 0.f),	glm::vec3(-1.f, 0.f, 0.f),	// Vertex 5
+		glm::vec3(2.f, -2.f, -2.f),		glm::vec3(1.f, 0.f, 0.f),	glm::vec2(1.f, 0.f),	glm::vec3(1.f, 0.f, 0.f),	// Vertex 6
+		glm::vec3(2.f, 2.f, -2.f),		glm::vec3(0.f, 1.f, 0.f),	glm::vec2(1.f, 1.f),	glm::vec3(1.f, 0.f, 0.f),	// Vertex 7
 
 		/*
 		// Position						// Color					// texcoord				// Normal
@@ -281,18 +281,103 @@ Box::~Box()
 
 /*	----------------------------------------------------------
 *	Default class constructor
-*	Parameters: none
-*		Temporary coordinates are hardcoded inside constructor.
+*	Sphere initialization based on: http://www.songho.ca/opengl/gl_sphere.html
+*	Parameters: float radius - sphere darius
+*				int sectorCount - number of sphere sectors 
+*				int stackCount - number of sphere stacks
 */
-Sphere::Sphere()
+Sphere::Sphere(float radius, int sectorCount, int stackCount)
 {
-	/*Vertex vertices[] =
-	{
-		
-	};
-	unsigned nrOfVertices = sizeof(vertices) / sizeof(Vertex);
+	std::vector<float> vertices;
+	std::vector<float> normals;
+	std::vector<float> texCoords;
 
-	this->set(vertices, nrOfVertices, nullptr, 0);*/
+	float x, y, z, xy;							// vertex position
+	float nx, ny, nz, lengthInv = 1.f / radius;	// vertex normal
+	float s, t;
+
+	float sectorStep = 2 * PI / sectorCount;
+	float stackStep = PI / stackCount;
+	float sectorAngle, stackAngle;
+
+	for( int i=0; i <= stackCount; ++i)
+	{
+		stackAngle = PI / 2 - i * stackStep;
+		xy = radius * cosf(stackAngle);
+		z = radius * sinf(stackAngle);
+
+		// add (sectorCount+1) vertices per stack
+		// the first and last vertices have same position and normal, but different tex coords
+		for( int j=0; j<=sectorCount; ++j)
+		{
+			sectorAngle = j * sectorStep;
+
+			// vertex position (x, y, z)
+			x = xy * cosf(sectorAngle);			// r * cos(u) * cos(v)
+			y = xy * sinf(sectorAngle);			// r * cos(u) * sin(u)
+			vertices.push_back(x);
+			vertices.push_back(y);
+			vertices.push_back(z);
+
+			// normalized vertex normal (nx, ny, nz)
+			nx = x * lengthInv;
+			ny = y * lengthInv;
+			nz = z * lengthInv;
+			normals.push_back(nx);
+			normals.push_back(ny);
+			normals.push_back(nz);
+
+			//vertex texcoord (s, t) range between [0, 1]
+			s = (float)j / sectorCount;
+			t = (float)i / stackCount;
+			texCoords.push_back(s);
+			texCoords.push_back(t);
+		}
+	}
+
+	// Generate CCW index lis of sphere triangles
+	std::vector<GLuint> indices;
+	int k1, k2;
+
+	for(int i = 0; i<stackCount; ++i)
+	{
+		k1 = i * (sectorCount + 1);
+		k2 = k1 + sectorCount + 1;
+
+		for( int j = 0; j<sectorCount; ++j, ++k1, ++k2)
+		{
+			// 2 triangles per sector excluding first and last stacks
+			// k1 => k2 => k1+1
+			if( i != 0 )
+			{
+				indices.push_back(k1);
+				indices.push_back(k2);
+				indices.push_back(k1+1);
+			}
+
+			// k1+1 => k2 => k2+1
+			if( i != stackCount-1 )
+			{
+				indices.push_back(k1+1);
+				indices.push_back(k2);
+				indices.push_back(k2+1);
+			}
+		}
+	}
+
+	std::vector<Vertex> vertex_arr;
+	for( int i = 0; i<vertices.size()/3; i++)
+	{
+		Vertex temp = { glm::vec3(vertices[3*i], vertices[3*i+1], vertices[3*i+2]),
+			glm::vec3(0.f, 0.f, 0.f),
+			glm::vec2(texCoords[2*i], texCoords[2*i+1]),
+			glm::vec3(normals[3*i], normals[3*i+1], normals[3*i+2])
+		};
+
+		vertex_arr.push_back(temp);
+	}
+
+	this->set(vertex_arr.data(), vertex_arr.size(), indices.data(), indices.size());
 }
 
 /*	----------------------------------------------------------
