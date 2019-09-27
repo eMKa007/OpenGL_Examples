@@ -91,13 +91,19 @@ void Model::move()
 		glm::vec3 meshPosition = mesh->getPosition();
 
 		// Check for box limits
-		if( meshPosition.x >= 2.f-0.2f || meshPosition.x <= -2.f+0.2f )
+		if( meshPosition.x >= 2.f-0.2f && mesh->getDeltaMove().x > 0 )
+			mesh->reverse_dx();
+		else if( meshPosition.x <= -2.f+0.2f && mesh->getDeltaMove().x < 0 )
 			mesh->reverse_dx();
 
-		if( meshPosition.y >= 2.f-0.2f || meshPosition.y <= -2.f+0.2f )
+		if( meshPosition.y >= 2.f-0.2f && mesh->getDeltaMove().y > 0 )
+			mesh->reverse_dy();
+		else if( meshPosition.y <= -2.f+0.2f && mesh->getDeltaMove().y < 0 )
 			mesh->reverse_dy();
 
-		if( meshPosition.z >= 2.f-0.2f || meshPosition.z <= -2.f+0.2f )
+		if( meshPosition.z >= 2.f-0.2f && mesh->getDeltaMove().z > 0) 
+			mesh->reverse_dz();
+		else if( meshPosition.z <= -2.f+0.2f && mesh->getDeltaMove().z < 0 )
 			mesh->reverse_dz();
 
 		// Check distance between balls
