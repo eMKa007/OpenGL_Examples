@@ -25,6 +25,12 @@ enum mesh_enum
 	MESH_QUAD = 0
 };
 
+enum model_enum
+{
+	MODEL_BOX = 0,
+	MODEL_SPHERES
+};
+
 class Game
 {
 private:

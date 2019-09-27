@@ -284,6 +284,21 @@ void Mesh::setScale(const glm::vec3& scale)
 	this->scale = scale;
 }
 
+void Mesh::reverse_dx()
+{
+	this->dx *= -1;
+}
+
+void Mesh::reverse_dy()
+{
+	this->dy *= -1;
+}
+
+void Mesh::reverse_dz()
+{
+	this->dz *= -1;
+}
+
 
 /*	----------------------------------------------------------
 *	Function name: move()
@@ -363,4 +378,9 @@ void Mesh::render(Shader* shader, GLenum mode)
 glm::vec3 Mesh::getDeltaMove()
 {
 	return glm::vec3(this->dx, this->dy, this->dz);
+}
+
+glm::vec3 Mesh::getPosition()
+{
+	return this->position;
 }

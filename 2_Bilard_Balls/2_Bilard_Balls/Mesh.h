@@ -47,12 +47,16 @@ public:
 
 	/* ACCESSORS */
 	glm::vec3 getDeltaMove();
+	glm::vec3 getPosition();
 
 	/* MODIFIERS */
 	void setPosition( const glm::vec3& position );
 	void setOrigin( const glm::vec3& origin );
 	void setRotation( const glm::vec3& rotation );
 	void setScale( const glm::vec3& scale );
+	void reverse_dx();
+	void reverse_dy();
+	void reverse_dz();
 
 	/* FUNCTIONS*/
 	void move( const glm::vec3& position );

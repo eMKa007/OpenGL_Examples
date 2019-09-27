@@ -597,10 +597,11 @@ void Game::render()
 	//for( auto &i : this->models )
 	//	i->render(this->shaders[SHADER_BOX], GL_LINES);
 
-	this->models[0]->render(this->shaders[SHADER_BOX], GL_LINES);
+	this->models[MODEL_BOX]->render(this->shaders[SHADER_BOX], GL_LINES);
 
+	this->models[MODEL_SPHERES]->move();
 	this->models[1]->render(this->shaders[SHADER_BOX], GL_LINES);
-	//this->models[1]->move();
+	
 	
 		// End Draw
 	glfwSwapBuffers(window);
