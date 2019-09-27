@@ -80,3 +80,22 @@ void Model::rotate(const glm::vec3 rotation)
 		i->rotate(rotation);
 	}
 }
+
+void Model::move()
+{
+	//if( this->position.x >= 2.f-0.25f || this->position.x <= -2.f+0.25f )
+	//	this->dx = -this->dx;
+
+	//if( position.y >= 2.f-0.25f || this->position.y <= -2.f+0.25f )
+	//	this->dy = -this->dy;
+
+	//if( position.z >= 2.f-0.25f || this->position.z <= -2.f+0.25f )
+	//	this->dz = -this->dz;
+
+	//this->position += glm::vec3(this->dx, this->dy, this->dz);
+
+	for( auto & i : this->meshes )
+	{
+		//i->move(glm::vec3(this->dx, this->dy, this->dz));
+	}
+}

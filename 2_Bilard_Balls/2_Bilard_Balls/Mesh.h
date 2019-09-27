@@ -27,6 +27,10 @@ private:
 	glm::vec3 scale;
 	glm::mat4 ModelMatrix;
 
+	float dx;
+	float dy;
+	float dz;
+
 	void initVAO();
 	void updateUniforms( Shader* shader );
 	void updateModelMatrix();
@@ -34,7 +38,7 @@ private:
 public:
 	Mesh(Vertex* vertexArray, const unsigned& nrOfVertices, GLuint* indexArray,	const unsigned& nrOfIndices, 
 			glm::vec3 position = glm::vec3(0.f), glm::vec3 origin = glm::vec3(0.f), glm::vec3 rotation = glm::vec3(0.f), glm::vec3 scale = glm::vec3(1.f));
-	Mesh(Primitive* primitive, glm::vec3 position = glm::vec3(0.f), glm::vec3 origin = glm::vec3(0.f), glm::vec3 rotation = glm::vec3(0.f), glm::vec3 scale = glm::vec3(1.f));
+	Mesh(Primitive* primitive, glm::vec3 deltaMove = glm::vec3(0.f), glm::vec3 position = glm::vec3(0.f), glm::vec3 origin = glm::vec3(0.f), glm::vec3 rotation = glm::vec3(0.f), glm::vec3 scale = glm::vec3(1.f));
 	Mesh(const Mesh& obj);
 	~Mesh();
 
@@ -42,6 +46,7 @@ public:
 	void render(Shader* shader, GLenum mode);
 
 	/* ACCESSORS */
+	glm::vec3 getDeltaMove();
 
 	/* MODIFIERS */
 	void setPosition( const glm::vec3& position );

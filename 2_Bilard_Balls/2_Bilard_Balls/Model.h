@@ -31,5 +31,6 @@ public:
 	void update();
 	void render(Shader* shader, GLenum mode);
 	void rotate(const glm::vec3 rotation);
+	void move();
 };
 

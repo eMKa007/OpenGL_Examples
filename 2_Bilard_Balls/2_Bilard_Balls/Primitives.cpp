@@ -197,58 +197,6 @@ Box::Box()
 		glm::vec3(-2.f, -2.f, -2.f),	glm::vec3(0.f, 0.f, 1.f),	glm::vec2(0.f, 0.f),	glm::vec3(-1.f, 0.f, 0.f),	// Vertex 5
 		glm::vec3(2.f, -2.f, -2.f),		glm::vec3(1.f, 0.f, 0.f),	glm::vec2(1.f, 0.f),	glm::vec3(1.f, 0.f, 0.f),	// Vertex 6
 		glm::vec3(2.f, 2.f, -2.f),		glm::vec3(0.f, 1.f, 0.f),	glm::vec2(1.f, 1.f),	glm::vec3(1.f, 0.f, 0.f),	// Vertex 7
-
-		/*
-		// Position						// Color					// texcoord				// Normal
-		// Square 1
-		glm::vec3(-2.f, 2.f, 2.f),		glm::vec3(0.f, 0.f, 0.f),	glm::vec2(0.f, 1.f),	glm::vec3(0.f, 0.f, 1.f),	// Vertex 0
-		glm::vec3(-2.f, -2.f, 2.f),		glm::vec3(0.f, 0.f, 0.f),	glm::vec2(0.f, 0.f),	glm::vec3(0.f, 0.f, 1.f),	// Vertex 1
-		glm::vec3(2.f, -2.f, 2.f),		glm::vec3(0.f, 0.f, 0.f),	glm::vec2(1.f, 0.f),	glm::vec3(0.f, 0.f, 1.f),	// Vertex 2
-		glm::vec3(-2.f, 2.f, 2.f),		glm::vec3(0.f, 0.f, 0.f),	glm::vec2(0.f, 1.f),	glm::vec3(0.f, 0.f, 1.f),	// Vertex 0
-		glm::vec3(2.f, -2.f, 2.f),		glm::vec3(0.f, 0.f, 0.f),	glm::vec2(1.f, 0.f),	glm::vec3(0.f, 0.f, 1.f),	// Vertex 2
-		glm::vec3(2.f, 2.f, 2.f),		glm::vec3(0.f, 0.f, 0.f),	glm::vec2(1.f, 1.f),	glm::vec3(0.f, 0.f, 1.f),	// Vertex 3
-
-		// Square 2
-		glm::vec3(2.f, 2.f, 2.f),		glm::vec3(0.f, 0.f, 0.f),	glm::vec2(0.f, 1.f),	glm::vec3(1.f, 0.f, 0.f),	// Vertex 3
-		glm::vec3(2.f, -2.f, 2.f),		glm::vec3(0.f, 0.f, 0.f),	glm::vec2(0.f, 0.f),	glm::vec3(1.f, 0.f, 0.f),	// Vertex 2
-		glm::vec3(2.f, -2.f, -2.f),		glm::vec3(0.f, 0.f, 0.f),	glm::vec2(1.f, 0.f),	glm::vec3(1.f, 0.f, 0.f),	// Vertex 6
-		glm::vec3(2.f, 2.f, 2.f),		glm::vec3(0.f, 0.f, 0.f),	glm::vec2(0.f, 1.f),	glm::vec3(1.f, 0.f, 0.f),	// Vertex 3
-		glm::vec3(2.f, -2.f, -2.f),		glm::vec3(0.f, 0.f, 0.f),	glm::vec2(1.f, 0.f),	glm::vec3(1.f, 0.f, 0.f),	// Vertex 6
-		glm::vec3(2.f, 2.f, -2.f),		glm::vec3(0.f, 0.f, 0.f),	glm::vec2(1.f, 1.f),	glm::vec3(1.f, 0.f, 0.f),	// Vertex 7
-
-		// Square 3
-		glm::vec3(2.f, 2.f, -2.f),		glm::vec3(0.f, 0.f, 0.f),	glm::vec2(0.f, 1.f),	glm::vec3(0.f, 0.f, -1.f),	// Vertex 7
-		glm::vec3(2.f, -2.f, -2.f),		glm::vec3(0.f, 0.f, 0.f),	glm::vec2(0.f, 0.f),	glm::vec3(0.f, 0.f, -1.f),	// Vertex 6
-		glm::vec3(-2.f, -2.f, -2.f),	glm::vec3(0.f, 0.f, 0.f),	glm::vec2(1.f, 0.f),	glm::vec3(0.f, 0.f, -1.f),	// Vertex 5
-		glm::vec3(2.f, 2.f, -2.f),		glm::vec3(0.f, 0.f, 0.f),	glm::vec2(0.f, 1.f),	glm::vec3(0.f, 0.f, -1.f),	// Vertex 7
-		glm::vec3(-2.f, -2.f, -2.f),	glm::vec3(0.f, 0.f, 0.f),	glm::vec2(1.f, 0.f),	glm::vec3(0.f, 0.f, -1.f),	// Vertex 5
-		glm::vec3(-2.f, 2.f, -2.f),		glm::vec3(0.f, 0.f, 0.f),	glm::vec2(1.f, 1.f),	glm::vec3(0.f, 0.f, -1.f),	// Vertex 4
-
-		// Square 4
-		glm::vec3(-2.f, 2.f, -2.f),		glm::vec3(0.f, 0.f, 0.f),	glm::vec2(0.f, 1.f),	glm::vec3(-1.f, 0.f, 0.f),	// Vertex 4
-		glm::vec3(-2.f, -2.f, -2.f),	glm::vec3(0.f, 0.f, 0.f),	glm::vec2(0.f, 0.f),	glm::vec3(-1.f, 0.f, 0.f),	// Vertex 5
-		glm::vec3(-2.f, -2.f, 2.f),		glm::vec3(0.f, 0.f, 0.f),	glm::vec2(1.f, 0.f),	glm::vec3(-1.f, 0.f, 0.f),	// Vertex 1
-		glm::vec3(-2.f, 2.f, -2.f),		glm::vec3(0.f, 0.f, 0.f),	glm::vec2(0.f, 1.f),	glm::vec3(-1.f, 0.f, 0.f),	// Vertex 4
-		glm::vec3(-2.f, -2.f, 2.f),		glm::vec3(0.f, 0.f, 0.f),	glm::vec2(1.f, 0.f),	glm::vec3(-1.f, 0.f, 0.f),	// Vertex 1
-		glm::vec3(-2.f, 2.f, 2.f),		glm::vec3(0.f, 0.f, 0.f),	glm::vec2(1.f, 1.f),	glm::vec3(-1.f, 0.f, 0.f),	// Vertex 0
-
-		// Square 5
-		glm::vec3(-2.f, 2.f, -2.f),		glm::vec3(0.f, 0.f, 0.f),	glm::vec2(0.f, 1.f),	glm::vec3(0.f, 1.f, 0.f),	// Vertex 4
-		glm::vec3(-2.f, 2.f, 2.f),		glm::vec3(0.f, 0.f, 0.f),	glm::vec2(0.f, 0.f),	glm::vec3(0.f, 1.f, 0.f),	// Vertex 0
-		glm::vec3(2.f, 2.f, 2.f),		glm::vec3(0.f, 0.f, 0.f),	glm::vec2(1.f, 0.f),	glm::vec3(0.f, 1.f, 0.f),	// Vertex 3
-		glm::vec3(-2.f, 2.f, -2.f),		glm::vec3(0.f, 0.f, 0.f),	glm::vec2(0.f, 1.f),	glm::vec3(0.f, 1.f, 0.f),	// Vertex 4
-		glm::vec3(2.f, 2.f, 2.f),		glm::vec3(0.f, 0.f, 0.f),	glm::vec2(1.f, 0.f),	glm::vec3(0.f, 1.f, 0.f),	// Vertex 3
-		glm::vec3(2.f, 2.f, -2.f),		glm::vec3(0.f, 0.f, 0.f),	glm::vec2(1.f, 1.f),	glm::vec3(0.f, 1.f, 0.f),	// Vertex 7
-
-		// Square 6
-		glm::vec3(-2.f, -2.f, 2.f),		glm::vec3(0.f, 0.f, 0.f),	glm::vec2(0.f, 1.f),	glm::vec3(0.f, 0.f, 1.f),	// Vertex 1
-		glm::vec3(-2.f, -2.f, -2.f),	glm::vec3(0.f, 0.f, 0.f),	glm::vec2(0.f, 0.f),	glm::vec3(0.f, 0.f, 1.f),	// Vertex 5
-		glm::vec3(2.f, -2.f, -2.f),		glm::vec3(0.f, 0.f, 0.f),	glm::vec2(1.f, 0.f),	glm::vec3(0.f, 0.f, 1.f),	// Vertex 6
-		glm::vec3(-2.f, -2.f, 2.f),		glm::vec3(0.f, 0.f, 0.f),	glm::vec2(0.f, 1.f),	glm::vec3(0.f, 0.f, 1.f),	// Vertex 1
-		glm::vec3(2.f, -2.f, -2.f),		glm::vec3(0.f, 0.f, 0.f),	glm::vec2(1.f, 0.f),	glm::vec3(0.f, 0.f, 1.f),	// Vertex 6
-		glm::vec3(2.f, -2.f, 2.f),		glm::vec3(0.f, 0.f, 0.f),	glm::vec2(1.f, 1.f),	glm::vec3(0.f, 0.f, 1.f),	// Vertex 2
-
-		*/
 	};
 	unsigned nrOfVertices = sizeof(vertices) / sizeof(Vertex);
 
@@ -376,6 +324,11 @@ Sphere::Sphere(float radius, int sectorCount, int stackCount)
 
 		vertex_arr.push_back(temp);
 	}
+
+	// Free Memory
+	std::vector<float>().swap(vertices);
+	std::vector<float>().swap(texCoords);
+	std::vector<float>().swap(normals);
 
 	this->set(vertex_arr.data(), vertex_arr.size(), indices.data(), indices.size());
 }

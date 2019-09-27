@@ -93,7 +93,7 @@ private:
 	void initShaders();
 	void initTextures();
 	void initMaterials();
-	void initModels();
+	void initModels( float SphereRadius );
 	void initLights();
 	void initUniforms();
 

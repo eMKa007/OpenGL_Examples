@@ -29,7 +29,7 @@ Game::Game(const char* title, const int WINDOW_WIDTH, const int WINDOW_HEIGHT,
 	this->camFront = glm::vec3(0.f, 0.f, -1.f);
 	this->camPosition = glm::vec3(0.f, 0.f, 1.f);
 
-	this->fov = 90.f;	// Field of view. 90 degrees.
+	this->fov = 45.f;	// Field of view. 90 degrees.
 	this->nearPlane = 0.1f;
 	this->farPlane = 1000.f;
 
@@ -53,7 +53,7 @@ Game::Game(const char* title, const int WINDOW_WIDTH, const int WINDOW_HEIGHT,
 	this->initShaders();
 	this->initTextures();
 	this->initMaterials();
-	this->initModels();
+	this->initModels( 0.2f );
 	this->initLights();
 	this->initUniforms();
 }
@@ -270,16 +270,17 @@ void Game::initMaterials()
 *	Used to: Create Model objects.
 *	Return:	void
 */
-void Game::initModels()
+void Game::initModels(float sphereRadius)
 {
+	/* Init random Number generator */
+	std::random_device rd;
+	std::mt19937 eng(rd()); //seed the generator
+	std::uniform_real_distribution<float> distr(-0.1f, 0.1f); //define the range
+
 	/* Initialize BOX */
 	std::vector<Mesh*> meshes;
 	meshes.push_back(
-		new Mesh( &Box(), 
-		glm::vec3(0.f),
-		glm::vec3(0.f),
-		glm::vec3(0.f),
-		glm::vec3(1.f)));
+		new Mesh( &Box() ));
 
 	models.push_back( new Model(
 		glm::vec3(0.f),
@@ -291,8 +292,59 @@ void Game::initModels()
 	meshes.clear();
 
 	/* Initialize SPHERES */
+	// Sphere 1
 	meshes.push_back( new Mesh( 
-		&Sphere(1.f, 36, 18)));
+		&Sphere(sphereRadius, 36, 18),
+		glm::vec3(distr(eng), distr(eng), distr(eng)),
+		glm::vec3(1.f)));
+
+	// Sphere 2
+	meshes.push_back( new Mesh( 
+		&Sphere(sphereRadius, 36, 18),
+		glm::vec3(distr(eng), distr(eng), distr(eng)),
+		glm::vec3(0.f)));
+
+	// Sphere 3
+	meshes.push_back( new Mesh( 
+		&Sphere(sphereRadius, 36, 18),
+		glm::vec3(distr(eng), distr(eng), distr(eng)),
+		glm::vec3(-1.f)));
+
+	// Sphere 4
+	meshes.push_back( new Mesh( 
+		&Sphere(sphereRadius, 36, 18),
+		glm::vec3(distr(eng), distr(eng), distr(eng)),
+		glm::vec3(-1.f, 1.f, -1.f)));
+
+	// Sphere 5
+	meshes.push_back( new Mesh( 
+		&Sphere(sphereRadius, 36, 18),
+		glm::vec3(distr(eng), distr(eng), distr(eng)),
+		glm::vec3(-1.f, 1.f, 1.f)));
+
+	// Sphere 6
+	meshes.push_back( new Mesh( 
+		&Sphere(sphereRadius, 36, 18),
+		glm::vec3(distr(eng), distr(eng), distr(eng)),
+		glm::vec3(-1.f, -1.f, 1.f)));
+
+	// Sphere 7
+	meshes.push_back( new Mesh( 
+		&Sphere(sphereRadius, 36, 18),
+		glm::vec3(distr(eng), distr(eng), distr(eng)),
+		glm::vec3(1.f, 1.f, -1.f)));
+
+	// Sphere 8
+	meshes.push_back( new Mesh( 
+		&Sphere(sphereRadius, 36, 18),
+		glm::vec3(distr(eng), distr(eng), distr(eng)),
+		glm::vec3(1.f, -1.f, -1.f)));
+
+	// Sphere 9
+	meshes.push_back( new Mesh( 
+		&Sphere(sphereRadius, 36, 18),
+		glm::vec3(distr(eng), distr(eng), distr(eng)),
+		glm::vec3(1.f, -1.f, 1.f)));
 
 	models.push_back( new Model(
 		glm::vec3(0.f),
@@ -544,10 +596,12 @@ void Game::render()
 		// Render Models
 	//for( auto &i : this->models )
 	//	i->render(this->shaders[SHADER_BOX], GL_LINES);
-	
-	this->models[1]->render(this->shaders[SHADER_BOX], GL_LINES);
+
 	this->models[0]->render(this->shaders[SHADER_BOX], GL_LINES);
 
+	this->models[1]->render(this->shaders[SHADER_BOX], GL_LINES);
+	//this->models[1]->move();
+	
 		// End Draw
 	glfwSwapBuffers(window);
 	glFlush();

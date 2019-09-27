@@ -49,7 +49,7 @@ Mesh::Mesh(Vertex* vertexArray, const unsigned& nrOfVertices, GLuint* indexArray
 				glm::vec3 rotation - vector3 containing mesh rotation (Yaw/Pitch/Roll)
 				glm::vec3 scale - vector3 containing scale values (X/Y/Z)
 */
-Mesh::Mesh(Primitive* primitive, glm::vec3 position, glm::vec3 origin, glm::vec3 rotation, glm::vec3 scale)
+Mesh::Mesh(Primitive* primitive, glm::vec3 deltaMove, glm::vec3 position, glm::vec3 origin, glm::vec3 rotation, glm::vec3 scale)
 {
 	// Set Variables
 	this->position = position;
@@ -59,6 +59,10 @@ Mesh::Mesh(Primitive* primitive, glm::vec3 position, glm::vec3 origin, glm::vec3
 
 	this->nrOfVertices = primitive->getNrOfVertices();
 	this->nrOfIndices = primitive->getNrOfIndices();
+
+	this->dx = deltaMove.x;
+	this->dy = deltaMove.y;
+	this->dz = deltaMove.z;
 
 	// Copy every Vertex data to Mesh Vertex array
 	this->vertexArray = new Vertex[this->nrOfVertices];
@@ -94,6 +98,10 @@ Mesh::Mesh(const Mesh& obj)
 
 	this->nrOfVertices = obj.nrOfVertices;
 	this->nrOfIndices = obj.nrOfIndices;
+
+	this->dx = obj.dx;
+	this->dy = obj.dy;
+	this->dz = obj.dz;
 
 	// Copy every Vertex data to Mesh Vertex array
 	this->vertexArray = new Vertex[this->nrOfVertices];
@@ -350,4 +358,9 @@ void Mesh::render(Shader* shader, GLenum mode)
 	glUseProgram(0);
 	glActiveTexture(0);
 	glBindTexture(GL_TEXTURE_2D,0);
+}
+
+glm::vec3 Mesh::getDeltaMove()
+{
+	return glm::vec3(this->dx, this->dy, this->dz);
 }
