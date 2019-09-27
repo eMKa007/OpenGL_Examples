@@ -284,6 +284,28 @@ void Mesh::setScale(const glm::vec3& scale)
 	this->scale = scale;
 }
 
+void Mesh::set_dxdydz(glm::vec3 new_dxdydz)
+{
+	this->dx = new_dxdydz.x;
+	this->dy = new_dxdydz.y;
+	this->dz = new_dxdydz.z;
+}
+
+void Mesh::set_dx(float dx)
+{
+	this->dx = dx;
+}
+
+void Mesh::set_dy(float dy)
+{
+	this->dy = dy;
+}
+
+void Mesh::set_dz(float dz)
+{
+	this->dz = dz;
+}
+
 void Mesh::reverse_dx()
 {
 	this->dx *= -1;

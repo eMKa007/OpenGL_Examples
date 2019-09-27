@@ -54,6 +54,10 @@ public:
 	void setOrigin( const glm::vec3& origin );
 	void setRotation( const glm::vec3& rotation );
 	void setScale( const glm::vec3& scale );
+	void set_dxdydz(glm::vec3 new_dxdydz);
+	void set_dx( float dx );
+	void set_dy( float dy );
+	void set_dz( float dz );
 	void reverse_dx();
 	void reverse_dy();
 	void reverse_dz();

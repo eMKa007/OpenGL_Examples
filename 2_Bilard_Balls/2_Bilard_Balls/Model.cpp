@@ -85,22 +85,43 @@ void Model::move()
 {
 	//this->position += glm::vec3(this->dx, this->dy, this->dz);
 
-	for( auto & i : this->meshes )
+	for( auto & mesh : this->meshes )
 	{
-		//i->move(glm::vec3(this->dx, this->dy, this->dz));
-		glm::vec3 meshPosition = i->getPosition();
-		
-		if( meshPosition.x >= 2.f-0.25f || meshPosition.x <= -2.f+0.25f )
-			i->reverse_dx();
+		//mesh->move(glm::vec3(this->dx, this->dy, this->dz));
+		glm::vec3 meshPosition = mesh->getPosition();
 
-		if( meshPosition.y >= 2.f-0.25f || meshPosition.y <= -2.f+0.25f )
-			i->reverse_dy();
+		// Check for box limits
+		if( meshPosition.x >= 2.f-0.2f || meshPosition.x <= -2.f+0.2f )
+			mesh->reverse_dx();
 
-		if( meshPosition.z >= 2.f-0.25f || meshPosition.z <= -2.f+0.25f )
-			i->reverse_dz();
+		if( meshPosition.y >= 2.f-0.2f || meshPosition.y <= -2.f+0.2f )
+			mesh->reverse_dy();
 
-		i->move(i->getDeltaMove());
+		if( meshPosition.z >= 2.f-0.2f || meshPosition.z <= -2.f+0.2f )
+			mesh->reverse_dz();
+
+		// Check distance between balls
+		for( auto& mesh_two : this->meshes )
+		{
+			// Skip checking itself mesh
+			if( mesh == mesh_two )
+				continue;
+
+			glm::vec3 secondMeshPos = mesh_two->getPosition();
+
+			if( glm::distance( meshPosition, secondMeshPos) < 0.4f )
+				switch_dxdydz( mesh, mesh_two );
+
+		}
+
+		mesh->move(mesh->getDeltaMove());
 	}
+}
 
+void Model::switch_dxdydz(Mesh* mesh, Mesh* mesh_two)
+{
+	glm::vec3 meshTwo_dxdydz = mesh_two->getDeltaMove();
 
+	mesh_two->set_dxdydz(mesh->getDeltaMove());
+	mesh->set_dxdydz(meshTwo_dxdydz);
 }
