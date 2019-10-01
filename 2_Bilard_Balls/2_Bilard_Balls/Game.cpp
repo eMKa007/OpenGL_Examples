@@ -230,14 +230,17 @@ void Game::initShaders()
 	this->shaders.push_back(
 		new Shader(this->GL_VERSION_MAJOR, this->GL_VERSION_MINOR, 
 			"vertex_shader_box.glsl", 
-			"fragment_shader_box.glsl")
-	);
+			"fragment_shader_box.glsl"));
 
 	this->shaders.push_back(
 	new Shader(this->GL_VERSION_MAJOR, this->GL_VERSION_MINOR,
 		"vertex_shader_sphere.glsl",
 		"fragment_shader_sphere.glsl"));
 
+	this->shaders.push_back(
+	new Shader(this->GL_VERSION_MAJOR, this->GL_VERSION_MINOR,
+		"vertex_shader_floor.glsl",
+		"fragment_shader_floor.glsl"));
 }
 
 
@@ -250,7 +253,11 @@ void Game::initShaders()
 */
 void Game::initTextures()
 {
+	this->textures.push_back(
+		new Texture("Images/floor.png", GL_TEXTURE_2D));
 
+	this->textures.push_back(
+		new Texture("Images/floor_specular.png", GL_TEXTURE_2D));
 }
 
 
@@ -270,6 +277,10 @@ void Game::initMaterials()
 	materials.push_back( new Material(
 	glm::vec3(0.1f), glm::vec3(1.f), glm::vec3(1.f),
 		0, 0));
+
+	materials.push_back( new Material(
+	glm::vec3(0.1f), glm::vec3(1.f), glm::vec3(1.f),
+		0, 1));
 }
 
 
@@ -293,7 +304,7 @@ void Game::initModels(float sphereRadius)
 
 	models.push_back( new Model(
 		glm::vec3(0.f),
-		this->materials[MAT_BG],
+		this->materials[MAT_BOX],
 		nullptr,
 		nullptr,
 		meshes));
@@ -360,6 +371,22 @@ void Game::initModels(float sphereRadius)
 		this->materials[MAT_SPHERES],
 		nullptr,
 		nullptr,
+		meshes));
+
+	meshes.clear();
+
+	meshes.push_back( new Mesh( &Quad(), 
+		glm::vec3(0.f), 
+		glm::vec3(0.f, -2.f, 0.f), 
+		glm::vec3(0.f, 0.f, 0.f), 
+		glm::vec3(-90.f, 0.f, 0.f),
+		glm::vec3(50.f)));
+
+	models.push_back( new Model(
+	glm::vec3(0.f), 
+		this->materials[MAT_FLOOR],
+		this->textures[TEX_FLOOR],
+		this->textures[TEX_FLOOR_SPECULAR], 
 		meshes));
 
 	// Remove unnecessary meshes
@@ -432,6 +459,11 @@ void Game::updateUniforms()
 	this->shaders[SHADER_SPHERES]->setMat4fv(this->ProjectionMatrix, "ProjectionMatrix");
 	this->shaders[SHADER_SPHERES]->setVec3f(this->camera.getPosition(), "cameraPosition");
 	this->shaders[SHADER_SPHERES]->setVec3f(*this->lights[0], "lightPos0");
+
+	this->shaders[SHADER_FLOOR]->setMat4fv(this->ViewMatrix, "ViewMatrix");
+	this->shaders[SHADER_FLOOR]->setMat4fv(this->ProjectionMatrix, "ProjectionMatrix");
+	this->shaders[SHADER_FLOOR]->setVec3f(this->camera.getPosition(), "cameraPosition");
+	this->shaders[SHADER_FLOOR]->setVec3f(*this->lights[0], "lightPos0");
 }
 
 
@@ -624,6 +656,16 @@ void Game::render()
 	glActiveTexture(0);
 	glBindTexture(GL_TEXTURE_2D,0);
 	/* ---------------   END OF CURRENT BOX_PROGRAM --------------- */
+
+	/* ---------------   START OF CURRENT FLOOR_PROGRAM --------------- */
+	this->models[MODEL_FLOOR]->render(this->shaders[SHADER_FLOOR], GL_TRIANGLES);
+	
+	// Unbind the current program
+	glBindVertexArray(0);
+	glUseProgram(0);
+	glActiveTexture(0);
+	glBindTexture(GL_TEXTURE_2D,0);
+	/* ---------------   END OF CURRENT FLOOR_PROGRAM --------------- */
 	
 	// End Draw
 	glfwSwapBuffers(window);

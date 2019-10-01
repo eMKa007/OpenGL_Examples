@@ -8,18 +8,21 @@
 enum shaders_enum
 {
 	SHADER_BOX = 0,
-	SHADER_SPHERES
+	SHADER_SPHERES,
+	SHADER_FLOOR
 };
 
 enum textureUnit_enum
 {
-	TEX_BACKGROUD = 0
+	TEX_FLOOR = 0,
+	TEX_FLOOR_SPECULAR
 };
 
 enum material_enum
 {
-	MAT_BG = 0,
-	MAT_SPHERES
+	MAT_BOX = 0,
+	MAT_SPHERES,
+	MAT_FLOOR
 };
 
 enum mesh_enum
@@ -30,7 +33,8 @@ enum mesh_enum
 enum model_enum
 {
 	MODEL_BOX = 0,
-	MODEL_SPHERES
+	MODEL_SPHERES,
+	MODEL_FLOOR
 };
 
 class Game

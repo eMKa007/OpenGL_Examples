@@ -228,11 +228,11 @@ void Mesh::updateModelMatrix()
 {
 	this->ModelMatrix = glm::mat4(1.f);
 
-	this->ModelMatrix = glm::translate(this->ModelMatrix, this->origin);
+	//this->ModelMatrix = glm::translate(this->ModelMatrix, this->origin);
+	this->ModelMatrix = glm::translate(this->ModelMatrix,   this->position - this->origin);	// vec3 - translation vector
 	this->ModelMatrix = glm::rotate(this->ModelMatrix, glm::radians(this->rotation.x), glm::vec3(1.f, 0.f, 0.f));		// Choose angle of rotation and then rotation axis. (X)
 	this->ModelMatrix = glm::rotate(this->ModelMatrix, glm::radians(this->rotation.y), glm::vec3(0.f, 1.f, 0.f));		// Choose angle of rotation and then rotation axis. (Y)
 	this->ModelMatrix = glm::rotate(this->ModelMatrix, glm::radians(this->rotation.z), glm::vec3(0.f, 0.f, 1.f));		// Choose angle of rotation and then rotation axis. (Z)
-	this->ModelMatrix = glm::translate(this->ModelMatrix,   this->position - this->origin);	// vec3 - translation vector
 	this->ModelMatrix = glm::scale(this->ModelMatrix, this->scale);	// vec3 - scale vector ( 1 means = no scaling )
 }
 
