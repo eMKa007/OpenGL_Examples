@@ -20,11 +20,21 @@ uniform vec3 specularLightning;
 
 void main()
 {
+	// Ambient 
+	vec3 ambient = ambientLightning;
+
+	// Diffuse
 	vec3 norm = normalize(vs_normal);
 	vec3 lightDir = normalize( lightPos0 - vs_position );
+	vec3 diffuse = diffuseLightning * max( dot(norm,lightDir), 0.0);
 
-	vec3 diffuse = diffuseLightning * max( dot(norm,lightDir), 0.0) ;
+	// Specular
+	vec3 viewDir = normalize( cameraPosition - vs_position );
+	vec3 reflectDir = reflect( -lightDir, norm );
+	float spec = pow( max( dot( viewDir, reflectDir), 0.0), 32);
+	vec3 specular = specularLightning * spec;
 
-	vec3 final_color = vs_color * ( ambientLightning + diffuse );
+	// Final Color
+	vec3 final_color = vs_color * ( ambient + diffuse + specular );
 	fs_color = vec4(final_color, 1.f);
 }

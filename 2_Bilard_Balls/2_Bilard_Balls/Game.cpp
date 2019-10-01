@@ -374,7 +374,7 @@ void Game::initModels(float sphereRadius)
 void Game::initLights()
 {
 	// LIGHTS
-	this->lights.push_back( new glm::vec3 (0.f, 0.f, 0.f) );
+	this->lights.push_back( new glm::vec3 (4.f, 4.f, 4.f) );
 }
 
 
@@ -603,7 +603,7 @@ void Game::render()
 		// Render Models
 	this->models[MODEL_BOX]->render(this->shaders[SHADER_BOX], GL_LINES);
 
-	//this->models[MODEL_SPHERES]->move();
+	this->models[MODEL_SPHERES]->move();
 	this->models[MODEL_SPHERES]->render(this->shaders[SHADER_BOX], GL_TRIANGLES);
 	
 	
@@ -618,7 +618,6 @@ void Game::render()
 	glBindTexture(GL_TEXTURE_2D,0);
 
 	/* ---------------   END OF CURRENT BOX_PROGRAM --------------- */
-
 }
 
 
