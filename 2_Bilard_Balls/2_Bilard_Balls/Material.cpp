@@ -32,13 +32,13 @@ Material::~Material(){}
 */
 void Material::sendToShader(Shader& programID)
 {
-	if( this->ambient.x != 0.0f || this->ambient.y != 0.0f || this->ambient.z != 0.0f )
+	if( glGetUniformLocation( programID.getID(), "ambientLightning") != -1 )
 		programID.setVec3f(this->ambient, "ambientLightning");
-
-	if( this->diffuse.x != 0.0f || this->diffuse.y != 0.0f || this->diffuse.z != 0.0f )
+	
+	if( glGetUniformLocation( programID.getID(), "diffuseLightning") != -1 )
 		programID.setVec3f(this->diffuse, "diffuseLightning");
-
-	if( this->specular.x != 0.0f || this->specular.y != 0.0f || this->specular.z != 0.0f )
+	
+	if( glGetUniformLocation( programID.getID(), "specularLightning") != -1 )
 		programID.setVec3f(this->specular, "specularLightning");
 }
 

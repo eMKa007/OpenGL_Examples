@@ -182,6 +182,11 @@ void Shader::set1i(GLint value, const GLchar* name)
 	this->unuse();
 }
 
+GLuint Shader::getID()
+{
+	return this->id;
+}
+
 /*	----------------------------------------------------------
 *	Function name: loadShaderSource()
 *	Parameters:	const char* fileName - Pointer to string which consist input file name

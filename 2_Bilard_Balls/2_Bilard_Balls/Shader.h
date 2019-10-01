@@ -47,6 +47,8 @@ public:
 	void setMat3fv(glm::mat3 value, const GLchar* name, GLboolean transpose = GL_FALSE);
 	void set1i(GLint value, const GLchar* name);
 
+	GLuint getID();
+
 	void use();
 	void unuse();	
 };

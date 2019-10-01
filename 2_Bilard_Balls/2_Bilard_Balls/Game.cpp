@@ -270,14 +270,17 @@ void Game::initTextures()
 */
 void Game::initMaterials()
 {
+	// Material BOX
 	materials.push_back( new Material(
-	glm::vec3(1.f), glm::vec3(1.f), glm::vec3(1.f),
+	glm::vec3(0.f), glm::vec3(0.f), glm::vec3(0.f),
 		0, 0));
 
+	// Material SPHERES
 	materials.push_back( new Material(
 	glm::vec3(0.1f), glm::vec3(1.f), glm::vec3(1.f),
 		0, 0));
 
+	// Material FLOOR
 	materials.push_back( new Material(
 	glm::vec3(0.1f), glm::vec3(1.f), glm::vec3(1.f),
 		0, 1));
