@@ -375,7 +375,7 @@ void Game::initModels(float sphereRadius)
 
 	meshes.clear();
 
-	meshes.push_back( new Mesh( &Quad(), 
+	meshes.push_back( new Mesh( &Quad( 5.f ), 
 		glm::vec3(0.f), 
 		glm::vec3(0.f, -2.f, 0.f), 
 		glm::vec3(0.f, 0.f, 0.f), 

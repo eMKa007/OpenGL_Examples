@@ -45,7 +45,7 @@ class Quad : public Primitive
 private:
 
 public:
-	Quad();
+	Quad( float nrOfTexRepeats );
 	~Quad();
 };
 
