@@ -83,11 +83,8 @@ void Model::rotate(const glm::vec3 rotation)
 
 void Model::move()
 {
-	//this->position += glm::vec3(this->dx, this->dy, this->dz);
-
 	for( auto & mesh : this->meshes )
 	{
-		//mesh->move(glm::vec3(this->dx, this->dy, this->dz));
 		glm::vec3 meshPosition = mesh->getPosition();
 
 		// Check for box limits
@@ -106,7 +103,7 @@ void Model::move()
 		else if( meshPosition.z <= -2.f+0.2f && mesh->getDeltaMove().z < 0 )
 			mesh->reverse_dz();
 
-		// Check distance between balls
+		// Check distance between spheres
 		for( auto& mesh_two : this->meshes )
 		{
 			// Skip checking itself mesh

@@ -17,7 +17,8 @@ enum textureUnit_enum
 
 enum material_enum
 {
-	MAT_BG = 0
+	MAT_BG = 0,
+	MAT_SPHERES
 };
 
 enum mesh_enum

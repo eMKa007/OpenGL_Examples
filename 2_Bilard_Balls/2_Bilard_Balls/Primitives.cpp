@@ -317,7 +317,7 @@ Sphere::Sphere(float radius, int sectorCount, int stackCount)
 	for( int i = 0; i<vertices.size()/3; i++)
 	{
 		Vertex temp = { glm::vec3(vertices[3*i], vertices[3*i+1], vertices[3*i+2]),
-			glm::vec3(0.f, 0.f, 0.f),
+			glm::vec3(0.3f, 1.f/(vertices.size()/3.f)*i, 1.f/(vertices.size()/3.f)*i),
 			glm::vec2(texCoords[2*i], texCoords[2*i+1]),
 			glm::vec3(normals[3*i], normals[3*i+1], normals[3*i+2])
 		};

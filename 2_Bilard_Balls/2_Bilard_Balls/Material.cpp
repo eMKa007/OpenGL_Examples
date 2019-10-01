@@ -32,5 +32,8 @@ Material::~Material(){}
 */
 void Material::sendToShader(Shader& programID)
 {
+	programID.setVec3f(this->ambient, "ambientLightning");
+	programID.setVec3f(this->diffuse, "diffuseLightning");
+	programID.setVec3f(this->specular, "specularLightning");
 }
 

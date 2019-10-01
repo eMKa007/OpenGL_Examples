@@ -13,8 +13,18 @@ out vec4 fs_color;
 uniform vec3 lightPos0;
 uniform vec3 cameraPosition;
 
+uniform vec3 ambientLightning;
+uniform vec3 diffuseLightning;
+uniform vec3 specularLightning;
+
 
 void main()
 {
-	fs_color = vec4(vs_color, 1.f);
+	vec3 norm = normalize(vs_normal);
+	vec3 lightDir = normalize( lightPos0 - vs_position );
+
+	vec3 diffuse = diffuseLightning * max( dot(norm,lightDir), 0.0) ;
+
+	vec3 final_color = vs_color * ( ambientLightning + diffuse );
+	fs_color = vec4(final_color, 1.f);
 }

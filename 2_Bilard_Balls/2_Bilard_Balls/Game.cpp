@@ -261,6 +261,10 @@ void Game::initMaterials()
 	materials.push_back( new Material(
 	glm::vec3(1.f), glm::vec3(1.f), glm::vec3(1.f),
 		0, 0));
+
+	materials.push_back( new Material(
+	glm::vec3(0.1f), glm::vec3(1.f), glm::vec3(1.f),
+		0, 0));
 }
 
 
@@ -348,7 +352,7 @@ void Game::initModels(float sphereRadius)
 
 	models.push_back( new Model(
 		glm::vec3(0.f),
-		this->materials[MAT_BG],
+		this->materials[MAT_SPHERES],
 		nullptr,
 		nullptr,
 		meshes));
@@ -370,7 +374,7 @@ void Game::initModels(float sphereRadius)
 void Game::initLights()
 {
 	// LIGHTS
-	this->lights.push_back( new glm::vec3 (0.f, 0.f, 1.f) );
+	this->lights.push_back( new glm::vec3 (0.f, 0.f, 0.f) );
 }
 
 
@@ -418,6 +422,9 @@ void Game::updateUniforms()
 		this->farPlane
 	);
 	this->shaders[SHADER_BOX]->setMat4fv(this->ProjectionMatrix, "ProjectionMatrix");
+
+	// Send to shader actual light position
+	this->shaders[SHADER_BOX]->setVec3f(*this->lights[0], "lightPos0");
 }
 
 
@@ -594,13 +601,10 @@ void Game::render()
 	this->updateUniforms();
 
 		// Render Models
-	//for( auto &i : this->models )
-	//	i->render(this->shaders[SHADER_BOX], GL_LINES);
-
 	this->models[MODEL_BOX]->render(this->shaders[SHADER_BOX], GL_LINES);
 
-	this->models[MODEL_SPHERES]->move();
-	this->models[1]->render(this->shaders[SHADER_BOX], GL_LINES);
+	//this->models[MODEL_SPHERES]->move();
+	this->models[MODEL_SPHERES]->render(this->shaders[SHADER_BOX], GL_TRIANGLES);
 	
 	
 		// End Draw
