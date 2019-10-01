@@ -7,7 +7,8 @@
 /* ENUMERATIONS */
 enum shaders_enum
 {
-	SHADER_BOX = 0
+	SHADER_BOX = 0,
+	SHADER_SPHERES
 };
 
 enum textureUnit_enum

@@ -389,12 +389,6 @@ void Mesh::render(Shader* shader, GLenum mode)
 	else
 		// Draw triangles. made of nrOfIndices which are unsigned int, starting from 0 index.
 		glDrawElements(mode, this->nrOfIndices, GL_UNSIGNED_INT, 0);
-
-	// Unbind the current program
-	glBindVertexArray(0);
-	glUseProgram(0);
-	glActiveTexture(0);
-	glBindTexture(GL_TEXTURE_2D,0);
 }
 
 glm::vec3 Mesh::getDeltaMove()

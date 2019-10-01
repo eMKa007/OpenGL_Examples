@@ -114,7 +114,6 @@ void Model::move()
 
 			if( glm::distance( meshPosition, secondMeshPos) < 0.4f )
 				switch_dxdydz( mesh, mesh_two );
-
 		}
 
 		mesh->move(mesh->getDeltaMove());

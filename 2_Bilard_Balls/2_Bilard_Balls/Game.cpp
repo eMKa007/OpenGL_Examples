@@ -233,6 +233,11 @@ void Game::initShaders()
 			"fragment_shader_box.glsl")
 	);
 
+	this->shaders.push_back(
+	new Shader(this->GL_VERSION_MAJOR, this->GL_VERSION_MINOR,
+		"vertex_shader_sphere.glsl",
+		"fragment_shader_sphere.glsl"));
+
 }
 
 
@@ -388,8 +393,11 @@ void Game::initLights()
 void Game::initUniforms()
 {
 	//Init Uniforms
-	this->shaders[SHADER_BOX]->setMat4fv(this->ViewMatrix, "ViewMatrix");
-	this->shaders[SHADER_BOX]->setMat4fv(this->ProjectionMatrix, "ProjectionMatrix");
+	for( auto& i : this->shaders)
+	{
+		i->setMat4fv(this->ViewMatrix, "ViewMatrix");
+		i->setMat4fv(this->ProjectionMatrix, "ProjectionMatrix");
+	}
 }
 
 
@@ -406,14 +414,9 @@ void Game::updateUniforms()
 {
 	// update View Matrix as we'll move the camera
 	this->ViewMatrix = this->camera.getViewMatrix();
-	this->shaders[SHADER_BOX]->setMat4fv(this->ViewMatrix, "ViewMatrix");
 
-	// Update Camera Position
-	this->shaders[SHADER_BOX]->setVec3f(this->camera.getPosition(), "cameraPosition");
-
-	// Update frame buffers size, and send new Projection Matrix.
+	// Update frame buffers size, and Projection Matrix.
 	glfwGetFramebufferSize(this->window, &this->framebufferWidth, &this->framebufferHeight);
-
 	this->ProjectionMatrix = glm::perspective
 	(
 		glm::radians(this->fov), 
@@ -421,10 +424,14 @@ void Game::updateUniforms()
 		this->nearPlane,
 		this->farPlane
 	);
-	this->shaders[SHADER_BOX]->setMat4fv(this->ProjectionMatrix, "ProjectionMatrix");
 
-	// Send to shader actual light position
-	this->shaders[SHADER_BOX]->setVec3f(*this->lights[0], "lightPos0");
+	this->shaders[SHADER_BOX]->setMat4fv(this->ViewMatrix, "ViewMatrix");
+	this->shaders[SHADER_BOX]->setMat4fv(this->ProjectionMatrix, "ProjectionMatrix");
+	
+	this->shaders[SHADER_SPHERES]->setMat4fv(this->ViewMatrix, "ViewMatrix");
+	this->shaders[SHADER_SPHERES]->setMat4fv(this->ProjectionMatrix, "ProjectionMatrix");
+	this->shaders[SHADER_SPHERES]->setVec3f(this->camera.getPosition(), "cameraPosition");
+	this->shaders[SHADER_SPHERES]->setVec3f(*this->lights[0], "lightPos0");
 }
 
 
@@ -593,31 +600,34 @@ void Game::render()
 		// Clear
 	glClearColor(1.f, 1.f, 1.f, 1.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);		//Clear all three buffers.
-
-
-	/* ---------------   START OF CURRENT BOX_PROGRAM --------------- */
-
-		// Update uniforms (variables send to gpu [shader] from cpu)- every change they're updated.
+		
+	// Update uniforms (variables send to gpu [shader] from cpu)- every change they're updated.
 	this->updateUniforms();
 
-		// Render Models
+	/* ---------------   START OF CURRENT BOX_PROGRAM --------------- */
 	this->models[MODEL_BOX]->render(this->shaders[SHADER_BOX], GL_LINES);
-
-	this->models[MODEL_SPHERES]->move();
-	this->models[MODEL_SPHERES]->render(this->shaders[SHADER_BOX], GL_TRIANGLES);
 	
-	
-		// End Draw
-	glfwSwapBuffers(window);
-	glFlush();
-
-		// Unbind the current program
+	// Unbind the current program
 	glBindVertexArray(0);
 	glUseProgram(0);
 	glActiveTexture(0);
 	glBindTexture(GL_TEXTURE_2D,0);
-
 	/* ---------------   END OF CURRENT BOX_PROGRAM --------------- */
+
+	/* ---------------   START OF CURRENT SPHERES_PROGRAM --------------- */
+	this->models[MODEL_SPHERES]->move();
+	this->models[MODEL_SPHERES]->render(this->shaders[SHADER_SPHERES], GL_TRIANGLES);
+
+	// Unbind the current program
+	glBindVertexArray(0);
+	glUseProgram(0);
+	glActiveTexture(0);
+	glBindTexture(GL_TEXTURE_2D,0);
+	/* ---------------   END OF CURRENT BOX_PROGRAM --------------- */
+	
+	// End Draw
+	glfwSwapBuffers(window);
+	glFlush();
 }
 
 
