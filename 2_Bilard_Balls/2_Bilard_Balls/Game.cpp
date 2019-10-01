@@ -455,18 +455,20 @@ void Game::updateUniforms()
 		this->farPlane
 	);
 
-	this->shaders[SHADER_BOX]->setMat4fv(this->ViewMatrix, "ViewMatrix");
-	this->shaders[SHADER_BOX]->setMat4fv(this->ProjectionMatrix, "ProjectionMatrix");
-	
-	this->shaders[SHADER_SPHERES]->setMat4fv(this->ViewMatrix, "ViewMatrix");
-	this->shaders[SHADER_SPHERES]->setMat4fv(this->ProjectionMatrix, "ProjectionMatrix");
-	this->shaders[SHADER_SPHERES]->setVec3f(this->camera.getPosition(), "cameraPosition");
-	this->shaders[SHADER_SPHERES]->setVec3f(*this->lights[0], "lightPos0");
+	for( auto& i : this->shaders )
+	{
+		if( glGetUniformLocation( i->getID(), "ViewMatrix") != -1)
+			i->setMat4fv(this->ViewMatrix, "ViewMatrix");
 
-	this->shaders[SHADER_FLOOR]->setMat4fv(this->ViewMatrix, "ViewMatrix");
-	this->shaders[SHADER_FLOOR]->setMat4fv(this->ProjectionMatrix, "ProjectionMatrix");
-	this->shaders[SHADER_FLOOR]->setVec3f(this->camera.getPosition(), "cameraPosition");
-	this->shaders[SHADER_FLOOR]->setVec3f(*this->lights[0], "lightPos0");
+		if( glGetUniformLocation( i->getID(), "ProjectionMatrix") != -1)
+			i->setMat4fv(this->ProjectionMatrix, "ProjectionMatrix");
+
+		if( glGetUniformLocation( i->getID(), "cameraPosition") != -1)
+			i->setVec3f(this->camera.getPosition(), "cameraPosition");
+
+		if( glGetUniformLocation( i->getID(), "lightPos0") != -1)
+			i->setVec3f(*this->lights[0], "lightPos0");
+	}
 }
 
 
