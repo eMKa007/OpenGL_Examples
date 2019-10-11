@@ -399,6 +399,37 @@ void Game::initModels(float sphereRadius)
 	}
 }
 
+/*	----------------------------------------------------------
+*	Function name: initDephMapFrameObject()
+*	Parameters:	none
+*	Used to: Create depth map framebuffer object.
+*	Return:	void
+*/
+void Game::initDephMapFrameObject()
+{
+	glGenBuffers(1, &this->dephMapFBO);
+
+	// Generate Texture object for depth buffer.
+	glGenTextures(1, &this->depthMap);
+	glBindTexture(GL_TEXTURE_2D, this->depthMap);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, 
+		this->framebufferWidth, this->framebufferHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+	// Bind depth texture to depth buffer
+	glBindFramebuffer(GL_FRAMEBUFFER, this->dephMapFBO);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, this->depthMap, 0);
+	glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_NONE);
+
+	// Unbind current buffer
+	glBindBuffer(GL_FRAMEBUFFER, 0);
+
+}
+
 
 /*	----------------------------------------------------------
 *	Function name: initLights()

@@ -47,6 +47,12 @@ private:
 	int framebufferWidth;
 	int framebufferHeight;
 
+	// FrameBuffer Object
+	unsigned int dephMapFBO;
+
+	// Depth map Texture
+	unsigned int depthMap;
+
 	//OpenGL Context
 	const int GL_VERSION_MAJOR;
 	const int GL_VERSION_MINOR;
@@ -106,6 +112,7 @@ private:
 	void initTextures();
 	void initMaterials();
 	void initModels( float SphereRadius );
+	void initDephMapFrameObject();
 	void initLights();
 	void initUniforms();
 
