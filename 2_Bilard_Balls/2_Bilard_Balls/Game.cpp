@@ -241,6 +241,11 @@ void Game::initShaders()
 	new Shader(this->GL_VERSION_MAJOR, this->GL_VERSION_MINOR,
 		"vertex_shader_floor.glsl",
 		"fragment_shader_floor.glsl"));
+
+	this->shaders.push_back(
+		new Shader(this->GL_VERSION_MAJOR, this->GL_VERSION_MINOR,
+			"vertex_shader_core.glsl",
+			"fragment_shader_core.glsl"));
 }
 
 
@@ -672,29 +677,38 @@ void Game::render()
 	// Update uniforms (variables send to gpu [shader] from cpu)- every change they're updated.
 	this->updateUniforms();
 
+
 	/* ---------------   START OF CURRENT BOX_PROGRAM --------------- */
-	this->models[MODEL_BOX]->render(this->shaders[SHADER_BOX], GL_LINES);
+	//this->models[MODEL_BOX]->render(this->shaders[SHADER_BOX], GL_LINES);
+	this->shaders[SHADER_CORE]->set1i(0, "DRAW_MODE");
+	this->models[MODEL_BOX]->render(this->shaders[SHADER_CORE], GL_LINES);
+
 	
 	// Unbind the current program
 	glBindVertexArray(0);
 	glUseProgram(0);
 	glActiveTexture(0);
 	glBindTexture(GL_TEXTURE_2D,0);
-	/* ---------------   END OF CURRENT BOX_PROGRAM --------------- */
+	/* ---------------   END OF CURRENT BOX_PROGRAM --------------- */	
+
 
 	/* ---------------   START OF CURRENT SPHERES_PROGRAM --------------- */
 	this->models[MODEL_SPHERES]->move();
-	this->models[MODEL_SPHERES]->render(this->shaders[SHADER_SPHERES], GL_TRIANGLES);
+	//this->models[MODEL_SPHERES]->render(this->shaders[SHADER_SPHERES], GL_TRIANGLES);
+	this->shaders[SHADER_CORE]->set1i(1, "DRAW_MODE");
+	this->models[MODEL_SPHERES]->render(this->shaders[SHADER_CORE], GL_TRIANGLES);
 
 	// Unbind the current program
 	glBindVertexArray(0);
 	glUseProgram(0);
 	glActiveTexture(0);
 	glBindTexture(GL_TEXTURE_2D,0);
-	/* ---------------   END OF CURRENT BOX_PROGRAM --------------- */
+	/* ---------------   END OF CURRENT SPHERES_PROGRAM --------------- */
 
 	/* ---------------   START OF CURRENT FLOOR_PROGRAM --------------- */
-	this->models[MODEL_FLOOR]->render(this->shaders[SHADER_FLOOR], GL_TRIANGLES);
+	//this->models[MODEL_FLOOR]->render(this->shaders[SHADER_FLOOR], GL_TRIANGLES);
+	this->shaders[SHADER_CORE]->set1i(2, "DRAW_MODE");
+	this->models[MODEL_FLOOR]->render(this->shaders[SHADER_CORE], GL_TRIANGLES);
 	
 	// Unbind the current program
 	glBindVertexArray(0);
@@ -702,7 +716,9 @@ void Game::render()
 	glActiveTexture(0);
 	glBindTexture(GL_TEXTURE_2D,0);
 	/* ---------------   END OF CURRENT FLOOR_PROGRAM --------------- */
-	
+
+
+
 	// End Draw
 	glfwSwapBuffers(window);
 	glFlush();

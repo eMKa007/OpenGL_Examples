@@ -177,7 +177,9 @@ void Shader::set1i(GLint value, const GLchar* name)
 {
 	this->use();
 
-	glUniform1i(glGetUniformLocation(this->id, name), value);
+	auto placeholder = glGetUniformLocation(this->id, name);
+	if( placeholder != -1)
+		glUniform1i(placeholder, value);
 
 	this->unuse();
 }

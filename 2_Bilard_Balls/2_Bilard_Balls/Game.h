@@ -9,7 +9,8 @@ enum shaders_enum
 {
 	SHADER_BOX = 0,
 	SHADER_SPHERES,
-	SHADER_FLOOR
+	SHADER_FLOOR,
+	SHADER_CORE
 };
 
 enum textureUnit_enum

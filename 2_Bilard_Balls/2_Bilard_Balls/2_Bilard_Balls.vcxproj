@@ -147,9 +147,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="fragment_shader_box.glsl" />
+    <None Include="fragment_shader_core.glsl" />
     <None Include="fragment_shader_floor.glsl" />
     <None Include="fragment_shader_sphere.glsl" />
     <None Include="vertex_shader_box.glsl" />
+    <None Include="vertex_shader_core.glsl" />
     <None Include="vertex_shader_floor.glsl" />
     <None Include="vertex_shader_sphere.glsl" />
   </ItemGroup>

@@ -94,5 +94,11 @@
     <None Include="fragment_shader_floor.glsl">
       <Filter>Source Files</Filter>
     </None>
+    <None Include="fragment_shader_core.glsl">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="vertex_shader_core.glsl">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
 </Project>
