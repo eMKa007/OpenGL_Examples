@@ -17,10 +17,10 @@ Project which follows ["C++ OpenGL 3D Tutorial"](https://www.youtube.com/playlis
 ------
 
 #### 2_Bilard_Balls
-Based on previously created class hierarchy project shows spheres moving within box boundaries.
+Based on previously created class hierarchy project shows spheres moving within box boundaries.  
 Added light source and lightning to spheres ( ambient, diffuse and specular ).
 
-<img src="https://raw.githubusercontent.com/eMKa007/OpenGL_Examples/master/2_Bilard_Balls/GIFS/v01.gif" width="478" height="200" />
+<img src="https://raw.githubusercontent.com/eMKa007/OpenGL_Examples/master/2_Bilard_Balls/GIFS/v01.gif" width="500" height="350" />
 
    
 ------
