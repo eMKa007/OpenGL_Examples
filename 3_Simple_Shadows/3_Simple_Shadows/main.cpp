@@ -58,15 +58,29 @@ const int gWindowHeight = 600;
 int framebufferWidth;
 int framebufferHeight;
 
-glm::vec3 camPosition;
-glm::vec3 camFront;
-glm::vec3 worldUp;
-
 GLuint VAO;
 GLuint VBO;
 GLuint EBO;
 
 glm::vec3 currPosition;
+
+float currTime;
+float dt;
+float lastTime;
+
+double mouseX;
+double mouseY;
+
+bool firstMouse;
+double lastMouseX;
+double lastMouseY;
+
+double mouseOffsetX;
+double mouseOffsetY;
+
+void updateDt();
+void UpdateKeyboardInput( GLFWwindow* window, Camera* camera );
+void updateMouseInput();
 
 int main(int argc, char* argv[] )
 {
@@ -110,15 +124,11 @@ int main(int argc, char* argv[] )
 	glFrontFace(GL_CCW);
 	glPolygonMode( GL_FRONT_AND_BACK, GL_FILL);
 	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);// Init input options
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);// Init input options	
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-	worldUp = glm::vec3(0.f, 1.f, 0.f);
-	camFront = glm::vec3(-1.f, -1.5f, -1.f);
-	camPosition = glm::vec3(3.f, 3.f, 3.f);
+	Camera* camera = new Camera(glm::vec3(3.f, 3.f, 3.f), glm::vec3(-1.f, -1.5f, -1.f), glm::vec3(0.f, 1.f, 0.f));
 	
-	glm::mat4 ViewMatrix = glm::mat4(1.f);
-	ViewMatrix = glm::lookAt(camPosition, camPosition + camFront, worldUp);
-
 	glm::mat4 ProjectionMatrix = glm::mat4(1.f);
 
 	ProjectionMatrix = glm::perspective(
@@ -133,8 +143,6 @@ int main(int argc, char* argv[] )
 
 	Shader* Program = new Shader( 4, 4,
 		"vertex_core.glsl", "fragment_core.glsl");
-
-	currPosition = glm::vec3(0.f);
 
 	/* Initialize  Meshes */
 	glCreateVertexArrays(1, &VAO);
@@ -176,17 +184,18 @@ int main(int argc, char* argv[] )
 	ModelMatrix = glm::scale(ModelMatrix, glm::vec3(1.f));
 
 	//Init Uniforms
-	Program->setMat4fv(ViewMatrix, "ViewMatrix");
+	Program->setMat4fv(camera->getViewMatrix(), "ViewMatrix");
 	Program->setMat4fv(ProjectionMatrix, "ProjectionMatrix");
 
-    while(!glfwWindowShouldClose(window)) {
-        glfwPollEvents();
-		
+    while(!glfwWindowShouldClose(window)) {		
     	glClearColor(0.f, 0.f, 0.f, 1.f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);		//Clear all three buffers.
 
-		ViewMatrix = glm::mat4(1.f);
-		ViewMatrix = glm::lookAt(camPosition, camPosition + camFront, worldUp);
+		glfwPollEvents();
+		updateDt();
+		UpdateKeyboardInput(window, camera);
+		updateMouseInput();
+		camera->updateMouseInput(dt, mouseOffsetX, mouseOffsetY);
 
 		ProjectionMatrix = glm::mat4(1.f);
 		ProjectionMatrix = glm::perspective(
@@ -205,7 +214,7 @@ int main(int argc, char* argv[] )
 		ModelMatrix = glm::translate(ModelMatrix,   currPosition - glm::vec3(0.f));
 		ModelMatrix = glm::scale(ModelMatrix, glm::vec3(1.f));
 
-		Program->setMat4fv(ViewMatrix, "ViewMatrix");
+		Program->setMat4fv(camera->getViewMatrix(), "ViewMatrix");
 		Program->setMat4fv(ProjectionMatrix, "ProjectionMatrix");
 		Program->setMat4fv(ModelMatrix, "ModelMatrix");
 
@@ -231,4 +240,71 @@ int main(int argc, char* argv[] )
     glfwTerminate();
 
 	return 0;
+}
+
+void updateDt()
+{
+	currTime = static_cast<float>(glfwGetTime());
+	dt = currTime - lastTime;
+	lastTime = currTime;
+}
+
+void UpdateKeyboardInput( GLFWwindow* window, Camera* camera )
+{
+	if( glfwGetKey( window, GLFW_KEY_ESCAPE ) == GLFW_PRESS )
+	{
+		glfwSetWindowShouldClose(window, GLFW_TRUE);
+	}
+
+	// Camera
+	if( glfwGetKey( window, GLFW_KEY_W ) == GLFW_PRESS )
+	{
+		camera->move(dt, FORWARD);
+	}
+
+	if( glfwGetKey( window, GLFW_KEY_S ) == GLFW_PRESS )
+	{
+		camera->move(dt, BACKWARD);
+	}
+
+	if( glfwGetKey( window, GLFW_KEY_A ) == GLFW_PRESS )
+	{
+		camera->move(dt, LEFT);
+	}
+
+	if( glfwGetKey( window, GLFW_KEY_D ) == GLFW_PRESS )
+	{
+		camera->move(dt, RIGTH);
+	}
+
+	if( glfwGetKey( window, GLFW_KEY_SPACE ) == GLFW_PRESS )
+	{
+		camera->move(dt, UPWARD);
+	}
+
+	if( glfwGetKey( window, GLFW_KEY_LEFT_CONTROL ) == GLFW_PRESS )
+	{
+		camera->move(dt, DOWNWARD);
+	}
+}
+
+void updateMouseInput()
+{
+
+	glfwGetCursorPos(window, &mouseX, &mouseY);
+
+	if( firstMouse )
+	{
+		lastMouseX = mouseX;
+		lastMouseY = mouseY;
+		firstMouse = false;
+	}
+
+	// Calculate Offset
+	mouseOffsetX = mouseX - lastMouseX;
+	mouseOffsetY = mouseY - lastMouseY;
+
+	// Set last X and Y
+	lastMouseX = mouseX;
+	lastMouseY = mouseY;
 }
