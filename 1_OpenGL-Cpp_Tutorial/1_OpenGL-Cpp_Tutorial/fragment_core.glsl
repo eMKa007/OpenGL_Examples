@@ -70,7 +70,7 @@ void main()
 	/* Attenuation */
 
 	/* FINAL LIGHT */
-	fs_color = 
-		texture(material.diffuseTex, vs_texcoord) /* vec4(vs_color,1.f)*/
-		 * ( vec4(ambientFinal, 1.f) + vec4(diffuseFinal, 1.f) + vec4(SpecularFinal, 1.f));
+	fs_color = vec4(vec3(gl_FragCoord.z), 1.0);
+		//texture(material.diffuseTex, vs_texcoord) /* vec4(vs_color,1.f)*/
+		// * ( vec4(ambientFinal, 1.f) + vec4(diffuseFinal, 1.f) + vec4(SpecularFinal, 1.f));
 }

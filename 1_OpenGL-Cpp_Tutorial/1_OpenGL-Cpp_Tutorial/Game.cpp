@@ -177,6 +177,7 @@ void Game::initOpenGLOptions()
 	 * OpenGL is a state machine. Before we draw something, we want to enable some options.
 	 */
 	glEnable(GL_DEPTH_TEST); // Lock Z-coordinate. Impossible to use Z-values.
+	glDepthFunc(GL_LESS);
 
 	glEnable(GL_CULL_FACE); // Remove (do not draw) object that are not seen. (Face culling)
 	glCullFace(GL_BACK);	// Back side of object will not be drawn
