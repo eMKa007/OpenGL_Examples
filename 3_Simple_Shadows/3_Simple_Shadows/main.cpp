@@ -15,43 +15,40 @@ float z = 1.0f;
 
 Vertex vertices[] =
 {
-	// Position				// Color					// texcoord				// Normal
-	//glm::vec3(-x, -y, -z),	glm::vec3(1.f, 0.f, 0.f),	glm::vec2(0.f, 1.f),	glm::vec3(0.f, 0.f, 1.f),	// Vertex 0
-	//glm::vec3(x, -y, -z),	glm::vec3(0.f, 1.f, 0.f),	glm::vec2(0.f, 0.f),	glm::vec3(0.f, 0.f, 1.f),	// Vertex 1
-	//glm::vec3(x, y, -z),	glm::vec3(0.f, 0.f, 1.f),	glm::vec2(1.f, 0.f),	glm::vec3(0.f, 0.f, 1.f),	// Vertex 2
-	//glm::vec3(-x, y, -z),	glm::vec3(1.f, 1.f, 0.f),	glm::vec2(1.f, 1.f),	glm::vec3(0.f, 0.f, 1.f),	// Vertex 3
-	//glm::vec3(-x, -y, z),	glm::vec3(1.f, 1.f, 0.f),	glm::vec2(1.f, 1.f),	glm::vec3(0.f, 0.f, 1.f),	// Vertex 4
-	//glm::vec3(x, -y, z),	glm::vec3(1.f, 0.f, 1.f),	glm::vec2(1.f, 1.f),	glm::vec3(0.f, 0.f, 1.f),	// Vertex 5
-	//glm::vec3(x, y, z),		glm::vec3(0.f, 1.f, 0.f),	glm::vec2(1.f, 1.f),	glm::vec3(0.f, 0.f, 1.f),	// Vertex 6
-	//glm::vec3(-x, y, z),	glm::vec3(0.f, 1.f, 1.f),	glm::vec2(1.f, 1.f),	glm::vec3(0.f, 0.f, 1.f)	// Vertex 7
-	
-	glm::vec3(-1.f, -0.2f, 0.f),	glm::vec3(1.f, 0.f, 0.f),		glm::vec2(0.f, 1.f),	glm::vec3(0.f, 0.f, 1.f),	// Vertex 0
-	glm::vec3(1.f, -0.2f, 0.f),		glm::vec3(1.f, 1.f, 0.f),		glm::vec2(0.f, 1.f),	glm::vec3(0.f, 0.f, 1.f),	// Vertex 1
-	glm::vec3(0.f, 0.5f, 0.f),		glm::vec3(1.f, 0.f, 1.f),		glm::vec2(0.f, 1.f),	glm::vec3(0.f, 0.f, 1.f),	// Vertex 2
-	
+	// Position						// Color					// texcoord				// Normal
+	// Triangle Front
+		glm::vec3(0.f, 0.5f, 0.f),		glm::vec3(1.f, 0.f, 0.f),	glm::vec2(0.5f, 1.f),	glm::vec3(0.f, 0.f, 1.f),	// Vertex 0
+		glm::vec3(-0.5f, -0.5f, 0.5f),	glm::vec3(0.f, 1.f, 0.f),	glm::vec2(0.f, 0.f),	glm::vec3(0.f, 0.f, 1.f),	// Vertex 1
+		glm::vec3(0.5f, -0.5f, 0.5f),	glm::vec3(0.f, 0.f, 1.f),	glm::vec2(1.f, 0.f),	glm::vec3(0.f, 0.f, 1.f),	// Vertex 2
+
+	// Triangle Left
+		glm::vec3(0.f, 0.5f, 0.f),		glm::vec3(1.f, 1.f, 0.f),	glm::vec2(0.5f, 1.f),	glm::vec3(-1.f, 0.f, 0.f),	// Vertex 0
+		glm::vec3(-0.5f, -0.5f, -0.5f),	glm::vec3(0.f, 0.f, 1.f),	glm::vec2(0.f, 0.f),	glm::vec3(-1.f, 0.f, 0.f),	// Vertex 1
+		glm::vec3(-0.5f, -0.5f, 0.5f),	glm::vec3(0.f, 0.f, 1.f),	glm::vec2(1.f, 0.f),	glm::vec3(-1.f, 0.f, 0.f),	// Vertex 2
+
+	// Triangle Back
+		glm::vec3(0.f, 0.5f, 0.f),		glm::vec3(1.f, 1.f, 0.f),	glm::vec2(0.5f, 1.f),	glm::vec3(0.f, 0.f, -1.f),	// Vertex 0
+		glm::vec3(0.5f, -0.5f, -0.5f),	glm::vec3(0.f, 0.f, 0.f),	glm::vec2(0.f, 0.f),	glm::vec3(0.f, 0.f, -1.f),	// Vertex 1
+		glm::vec3(-0.5f, -0.5f, -0.5f),	glm::vec3(0.f, 0.f, 1.f),	glm::vec2(1.f, 0.f),	glm::vec3(0.f, 0.f, -1.f),	// Vertex 2
+
+	// Triangle Right
+		glm::vec3(0.f, 0.5f, 0.f),		glm::vec3(1.f, 1.f, 0.f),	glm::vec2(0.5f, 1.f),	glm::vec3(1.f, 0.f, 0.f),	// Vertex 0
+		glm::vec3(0.5f, -0.5f, 0.5f),	glm::vec3(0.f, 0.f, 1.f),	glm::vec2(0.f, 0.f),	glm::vec3(1.f, 0.f, 0.f),	// Vertex 1
+		glm::vec3(0.5f, -0.5f, -0.5f),	glm::vec3(0.f, 0.f, 1.f),	glm::vec2(1.f, 0.f),	glm::vec3(1.f, 0.f, 0.f),	// Vertex 2	
+
+	// Triangle Floor
+		glm::vec3(-10.f, -1.5f, -10.f),	glm::vec3(0.5f, 0.f, 0.5f),	glm::vec2(0.f, 1),		glm::vec3(0.f, 0.f, 1.f),	// Vertex 0
+		glm::vec3(-10.f, -1.5f, 10.f),	glm::vec3(1.f, 0.f, 0.f),	glm::vec2(0.f, 0.f),	glm::vec3(0.f, 0.f, 1.f),	// Vertex 1
+		glm::vec3(10.f, -1.5f, 10.f),	glm::vec3(0.5f, 0.f, 0.5f),	glm::vec2(1, 0.f),		glm::vec3(0.f, 0.f, 1.f),	// Vertex 2
+
+		glm::vec3(-10.f, -1.5f, -10.f),	glm::vec3(0.5f, 0.f, 0.5f),	glm::vec2(0.f, 1),		glm::vec3(0.f, 0.f, 1.f),	// Vertex 0
+		glm::vec3(10.f, -1.5f, 10.f),	glm::vec3(0.5f, 0.f, 0.5f),	glm::vec2(1, 0.f),		glm::vec3(0.f, 0.f, 1.f),	// Vertex 2
+		glm::vec3(10.f, -1.5f, -10.f),	glm::vec3(0.f, 0.f, 1.f),	glm::vec2(1, 1),		glm::vec3(0.f, 0.f, 1.f)	// Vertex 3
+
 };
 
-GLuint indices[] =
+GLuint indices[10] =
 {
-	/*0, 2, 1,
-    0, 3, 2,
-
-    1, 2, 6,
-    6, 5, 1,
-
-    4, 5, 6,
-    6, 7, 4,
-
-    2, 3, 6,
-    6, 3, 7,
-
-    0, 7, 3,
-    0, 4, 7,
-
-    0, 1, 5,
-    0, 5, 4*/
-
-	0, 1, 2
 };
 
 GLFWwindow* window;
@@ -116,8 +113,8 @@ int main(int argc, char* argv[] )
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);// Init input options
 
 	worldUp = glm::vec3(0.f, 1.f, 0.f);
-	camFront = glm::vec3(0.f, 0.f, -1.f);
-	camPosition = glm::vec3(0.f, 0.f, 2.f);
+	camFront = glm::vec3(-1.f, -1.5f, -1.f);
+	camPosition = glm::vec3(3.f, 3.f, 3.f);
 	
 	glm::mat4 ViewMatrix = glm::mat4(1.f);
 	ViewMatrix = glm::lookAt(camPosition, camPosition + camFront, worldUp);
@@ -132,7 +129,7 @@ int main(int argc, char* argv[] )
 	);
 
 	unsigned nrOfVertices = sizeof(vertices) / sizeof(Vertex);
-	unsigned nrOfIndices = sizeof(indices) / sizeof(GLuint);
+	unsigned nrOfIndices = 0;//sizeof(indices) / sizeof(GLuint);
 
 	Shader* Program = new Shader( 4, 4,
 		"vertex_core.glsl", "fragment_core.glsl");
@@ -188,8 +185,6 @@ int main(int argc, char* argv[] )
     	glClearColor(0.f, 0.f, 0.f, 1.f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);		//Clear all three buffers.
 
-	
-
 		ViewMatrix = glm::mat4(1.f);
 		ViewMatrix = glm::lookAt(camPosition, camPosition + camFront, worldUp);
 
@@ -200,6 +195,7 @@ int main(int argc, char* argv[] )
 		0.1f, 
 		100.f
 		);
+
 
 		ModelMatrix = glm::mat4(1.f);
 		ModelMatrix = glm::translate(ModelMatrix, glm::vec3(0.f));
