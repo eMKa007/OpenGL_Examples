@@ -121,6 +121,7 @@ private:
 	void updateUniforms();
 
 	void RenderFromLightPOV();
+	void RenderFromCameraPOV();
 
 public:
 	/* CONSTRUCTORS/DESTRUCTORS */

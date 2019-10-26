@@ -497,11 +497,35 @@ void Game::updateUniforms()
 void Game::RenderFromLightPOV()
 {
 	this->DepthMapFBO.BindForWriting();
-
 	glClear( GL_DEPTH_BUFFER_BIT);
 
+	/* ---------------   START OF CURRENT SPHERES_PROGRAM --------------- */
+	this->models[MODEL_SPHERES]->render(this->shaders[SHADER_SHADOW], GL_TRIANGLES);
+
+	// Unbind the current program
+	glBindVertexArray(0);
+	glUseProgram(0);
+	glActiveTexture(0);
+	glBindTexture(GL_TEXTURE_2D,0);
+	/* ---------------   END OF CURRENT SPHERES_PROGRAM --------------- */
+
+	/* ---------------   START OF CURRENT FLOOR_PROGRAM --------------- */
+	this->models[MODEL_FLOOR]->render(this->shaders[SHADER_SHADOW], GL_TRIANGLES);
+	
+	// Unbind the current program
+	glBindVertexArray(0);
+	glUseProgram(0);
+	glActiveTexture(0);
+	glBindTexture(GL_TEXTURE_2D,0);
+	/* ---------------   END OF CURRENT FLOOR_PROGRAM --------------- */
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void Game::RenderFromCameraPOV()
+{
 	/* ---------------   START OF CURRENT BOX_PROGRAM --------------- */
-	this->models[MODEL_BOX]->render(this->shaders[SHADER_SHADOW], GL_LINES);
+	this->models[MODEL_BOX]->render(this->shaders[SHADER_BOX], GL_LINES);
 	//this->shaders[SHADER_CORE]->set1i(0, "DRAW_MODE");
 	//this->models[MODEL_BOX]->render(this->shaders[SHADER_CORE], GL_LINES);
 
@@ -515,7 +539,7 @@ void Game::RenderFromLightPOV()
 
 
 	/* ---------------   START OF CURRENT SPHERES_PROGRAM --------------- */
-	this->models[MODEL_SPHERES]->render(this->shaders[SHADER_SHADOW], GL_TRIANGLES);
+	this->models[MODEL_SPHERES]->render(this->shaders[SHADER_SPHERES], GL_TRIANGLES);
 	//this->shaders[SHADER_CORE]->set1i(1, "DRAW_MODE");
 	//this->models[MODEL_SPHERES]->render(this->shaders[SHADER_CORE], GL_TRIANGLES);
 
@@ -527,7 +551,7 @@ void Game::RenderFromLightPOV()
 	/* ---------------   END OF CURRENT SPHERES_PROGRAM --------------- */
 
 	/* ---------------   START OF CURRENT FLOOR_PROGRAM --------------- */
-	this->models[MODEL_FLOOR]->render(this->shaders[SHADER_SHADOW], GL_TRIANGLES);
+	this->models[MODEL_FLOOR]->render(this->shaders[SHADER_FLOOR], GL_TRIANGLES);
 	//this->shaders[SHADER_CORE]->set1i(2, "DRAW_MODE");
 	//this->models[MODEL_FLOOR]->render(this->shaders[SHADER_CORE], GL_TRIANGLES);
 	
@@ -537,8 +561,6 @@ void Game::RenderFromLightPOV()
 	glActiveTexture(0);
 	glBindTexture(GL_TEXTURE_2D,0);
 	/* ---------------   END OF CURRENT FLOOR_PROGRAM --------------- */
-
-	
 }
 
 
@@ -712,48 +734,8 @@ void Game::render()
 	this->models[MODEL_SPHERES]->move();
 
 	/* DRAW */
-	//this->RenderFromLightPOV();
-	//this->RenderFromCameraPOV();
-
-	/* ---------------   START OF CURRENT BOX_PROGRAM --------------- */
-	this->models[MODEL_BOX]->render(this->shaders[SHADER_BOX], GL_LINES);
-	//this->shaders[SHADER_CORE]->set1i(0, "DRAW_MODE");
-	//this->models[MODEL_BOX]->render(this->shaders[SHADER_CORE], GL_LINES);
-
-	
-	// Unbind the current program
-	glBindVertexArray(0);
-	glUseProgram(0);
-	glActiveTexture(0);
-	glBindTexture(GL_TEXTURE_2D,0);
-	/* ---------------   END OF CURRENT BOX_PROGRAM --------------- */	
-
-
-	/* ---------------   START OF CURRENT SPHERES_PROGRAM --------------- */
-	this->models[MODEL_SPHERES]->render(this->shaders[SHADER_SPHERES], GL_TRIANGLES);
-	//this->shaders[SHADER_CORE]->set1i(1, "DRAW_MODE");
-	//this->models[MODEL_SPHERES]->render(this->shaders[SHADER_CORE], GL_TRIANGLES);
-
-	// Unbind the current program
-	glBindVertexArray(0);
-	glUseProgram(0);
-	glActiveTexture(0);
-	glBindTexture(GL_TEXTURE_2D,0);
-	/* ---------------   END OF CURRENT SPHERES_PROGRAM --------------- */
-
-	/* ---------------   START OF CURRENT FLOOR_PROGRAM --------------- */
-	this->models[MODEL_FLOOR]->render(this->shaders[SHADER_FLOOR], GL_TRIANGLES);
-	//this->shaders[SHADER_CORE]->set1i(2, "DRAW_MODE");
-	//this->models[MODEL_FLOOR]->render(this->shaders[SHADER_CORE], GL_TRIANGLES);
-	
-	// Unbind the current program
-	glBindVertexArray(0);
-	glUseProgram(0);
-	glActiveTexture(0);
-	glBindTexture(GL_TEXTURE_2D,0);
-	/* ---------------   END OF CURRENT FLOOR_PROGRAM --------------- */
-
-
+	this->RenderFromLightPOV();
+	this->RenderFromCameraPOV();
 
 	// End Draw
 	glfwSwapBuffers(window);
