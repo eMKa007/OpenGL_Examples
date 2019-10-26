@@ -56,6 +56,8 @@ Game::Game(const char* title, const int WINDOW_WIDTH, const int WINDOW_HEIGHT,
 	this->initModels( 0.2f );
 	this->initLights();
 	this->initUniforms();
+
+	glfwSwapInterval(1);
 }
 
 
@@ -246,6 +248,11 @@ void Game::initShaders()
 		new Shader(this->GL_VERSION_MAJOR, this->GL_VERSION_MINOR,
 			"vertex_shader_core.glsl",
 			"fragment_shader_core.glsl"));
+
+	this->shaders.push_back(
+		new Shader(this->GL_VERSION_MAJOR, this->GL_VERSION_MINOR,
+			"vertex_shadowMap.glsl",
+			"fragment_shadowMap.glsl"));
 }
 
 
@@ -412,27 +419,7 @@ void Game::initModels(float sphereRadius)
 */
 void Game::initDephMapFrameObject()
 {
-	glGenBuffers(1, &this->dephMapFBO);
-
-	// Generate Texture object for depth buffer.
-	glGenTextures(1, &this->depthMap);
-	glBindTexture(GL_TEXTURE_2D, this->depthMap);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, 
-		this->framebufferWidth, this->framebufferHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-	// Bind depth texture to depth buffer
-	glBindFramebuffer(GL_FRAMEBUFFER, this->dephMapFBO);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, this->depthMap, 0);
-	glDrawBuffer(GL_NONE);
-	glReadBuffer(GL_NONE);
-
-	// Unbind current buffer
-	glBindBuffer(GL_FRAMEBUFFER, 0);
-
+	this->DepthMapFBO = ShadowMapFBO();
 }
 
 
@@ -507,6 +494,52 @@ void Game::updateUniforms()
 	}
 }
 
+void Game::RenderFromLightPOV()
+{
+	this->DepthMapFBO.BindForWriting();
+
+	glClear( GL_DEPTH_BUFFER_BIT);
+
+	/* ---------------   START OF CURRENT BOX_PROGRAM --------------- */
+	this->models[MODEL_BOX]->render(this->shaders[SHADER_SHADOW], GL_LINES);
+	//this->shaders[SHADER_CORE]->set1i(0, "DRAW_MODE");
+	//this->models[MODEL_BOX]->render(this->shaders[SHADER_CORE], GL_LINES);
+
+	
+	// Unbind the current program
+	glBindVertexArray(0);
+	glUseProgram(0);
+	glActiveTexture(0);
+	glBindTexture(GL_TEXTURE_2D,0);
+	/* ---------------   END OF CURRENT BOX_PROGRAM --------------- */	
+
+
+	/* ---------------   START OF CURRENT SPHERES_PROGRAM --------------- */
+	this->models[MODEL_SPHERES]->render(this->shaders[SHADER_SHADOW], GL_TRIANGLES);
+	//this->shaders[SHADER_CORE]->set1i(1, "DRAW_MODE");
+	//this->models[MODEL_SPHERES]->render(this->shaders[SHADER_CORE], GL_TRIANGLES);
+
+	// Unbind the current program
+	glBindVertexArray(0);
+	glUseProgram(0);
+	glActiveTexture(0);
+	glBindTexture(GL_TEXTURE_2D,0);
+	/* ---------------   END OF CURRENT SPHERES_PROGRAM --------------- */
+
+	/* ---------------   START OF CURRENT FLOOR_PROGRAM --------------- */
+	this->models[MODEL_FLOOR]->render(this->shaders[SHADER_SHADOW], GL_TRIANGLES);
+	//this->shaders[SHADER_CORE]->set1i(2, "DRAW_MODE");
+	//this->models[MODEL_FLOOR]->render(this->shaders[SHADER_CORE], GL_TRIANGLES);
+	
+	// Unbind the current program
+	glBindVertexArray(0);
+	glUseProgram(0);
+	glActiveTexture(0);
+	glBindTexture(GL_TEXTURE_2D,0);
+	/* ---------------   END OF CURRENT FLOOR_PROGRAM --------------- */
+
+	
+}
 
 
 /* ---------------------------- PUBLIC FUNCTIONS ---------------------------- */
@@ -669,19 +702,23 @@ void Game::update()
 */
 void Game::render()
 {
-	/* DRAW */
-		// Clear
-	glClearColor(1.f, 1.f, 1.f, 1.f);
+	/* CLEAR */
+	glClearColor(0.f, 0.f, 0.f, 1.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);		//Clear all three buffers.
-		
+
+	/* UPDATE */
 	// Update uniforms (variables send to gpu [shader] from cpu)- every change they're updated.
 	this->updateUniforms();
+	this->models[MODEL_SPHERES]->move();
 
+	/* DRAW */
+	//this->RenderFromLightPOV();
+	//this->RenderFromCameraPOV();
 
 	/* ---------------   START OF CURRENT BOX_PROGRAM --------------- */
-	//this->models[MODEL_BOX]->render(this->shaders[SHADER_BOX], GL_LINES);
-	this->shaders[SHADER_CORE]->set1i(0, "DRAW_MODE");
-	this->models[MODEL_BOX]->render(this->shaders[SHADER_CORE], GL_LINES);
+	this->models[MODEL_BOX]->render(this->shaders[SHADER_BOX], GL_LINES);
+	//this->shaders[SHADER_CORE]->set1i(0, "DRAW_MODE");
+	//this->models[MODEL_BOX]->render(this->shaders[SHADER_CORE], GL_LINES);
 
 	
 	// Unbind the current program
@@ -693,10 +730,9 @@ void Game::render()
 
 
 	/* ---------------   START OF CURRENT SPHERES_PROGRAM --------------- */
-	this->models[MODEL_SPHERES]->move();
-	//this->models[MODEL_SPHERES]->render(this->shaders[SHADER_SPHERES], GL_TRIANGLES);
-	this->shaders[SHADER_CORE]->set1i(1, "DRAW_MODE");
-	this->models[MODEL_SPHERES]->render(this->shaders[SHADER_CORE], GL_TRIANGLES);
+	this->models[MODEL_SPHERES]->render(this->shaders[SHADER_SPHERES], GL_TRIANGLES);
+	//this->shaders[SHADER_CORE]->set1i(1, "DRAW_MODE");
+	//this->models[MODEL_SPHERES]->render(this->shaders[SHADER_CORE], GL_TRIANGLES);
 
 	// Unbind the current program
 	glBindVertexArray(0);
@@ -706,9 +742,9 @@ void Game::render()
 	/* ---------------   END OF CURRENT SPHERES_PROGRAM --------------- */
 
 	/* ---------------   START OF CURRENT FLOOR_PROGRAM --------------- */
-	//this->models[MODEL_FLOOR]->render(this->shaders[SHADER_FLOOR], GL_TRIANGLES);
-	this->shaders[SHADER_CORE]->set1i(2, "DRAW_MODE");
-	this->models[MODEL_FLOOR]->render(this->shaders[SHADER_CORE], GL_TRIANGLES);
+	this->models[MODEL_FLOOR]->render(this->shaders[SHADER_FLOOR], GL_TRIANGLES);
+	//this->shaders[SHADER_CORE]->set1i(2, "DRAW_MODE");
+	//this->models[MODEL_FLOOR]->render(this->shaders[SHADER_CORE], GL_TRIANGLES);
 	
 	// Unbind the current program
 	glBindVertexArray(0);

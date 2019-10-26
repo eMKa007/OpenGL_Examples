@@ -42,6 +42,9 @@
     <ClCompile Include="Texture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ShadowMapFBO.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="libs.h">
@@ -74,31 +77,40 @@
     <ClInclude Include="Vertex.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ShadowMapFBO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="vertex_shader_box.glsl">
-      <Filter>Source Files</Filter>
-    </None>
     <None Include="fragment_shader_box.glsl">
-      <Filter>Source Files</Filter>
-    </None>
-    <None Include="fragment_shader_sphere.glsl">
-      <Filter>Source Files</Filter>
-    </None>
-    <None Include="vertex_shader_sphere.glsl">
-      <Filter>Source Files</Filter>
-    </None>
-    <None Include="vertex_shader_floor.glsl">
-      <Filter>Source Files</Filter>
-    </None>
-    <None Include="fragment_shader_floor.glsl">
-      <Filter>Source Files</Filter>
+      <Filter>Resource Files</Filter>
     </None>
     <None Include="fragment_shader_core.glsl">
-      <Filter>Source Files</Filter>
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="fragment_shader_floor.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="fragment_shader_sphere.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="vertex_shader_box.glsl">
+      <Filter>Resource Files</Filter>
     </None>
     <None Include="vertex_shader_core.glsl">
-      <Filter>Source Files</Filter>
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="vertex_shader_floor.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="vertex_shader_sphere.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="vertex_shadowMap.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="fragment_shadowMap.glsl">
+      <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>
 </Project>

@@ -10,7 +10,8 @@ enum shaders_enum
 	SHADER_BOX = 0,
 	SHADER_SPHERES,
 	SHADER_FLOOR,
-	SHADER_CORE
+	SHADER_CORE,
+	SHADER_SHADOW
 };
 
 enum textureUnit_enum
@@ -49,7 +50,7 @@ private:
 	int framebufferHeight;
 
 	// FrameBuffer Object
-	unsigned int dephMapFBO;
+	ShadowMapFBO DepthMapFBO;
 
 	// Depth map Texture
 	unsigned int depthMap;
@@ -118,6 +119,8 @@ private:
 	void initUniforms();
 
 	void updateUniforms();
+
+	void RenderFromLightPOV();
 
 public:
 	/* CONSTRUCTORS/DESTRUCTORS */

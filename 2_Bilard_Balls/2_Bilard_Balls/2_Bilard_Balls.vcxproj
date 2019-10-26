@@ -131,6 +131,7 @@
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="Primitives.cpp" />
     <ClCompile Include="Shader.cpp" />
+    <ClCompile Include="ShadowMapFBO.cpp" />
     <ClCompile Include="Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -142,6 +143,7 @@
     <ClInclude Include="Model.h" />
     <ClInclude Include="Primitives.h" />
     <ClInclude Include="Shader.h" />
+    <ClInclude Include="ShadowMapFBO.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Vertex.h" />
   </ItemGroup>
@@ -150,10 +152,12 @@
     <None Include="fragment_shader_core.glsl" />
     <None Include="fragment_shader_floor.glsl" />
     <None Include="fragment_shader_sphere.glsl" />
+    <None Include="fragment_shadowMap.glsl" />
     <None Include="vertex_shader_box.glsl" />
     <None Include="vertex_shader_core.glsl" />
     <None Include="vertex_shader_floor.glsl" />
     <None Include="vertex_shader_sphere.glsl" />
+    <None Include="vertex_shadowMap.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
