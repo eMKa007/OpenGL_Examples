@@ -119,9 +119,12 @@ private:
 	void initUniforms();
 
 	void updateUniforms();
+	void updateUniforms_LightPOV();
 
 	void RenderFromLightPOV();
 	void RenderFromCameraPOV();
+
+	void SendUniformsToShaders();
 
 public:
 	/* CONSTRUCTORS/DESTRUCTORS */

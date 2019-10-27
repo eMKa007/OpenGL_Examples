@@ -478,6 +478,32 @@ void Game::updateUniforms()
 		this->farPlane
 	);
 
+	this->SendUniformsToShaders();
+}
+
+void Game::updateUniforms_LightPOV()
+{
+	// Get View Matrix from Light POV.
+	//this->ViewMatrix = this->camera.getViewMatrix();
+	this->ViewMatrix = glm::lookAt( *this->lights[0], 
+		glm::vec3(0.f), 
+		glm::vec3(0.f, 1.0f, 0.f));
+
+	// Update frame buffers size, and Projection Matrix.
+	glfwGetFramebufferSize(this->window, &this->framebufferWidth, &this->framebufferHeight);
+	this->ProjectionMatrix = glm::perspective
+	(
+		glm::radians(this->fov), 
+		static_cast<float>(this->framebufferWidth)/this->framebufferHeight, 
+		this->nearPlane,
+		this->farPlane
+	);
+
+	this->SendUniformsToShaders();
+}
+
+void Game::SendUniformsToShaders()
+{
 	for( auto& i : this->shaders )
 	{
 		if( glGetUniformLocation( i->getID(), "ViewMatrix") != -1)
@@ -730,11 +756,13 @@ void Game::render()
 
 	/* UPDATE */
 	// Update uniforms (variables send to gpu [shader] from cpu)- every change they're updated.
-	this->updateUniforms();
 	this->models[MODEL_SPHERES]->move();
 
 	/* DRAW */
+	this->updateUniforms_LightPOV();
 	this->RenderFromLightPOV();
+
+	this->updateUniforms();
 	this->RenderFromCameraPOV();
 
 	// End Draw
