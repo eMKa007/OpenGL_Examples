@@ -24,7 +24,7 @@ void ShadowMapFBO::BindForWriting()
 
 void ShadowMapFBO::BindForReading(GLenum TextureUnit)
 {
-	glActiveTexture(TextureUnit);
+	glActiveTexture(GL_TEXTURE0+TextureUnit);
 	glBindTexture(GL_TEXTURE_2D, this->m_shadowMap);
 }
 
@@ -64,5 +64,4 @@ void ShadowMapFBO::InitDepthMapTexture(unsigned TextureWidth, unsigned TextureHe
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
 }

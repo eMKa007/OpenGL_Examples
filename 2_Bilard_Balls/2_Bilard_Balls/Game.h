@@ -51,10 +51,7 @@ private:
 
 	// FrameBuffer Object
 	ShadowMapFBO* DepthMapFBO;
-
-	// Depth map Texture
-	unsigned int depthMap;
-
+	
 	//OpenGL Context
 	const int GL_VERSION_MAJOR;
 	const int GL_VERSION_MINOR;

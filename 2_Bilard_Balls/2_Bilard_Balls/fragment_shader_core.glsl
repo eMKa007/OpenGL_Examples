@@ -24,6 +24,7 @@ uniform vec3 specularLightning;
 
 uniform sampler2D diffuseTex;
 uniform sampler2D specularTex;
+uniform sampler2D shadowMapTex;
 
 float near = 0.1;
 float far = 50.0;
@@ -56,9 +57,9 @@ void main()
 {
 	if( DRAW_MODE == BOX )
 	{
-		//fs_color = vec4(vs_color, 1.f);
-		float depth = LinearizeDepth(gl_FragCoord.z)/far;
-		fs_color = vec4(vec3(depth), 1.0);
+		fs_color = vec4(vs_color, 1.f);
+		//float depth = LinearizeDepth(gl_FragCoord.z)/far;
+		//fs_color = vec4(vec3(depth), 1.0);
 	}
 	else if( DRAW_MODE == SPHERE || DRAW_MODE == FLOOR )
 	{
@@ -74,8 +75,8 @@ void main()
 		// Final Color
 		vec3 final_color = ( ambient + diffuse + specular ) * ( DRAW_MODE == SPHERE ? vs_color : vec3(1.f) );
 		
-		float depth = LinearizeDepth(gl_FragCoord.z)/far;
-		fs_color = vec4(vec3(depth), 1.0);//vec4(final_color, 1.f) * ( DRAW_MODE == SPHERE ? vec4(1.f) : texture(diffuseTex, vs_texcoord) );
+		fs_color = vec4(final_color, 1.f) * ( DRAW_MODE == SPHERE ? vec4(1.f) : texture(shadowMapTex, vs_texcoord) );
+		
 	}
 	else
 	{

@@ -49,7 +49,7 @@ void Model::update()
 
 }
 
-void Model::render(Shader* shader, GLenum mode)
+void Model::render(Shader* shader, GLenum mode, ShadowMapFBO* shaderMapFBO)
 {
 	// Update uniforms (variables send to gpu [shader] from cpu)- every change they're updated.
 	this->updateUniforms();
@@ -61,10 +61,13 @@ void Model::render(Shader* shader, GLenum mode)
 	shader->use();
 
 		// Activate Texture
-	if( overrideTextureDiffuse != nullptr )
+	if( this->overrideTextureDiffuse != nullptr )
 		overrideTextureDiffuse->bind(0);
-	if( overrideTextureSpecular != nullptr )
+	if( this->overrideTextureSpecular != nullptr )
 		overrideTextureSpecular->bind(1);
+
+	if( shaderMapFBO )
+		shaderMapFBO->BindForReading(2);
 
 		// Draw
 	for( auto &i : this->meshes )

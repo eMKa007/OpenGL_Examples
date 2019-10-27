@@ -4,6 +4,7 @@
 #include "Texture.h"
 #include "Shader.h"
 #include "Material.h"
+#include "ShadowMapFBO.h"
 
 
 class Model
@@ -29,7 +30,7 @@ public:
 
 	/* FUNCTIONS */
 	void update();
-	void render(Shader* shader, GLenum mode);
+	void render(Shader* shader, GLenum mode, ShadowMapFBO* shadowMapFBO = nullptr);
 	void rotate(const glm::vec3 rotation);
 	void move();
 	void switch_dxdydz( Mesh* mesh, Mesh* mesh_two);
