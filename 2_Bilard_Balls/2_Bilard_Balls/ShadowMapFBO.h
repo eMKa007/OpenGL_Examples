@@ -24,10 +24,10 @@ private:
 	void InitDepthMapTexture(unsigned TextureWidth, unsigned TextureHeight);
 
 public:
-	ShadowMapFBO();
+	ShadowMapFBO(unsigned WindowWidth, unsigned WindowHeight);
 	~ShadowMapFBO();
 
-	bool Init( unsigned int WindowWidth, unsigned int WindowHeight);
+	void Init( unsigned int WindowWidth, unsigned int WindowHeight);
 
 	void BindForWriting();
 

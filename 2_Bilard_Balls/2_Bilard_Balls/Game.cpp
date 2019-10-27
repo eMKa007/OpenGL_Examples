@@ -57,6 +57,8 @@ Game::Game(const char* title, const int WINDOW_WIDTH, const int WINDOW_HEIGHT,
 	this->initLights();
 	this->initUniforms();
 
+	this->initDephMapFrameObject();
+
 	glfwSwapInterval(1);
 }
 
@@ -419,7 +421,7 @@ void Game::initModels(float sphereRadius)
 */
 void Game::initDephMapFrameObject()
 {
-	this->DepthMapFBO = ShadowMapFBO();
+	this->DepthMapFBO = new ShadowMapFBO(this->WINDOW_WIDTH, this->WINDOW_HEIGHT);
 }
 
 
@@ -522,7 +524,7 @@ void Game::SendUniformsToShaders()
 
 void Game::RenderFromLightPOV()
 {
-	this->DepthMapFBO.BindForWriting();
+	this->DepthMapFBO->BindForWriting();
 	glClear( GL_DEPTH_BUFFER_BIT);
 
 	/* ---------------   START OF CURRENT SPHERES_PROGRAM --------------- */
@@ -550,6 +552,10 @@ void Game::RenderFromLightPOV()
 
 void Game::RenderFromCameraPOV()
 {
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	
+
 	/* ---------------   START OF CURRENT BOX_PROGRAM --------------- */
 	this->models[MODEL_BOX]->render(this->shaders[SHADER_BOX], GL_LINES);
 	//this->shaders[SHADER_CORE]->set1i(0, "DRAW_MODE");

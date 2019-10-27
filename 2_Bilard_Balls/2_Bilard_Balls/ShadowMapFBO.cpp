@@ -1,9 +1,11 @@
 #include "ShadowMapFBO.h"
 
-ShadowMapFBO::ShadowMapFBO()
+ShadowMapFBO::ShadowMapFBO(unsigned WindowWidth, unsigned WindowHeight)
 {
 	this->m_fbo = 0;
 	this->m_shadowMap = 0;
+
+	this->Init(WindowWidth, WindowHeight);
 }
 
 ShadowMapFBO::~ShadowMapFBO()
@@ -26,7 +28,7 @@ void ShadowMapFBO::BindForReading(GLenum TextureUnit)
 	glBindTexture(GL_TEXTURE_2D, this->m_shadowMap);
 }
 
-bool ShadowMapFBO::Init(unsigned WindowWidth, unsigned WindowHeight)
+void ShadowMapFBO::Init(unsigned WindowWidth, unsigned WindowHeight)
 {
 	glGenFramebuffers(1, &this->m_fbo);
 
@@ -49,7 +51,6 @@ bool ShadowMapFBO::Init(unsigned WindowWidth, unsigned WindowHeight)
 		std::cout << "ERROR::DEPTH_FRAME_BUFFER_OBJECT_CREATION::STATUS: " << status << std::endl;
 		throw std::exception("ERROR::DEPTH_FRAME_BUFFER_OBJECT_CREATION");
 	}
-
 }
 
 void ShadowMapFBO::InitDepthMapTexture(unsigned TextureWidth, unsigned TextureHeight)

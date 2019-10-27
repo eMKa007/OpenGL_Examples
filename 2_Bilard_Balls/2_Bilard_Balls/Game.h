@@ -50,7 +50,7 @@ private:
 	int framebufferHeight;
 
 	// FrameBuffer Object
-	ShadowMapFBO DepthMapFBO;
+	ShadowMapFBO* DepthMapFBO;
 
 	// Depth map Texture
 	unsigned int depthMap;
