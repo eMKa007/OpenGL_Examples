@@ -6,10 +6,13 @@ const uint BOX = 0u;
 const uint SPHERE = 1u;
 const uint FLOOR = 2u;
 
-in vec3 vs_position;
-in vec3 vs_color;
-in vec2 vs_texcoord;
-in vec3 vs_normal;
+in VS_OUT {
+	vec3 vs_position;
+	vec3 vs_color;
+	vec2 vs_texcoord;
+	vec3 vs_normal;
+	vec4 FragPosLightSpace;
+} fs_in;
 
 out vec4 fs_color;
 
@@ -47,17 +50,17 @@ vec3 calculateSpecular( vec3 cameraPosition, vec3 vs_position, vec3 lightPos0 )
 {
 	vec3 viewDir = normalize( cameraPosition - vs_position );
 	vec3 lightDir = normalize( lightPos0 - vs_position );
-	vec3 reflectDir = reflect( -lightDir, normalize(vs_normal) );
+	vec3 reflectDir = reflect( -lightDir, normalize(fs_in.vs_normal) );
 	float spec = pow( max( dot( viewDir, reflectDir), 0.0), 32);
 
-	return specularLightning * spec * ( DRAW_MODE == 1 ? vec3(1.f) : texture(specularTex, vs_texcoord).rgb );
+	return specularLightning * spec * ( DRAW_MODE == 1 ? vec3(1.f) : texture(specularTex, fs_in.vs_texcoord).rgb );
 }
 
 void main()
 {
 	if( DRAW_MODE == BOX )
 	{
-		fs_color = vec4(vs_color, 1.f);
+		fs_color = vec4(fs_in.vs_color, 1.f);
 		//float depth = LinearizeDepth(gl_FragCoord.z)/far;
 		//fs_color = vec4(vec3(depth), 1.0);
 	}
@@ -67,15 +70,15 @@ void main()
 		vec3 ambient = length(ambientLightning) > 0.f ? ambientLightning : vec3(1.f);
 
 		// Diffuse
-		vec3 diffuse = length(diffuseLightning) > 0.f ? calculateDiffuse( vs_normal, lightPos0, vs_position ) : vec3(1.f);
+		vec3 diffuse = length(diffuseLightning) > 0.f ? calculateDiffuse( fs_in.vs_normal, lightPos0, fs_in.vs_position ) : vec3(1.f);
 
 		// Specular
-		vec3 specular = length(specularLightning) > 0.f ? calculateSpecular( cameraPosition, vs_position, lightPos0 ) : vec3(1.f);
+		vec3 specular = length(specularLightning) > 0.f ? calculateSpecular( cameraPosition, fs_in.vs_position, lightPos0 ) : vec3(1.f);
 
 		// Final Color
-		vec3 final_color = ( ambient + diffuse + specular ) * ( DRAW_MODE == SPHERE ? vs_color : vec3(1.f) );
+		vec3 final_color = ( ambient + diffuse + specular ) * ( DRAW_MODE == SPHERE ? fs_in.vs_color : vec3(1.f) );
 		
-		fs_color = vec4(final_color, 1.f) * ( DRAW_MODE == SPHERE ? vec4(1.f) : texture(shadowMapTex, vs_texcoord) );
+		fs_color = vec4(final_color, 1.f) * ( DRAW_MODE == SPHERE ? vec4(1.f) : texture(shadowMapTex, fs_in.vs_texcoord) );
 		
 	}
 	else
