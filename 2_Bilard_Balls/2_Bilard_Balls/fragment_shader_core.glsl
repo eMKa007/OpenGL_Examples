@@ -80,6 +80,6 @@ void main()
 	}
 	else
 	{
-		fs_color = vec4(vs_color, 1.f);
+		fs_color = vec4(1.f);
 	}	
 }

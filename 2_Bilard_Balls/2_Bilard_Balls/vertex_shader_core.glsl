@@ -42,10 +42,12 @@ void main()
 	}
 	else
 	{
-		vs_position = vec3(0.f);
-		vs_color = vec3(0.f);
-		vs_texcoord = vec2(0.f);
-		vs_normal = vec3(0.f);
+		vs_position = vec4( ModelMatrix * vec4(vertex_position, 1.f)).xyz;	/* Keep world coordinates for further calculations */
+		vs_color = vertex_color;
+		vs_texcoord = vec2( tex_coord.x, tex_coord.y * -1.f);
+		vs_normal = mat3(ModelMatrix) * vertex_normal;
+
+		gl_Position = ProjectionMatrix * ViewMatrix * ModelMatrix * vec4(vertex_position, 1.f);	/* Multiply every point in vertex shader by ModelMatrix  - final position*/
 	}	
 	
 }

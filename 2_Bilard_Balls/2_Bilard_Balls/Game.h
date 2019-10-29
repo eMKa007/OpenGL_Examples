@@ -36,7 +36,8 @@ enum model_enum
 {
 	MODEL_BOX = 0,
 	MODEL_SPHERES,
-	MODEL_FLOOR
+	MODEL_FLOOR,
+	MODEL_LIGHT_SPHERE
 };
 
 class Game
@@ -110,9 +111,9 @@ private:
 	void initShaders();
 	void initTextures();
 	void initMaterials();
+	void initLights();
 	void initModels( float SphereRadius );
 	void initDephMapFrameObject();
-	void initLights();
 	void initUniforms();
 
 	void updateUniforms();

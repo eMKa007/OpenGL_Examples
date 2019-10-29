@@ -53,8 +53,8 @@ Game::Game(const char* title, const int WINDOW_WIDTH, const int WINDOW_HEIGHT,
 	this->initShaders();
 	this->initTextures();
 	this->initMaterials();
-	this->initModels( 0.2f );
 	this->initLights();
+	this->initModels( 0.2f );
 	this->initUniforms();
 
 	this->initDephMapFrameObject();
@@ -304,6 +304,19 @@ void Game::initMaterials()
 
 
 /*	----------------------------------------------------------
+*	Function name: initLights()
+*	Parameters:	none
+*	Used to: Determine lights position.
+*	Return:	void
+*/
+void Game::initLights()
+{
+	// LIGHTS
+	this->lights.push_back( new glm::vec3 (10.f, 10.f, 10.f) );
+}
+
+
+/*	----------------------------------------------------------
 *	Function name: initModels()
 *	Parameters:	none
 *	Used to: Create Model objects.
@@ -408,6 +421,20 @@ void Game::initModels(float sphereRadius)
 		this->textures[TEX_FLOOR_SPECULAR], 
 		meshes));
 
+	meshes.clear();
+
+	// position is pushed backwards to simulate sun object.
+	meshes.push_back( new Mesh( 
+		&Sphere(sphereRadius*5, 36, 18),
+		glm::vec3(0.f), (*this->lights[0]) * 10.f));
+
+	models.push_back( new Model(
+		glm::vec3(0.f),
+		this->materials[MAT_SPHERES],
+		nullptr,
+		nullptr, 
+		meshes));
+
 	// Remove unnecessary meshes
 	for( auto *& i : meshes )
 	{
@@ -424,19 +451,6 @@ void Game::initModels(float sphereRadius)
 void Game::initDephMapFrameObject()
 {
 	this->DepthMapFBO = new ShadowMapFBO(800, 600);
-}
-
-
-/*	----------------------------------------------------------
-*	Function name: initLights()
-*	Parameters:	none
-*	Used to: Determine lights position.
-*	Return:	void
-*/
-void Game::initLights()
-{
-	// LIGHTS
-	this->lights.push_back( new glm::vec3 (4.f, 4.f, 4.f) );
 }
 
 
@@ -581,6 +595,18 @@ void Game::RenderFromCameraPOV()
 	//this->models[MODEL_FLOOR]->render(this->shaders[SHADER_FLOOR], GL_TRIANGLES);
 	this->shaders[SHADER_CORE]->set1i(2, "DRAW_MODE");
 	this->models[MODEL_FLOOR]->render(this->shaders[SHADER_CORE], GL_TRIANGLES, this->DepthMapFBO);
+	
+	// Unbind the current program
+	glBindVertexArray(0);
+	glUseProgram(0);
+	glActiveTexture(0);
+	glBindTexture(GL_TEXTURE_2D,0);
+	/* ---------------   END OF CURRENT FLOOR_PROGRAM --------------- */
+
+	/* ---------------   START OF CURRENT LIGHT_SPHERE_PROGRAM --------------- */
+	//this->models[MODEL_FLOOR]->render(this->shaders[SHADER_FLOOR], GL_TRIANGLES);
+	this->shaders[SHADER_CORE]->set1i(3, "DRAW_MODE");
+	this->models[MODEL_LIGHT_SPHERE]->render(this->shaders[SHADER_CORE], GL_TRIANGLES, this->DepthMapFBO);
 	
 	// Unbind the current program
 	glBindVertexArray(0);
