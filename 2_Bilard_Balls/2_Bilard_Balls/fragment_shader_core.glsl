@@ -66,8 +66,11 @@ float ShadowCalculation(vec4 fragPosLightSpace)
     float closestDepth = texture(shadowMapTex, projCoords.xy).r; 
     // get depth of current fragment from light's perspective
     float currentDepth = projCoords.z;
+	// Add small value to prevent shadow acne. this value is based on angle between normal and lightdir. 
+	vec3 lightDir = normalize( lightPos0 - fs_in.vs_position );
+	float bias = max(0.00001 * (1.0 - dot(fs_in.vs_normal, lightDir)), 0.00005);  // val between [0.00001, 0.00005]
     // check whether current frag pos is in shadow
-    float shadow = currentDepth > closestDepth  ? 1.0 : 0.0;
+    float shadow = currentDepth-bias > closestDepth  ? 1.0 : 0.0;
 
     return shadow;
 }  

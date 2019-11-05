@@ -784,7 +784,7 @@ void Game::render()
 
 	/* UPDATE */
 	// Update uniforms (variables send to gpu [shader] from cpu)- every change they're updated.
-	this->models[MODEL_SPHERES]->move();
+	//this->models[MODEL_SPHERES]->move();
 
 	/* DRAW */
 	this->updateUniforms_LightPOV();
