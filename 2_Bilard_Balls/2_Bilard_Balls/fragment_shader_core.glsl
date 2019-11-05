@@ -56,6 +56,22 @@ vec3 calculateSpecular( vec3 cameraPosition, vec3 vs_position, vec3 lightPos0 )
 	return specularLightning * spec * ( DRAW_MODE == 1 ? vec3(1.f) : texture(specularTex, fs_in.vs_texcoord).rgb );
 }
 
+float ShadowCalculation(vec4 fragPosLightSpace)
+{
+    // perform perspective divide
+    vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
+    // transform to [0,1] range
+    projCoords = projCoords * 0.5 + 0.5;
+    // get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
+    float closestDepth = texture(shadowMapTex, projCoords.xy).r; 
+    // get depth of current fragment from light's perspective
+    float currentDepth = projCoords.z;
+    // check whether current frag pos is in shadow
+    float shadow = currentDepth > closestDepth  ? 1.0 : 0.0;
+
+    return shadow;
+}  
+
 void main()
 {
 	if( DRAW_MODE == BOX )
@@ -75,10 +91,13 @@ void main()
 		// Specular
 		vec3 specular = length(specularLightning) > 0.f ? calculateSpecular( cameraPosition, fs_in.vs_position, lightPos0 ) : vec3(1.f);
 
+		// Calculate shadow 
+		float shadow = ShadowCalculation(fs_in.FragPosLightSpace);
+
 		// Final Color
-		vec3 final_color = ( ambient + diffuse + specular ) * ( DRAW_MODE == SPHERE ? fs_in.vs_color : vec3(1.f) );
+		vec3 final_color = ( ambient + + (1.0 - shadow) * (diffuse + specular )) * ( DRAW_MODE == SPHERE ? fs_in.vs_color : vec3(1.f) );
 		
-		fs_color = vec4(final_color, 1.f) * ( DRAW_MODE == SPHERE ? vec4(1.f) : texture(shadowMapTex, fs_in.vs_texcoord) );
+		fs_color = vec4(final_color, 1.f) * ( DRAW_MODE == SPHERE ? vec4(1.f) : texture(diffuseTex, fs_in.vs_texcoord) );
 		
 	}
 	else

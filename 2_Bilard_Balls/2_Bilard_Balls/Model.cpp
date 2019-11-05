@@ -60,14 +60,26 @@ void Model::render(Shader* shader, GLenum mode, ShadowMapFBO* shaderMapFBO)
 		// Use a program (shader) - need to tell what shader we want to use.
 	shader->use();
 
+	GLint tex_unit = 0;
 		// Activate Texture
 	if( this->overrideTextureDiffuse != nullptr )
-		overrideTextureDiffuse->bind(0);
+	{
+		overrideTextureDiffuse->bind(tex_unit);
+		glUniform1i(glGetUniformLocation(shader->getID(), "diffuseTex"), tex_unit++);
+	}
+		
 	if( this->overrideTextureSpecular != nullptr )
-		overrideTextureSpecular->bind(1);
+	{
+		overrideTextureSpecular->bind(tex_unit);
+		glUniform1i(glGetUniformLocation(shader->getID(), "specularTex"), tex_unit++);
+	}
 
 	if( shaderMapFBO )
-		shaderMapFBO->BindForReading(2);
+	{
+		shaderMapFBO->BindForReading(tex_unit);
+		glUniform1i(glGetUniformLocation(shader->getID(), "shadowMapTex"), tex_unit++);
+	}
+		
 
 		// Draw
 	for( auto &i : this->meshes )

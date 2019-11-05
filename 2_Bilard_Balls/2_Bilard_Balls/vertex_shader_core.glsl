@@ -24,6 +24,7 @@ uniform int DRAW_MODE;
 uniform mat4 ModelMatrix;
 uniform mat4 ViewMatrix;
 uniform mat4 ProjectionMatrix;
+uniform mat4 LightSpaceMatrix;
 
 void main()
 {
@@ -31,6 +32,7 @@ void main()
 	{
 		vs_out.vs_position = vec4( ModelMatrix * vec4(vertex_position, 1.f)).xyz;	/* Keep world coordinates for further calculations */
 		vs_out.vs_color = vertex_color;
+		vs_out.FragPosLightSpace = LightSpaceMatrix * vec4(vs_out.vs_position, 1.0);
 
 		gl_Position = ProjectionMatrix * ViewMatrix * ModelMatrix * vec4(vertex_position, 1.f);	/* Multiply every point in vertex shader by ModelMatrix  - final position*/
 	}
@@ -40,6 +42,7 @@ void main()
 		vs_out.vs_color = vertex_color;
 		vs_out.vs_texcoord = vec2( tex_coord.x, tex_coord.y * -1.f);
 		vs_out.vs_normal = mat3(ModelMatrix) * vertex_normal;
+		vs_out.FragPosLightSpace = LightSpaceMatrix * vec4(vs_out.vs_position, 1.0);
 
 		gl_Position = ProjectionMatrix * ViewMatrix * ModelMatrix * vec4(vertex_position, 1.f);	/* Multiply every point in vertex shader by ModelMatrix  - final position*/
 	}
@@ -49,6 +52,7 @@ void main()
 		vs_out.vs_color = vertex_color;
 		vs_out.vs_texcoord = vec2( tex_coord.x, tex_coord.y * -1.f);
 		vs_out.vs_normal = mat3(ModelMatrix) * vertex_normal;
+		vs_out.FragPosLightSpace = LightSpaceMatrix * vec4(vs_out.vs_position, 1.0);
 
 		gl_Position = ProjectionMatrix * ViewMatrix * ModelMatrix * vec4(vertex_position, 1.f);	/* Multiply every point in vertex shader by ModelMatrix  - final position*/
 	}	

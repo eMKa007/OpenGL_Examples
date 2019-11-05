@@ -52,6 +52,9 @@ private:
 
 	// FrameBuffer Object
 	ShadowMapFBO* DepthMapFBO;
+
+	// Light Space Matrix
+	glm::mat4 LightSpaceMatrix;
 	
 	//OpenGL Context
 	const int GL_VERSION_MAJOR;

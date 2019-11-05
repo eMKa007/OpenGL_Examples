@@ -37,7 +37,7 @@ Texture::Texture(const char* fileName, GLenum type)
 		std::cout << "ERROR::TEXTURE::TEXTURE_LOADING_FAILED" << fileName << "\n";
 	}
 
-	glActiveTexture(0);
+	
 	glBindTexture(type, 0);	// Unbound any texture!!! Tidy up purpose. 
 	SOIL_free_image_data(image);	// Image is loaded, not need to hold its raw data.
 }
@@ -72,7 +72,7 @@ void Texture::bind(const GLint texture_unit)
 */
 void Texture::unbind()
 {
-	glActiveTexture(0);
+	
 	glBindTexture(this->type,0);
 }
 
@@ -117,7 +117,7 @@ void Texture::loadFromFile(const char* fileName)
 		std::cout << "ERROR::TEXTURE::LOAD_FROM_FILE::TEXTURE_LOADING_FAILED" << fileName << "\n";
 	} 
 
-	glActiveTexture(0);
+	
 	glBindTexture(type, 0);	// Unbound any texture!!! Tidy up purpose. 
 	SOIL_free_image_data(image);	// Image is loaded, not need to hold its raw data.
 }

@@ -450,7 +450,7 @@ void Game::initModels(float sphereRadius)
 */
 void Game::initDephMapFrameObject()
 {
-	this->DepthMapFBO = new ShadowMapFBO(800, 600);
+	this->DepthMapFBO = new ShadowMapFBO(WINDOW_WIDTH, WINDOW_HEIGHT);
 }
 
 
@@ -510,8 +510,9 @@ void Game::updateUniforms_LightPOV()
 
 	// Update frame buffers size, and Projection Matrix.
 	glfwGetFramebufferSize(this->window, &this->framebufferWidth, &this->framebufferHeight);
-	glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, this->nearPlane, this->farPlane); 
+	this->ProjectionMatrix = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, this->nearPlane, this->farPlane); 
 
+	this->LightSpaceMatrix = ProjectionMatrix * this->ViewMatrix; 
 	this->SendUniformsToShaders();
 }
 
@@ -530,12 +531,15 @@ void Game::SendUniformsToShaders()
 
 		if( glGetUniformLocation( i->getID(), "lightPos0") != -1)
 			i->setVec3f(*this->lights[0], "lightPos0");
+
+		if( glGetUniformLocation( i->getID(), "LightSpaceMatrix") != -1)
+			i->setMat4fv(this->LightSpaceMatrix, "LightSpaceMatrix");
 	}
 }
 
 void Game::RenderFromLightPOV()
 {
-	glViewport(0, 0, 800, 600);
+	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 	this->DepthMapFBO->BindForWriting();
 	
 	glClear( GL_DEPTH_BUFFER_BIT);
@@ -572,7 +576,7 @@ void Game::RenderFromCameraPOV()
 	// Unbind the current program
 	glBindVertexArray(0);
 	glUseProgram(0);
-	glActiveTexture(0);
+	
 	glBindTexture(GL_TEXTURE_2D,0);
 	/* ---------------   END OF CURRENT BOX_PROGRAM --------------- */	
 
@@ -584,7 +588,6 @@ void Game::RenderFromCameraPOV()
 	// Unbind the current program
 	glBindVertexArray(0);
 	glUseProgram(0);
-	glActiveTexture(0);
 	glBindTexture(GL_TEXTURE_2D,0);
 	/* ---------------   END OF CURRENT SPHERES_PROGRAM --------------- */
 
@@ -599,7 +602,6 @@ void Game::RenderFromCameraPOV()
 	// Unbind the current program
 	glBindVertexArray(0);
 	glUseProgram(0);
-	glActiveTexture(0);
 	glBindTexture(GL_TEXTURE_2D,0);
 	/* ---------------   END OF CURRENT FLOOR_PROGRAM --------------- */
 
@@ -611,7 +613,6 @@ void Game::RenderFromCameraPOV()
 	// Unbind the current program
 	glBindVertexArray(0);
 	glUseProgram(0);
-	glActiveTexture(0);
 	glBindTexture(GL_TEXTURE_2D,0);
 	/* ---------------   END OF CURRENT FLOOR_PROGRAM --------------- */
 }
@@ -700,7 +701,7 @@ void Game::updateKeyboardInput()
 		camera.move(this->dt, UPWARD);
 	}
 
-	if( glfwGetKey( this->window, GLFW_KEY_LEFT_CONTROL ) == GLFW_PRESS )
+	if( glfwGetKey( this->window, GLFW_KEY_C ) == GLFW_PRESS )
 	{
 		camera.move(this->dt, DOWNWARD);
 	}
