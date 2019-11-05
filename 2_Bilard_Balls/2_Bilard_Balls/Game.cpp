@@ -545,7 +545,9 @@ void Game::RenderFromLightPOV()
 	glClear( GL_DEPTH_BUFFER_BIT);
 
 	/* ---------------   START OF CURRENT SPHERES_PROGRAM --------------- */
+	glCullFace(GL_FRONT);
 	this->models[MODEL_SPHERES]->render(this->shaders[SHADER_SHADOW], GL_TRIANGLES);
+	glCullFace(GL_BACK); // don't forget to reset original culling face
 
 	// Unbind the current program
 	glBindVertexArray(0);
@@ -784,7 +786,7 @@ void Game::render()
 
 	/* UPDATE */
 	// Update uniforms (variables send to gpu [shader] from cpu)- every change they're updated.
-	//this->models[MODEL_SPHERES]->move();
+	this->models[MODEL_SPHERES]->move();
 
 	/* DRAW */
 	this->updateUniforms_LightPOV();
