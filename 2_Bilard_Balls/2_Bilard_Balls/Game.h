@@ -36,7 +36,8 @@ enum model_enum
 	MODEL_BOX = 0,
 	MODEL_SPHERES,
 	MODEL_FLOOR,
-	MODEL_LIGHT_SPHERE
+	MODEL_LIGHT_SPHERE,
+    MODEL_SPIDER
 };
 
 class Game

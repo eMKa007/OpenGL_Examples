@@ -440,6 +440,23 @@ void Game::initModels(float sphereRadius)
 	{
 		delete i;
 	}
+
+    /* Initialize Assimp Models */
+
+    std::unique_ptr<AssimpLoader> SpiderModel = std::make_unique<AssimpLoader>("Models/spider.3mf", 
+        aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals );
+    const std::vector<Mesh*> spiderMeshes = SpiderModel->GetMeshes();
+
+    models.push_back( new Model(
+		glm::vec3(0.f),
+		this->materials[MAT_SPHERES],
+		nullptr,
+		nullptr, 
+		spiderMeshes));
+
+    this->models[MODEL_SPIDER]->setScale(glm::vec3(0.03f));
+    this->models[MODEL_SPIDER]->rotate(glm::vec3(0.f, 150.f, 0.f));
+    this->models[MODEL_SPIDER]->moveMeshes( glm::vec3(0.f, -0.8f, -6.f));
 }
 
 /*	----------------------------------------------------------
@@ -553,6 +570,18 @@ void Game::RenderFromLightPOV()
 	glUseProgram(0);
 	/* ---------------   END OF CURRENT SPHERES_PROGRAM --------------- */
 
+
+    /* ---------------   START OF CURRENT SPIDER_PROGRAM --------------- */
+	glCullFace(GL_FRONT);
+	this->models[MODEL_SPIDER]->render(this->shaders[SHADER_SHADOW], GL_TRIANGLES);
+	glCullFace(GL_BACK); // don't forget to reset original culling face
+
+	// Unbind the current program
+	glBindVertexArray(0);
+	glUseProgram(0);
+	/* ---------------   END OF CURRENT SPHERES_PROGRAM --------------- */
+
+
 	/* ---------------   START OF CURRENT FLOOR_PROGRAM --------------- */
 	this->models[MODEL_FLOOR]->render(this->shaders[SHADER_SHADOW], GL_TRIANGLES);
 	
@@ -590,6 +619,15 @@ void Game::RenderFromCameraPOV()
 	
 	/* ---------------   START OF CURRENT FLOOR_PROGRAM --------------- */
 	this->models[MODEL_FLOOR]->render(this->shaders[SHADER_FLOOR], GL_TRIANGLES, this->DepthMapFBO);
+	
+	// Unbind the current program
+	glBindVertexArray(0);
+	glUseProgram(0);
+	/* ---------------   END OF CURRENT FLOOR_PROGRAM --------------- */
+
+
+    /* ---------------   START OF CURRENT SPIDER_PROGRAM --------------- */
+	this->models[MODEL_SPIDER]->render(this->shaders[SHADER_SPHERES], GL_TRIANGLES, this->DepthMapFBO);
 	
 	// Unbind the current program
 	glBindVertexArray(0);

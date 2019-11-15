@@ -36,6 +36,33 @@ Model::Model(glm::vec3 position,
 	}
 }
 
+Model::Model(glm::vec3 position, Material* material, Texture* ovTexDiff, Texture* ovTexSpec, std::vector<Mesh> meshes)
+{
+    this->position = position;
+	this->material = material;
+	this->overrideTextureDiffuse = nullptr;
+	this->overrideTextureSpecular = nullptr;
+
+	if( ovTexDiff != nullptr )
+		this->overrideTextureDiffuse = ovTexDiff;
+
+	if( ovTexDiff != nullptr )
+		this->overrideTextureSpecular = ovTexSpec;
+
+	
+	for( auto i: meshes)
+	{
+		this->meshes.push_back(new Mesh(i));
+	}
+
+	//Move every mesh of given offset
+	for( auto &i : this->meshes)
+	{
+		i->move(this->position);
+		i->setOrigin(this->position);
+	}
+}
+
 Model::~Model()
 {
 	for( auto *&i: this->meshes)

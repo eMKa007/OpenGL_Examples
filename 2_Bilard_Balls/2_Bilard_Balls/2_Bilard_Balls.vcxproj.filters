@@ -80,6 +80,9 @@
     <ClInclude Include="ShadowMapFBO.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="AssimpLoader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="fragment_shader_box.frag">

@@ -24,6 +24,11 @@
 /* SOIL2 - Simple OpenGL Image Library */
 #include <SOIL2.h>
 
+/* Open Asset Import Library (assimp) */
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+
 #include "Shader.h"
 #include "Texture.h"
 #include "Material.h"
@@ -31,4 +36,6 @@
 #include "Mesh.h"
 #include "Primitives.h"
 #include "Model.h"
+#include "AssimpLoader.h"
+
 #include "ShadowMapFBO.h"

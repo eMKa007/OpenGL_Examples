@@ -38,6 +38,7 @@ private:
 public:
 	Mesh(Vertex* vertexArray, const unsigned& nrOfVertices, GLuint* indexArray,	const unsigned& nrOfIndices, 
 			glm::vec3 position = glm::vec3(0.f), glm::vec3 origin = glm::vec3(0.f), glm::vec3 rotation = glm::vec3(0.f), glm::vec3 scale = glm::vec3(1.f));
+    Mesh(std::vector<Vertex>, std::vector<unsigned int> indices, std::vector<Texture> textures);
 	Mesh(Primitive* primitive, glm::vec3 deltaMove = glm::vec3(0.f), glm::vec3 position = glm::vec3(0.f), glm::vec3 origin = glm::vec3(0.f), glm::vec3 rotation = glm::vec3(0.f), glm::vec3 scale = glm::vec3(1.f));
 	Mesh(const Mesh& obj);
 	~Mesh();
