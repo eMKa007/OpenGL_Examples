@@ -235,28 +235,28 @@ void Game::initShaders()
 	 */
 	this->shaders.push_back(
 		new Shader(this->GL_VERSION_MAJOR, this->GL_VERSION_MINOR, 
-			"vertex_shader_box.glsl", 
-			"fragment_shader_box.glsl"));
+			"vertex_shader_box.vert", 
+			"fragment_shader_box.frag"));
 
 	this->shaders.push_back(
 	new Shader(this->GL_VERSION_MAJOR, this->GL_VERSION_MINOR,
-		"vertex_shader_sphere.glsl",
-		"fragment_shader_sphere.glsl"));
+		"vertex_shader_sphere.vert",
+		"fragment_shader_sphere.frag"));
 
 	this->shaders.push_back(
 	new Shader(this->GL_VERSION_MAJOR, this->GL_VERSION_MINOR,
-		"vertex_shader_floor.glsl",
-		"fragment_shader_floor.glsl"));
+		"vertex_shader_floor.vert",
+		"fragment_shader_floor.frag"));
 
 	this->shaders.push_back(
 		new Shader(this->GL_VERSION_MAJOR, this->GL_VERSION_MINOR,
-			"vertex_shader_core.glsl",
-			"fragment_shader_core.glsl"));
+			"vertex_shader_core.vert",
+			"fragment_shader_core.frag"));
 
 	this->shaders.push_back(
 		new Shader(this->GL_VERSION_MAJOR, this->GL_VERSION_MINOR,
-			"vertex_shadowMap.glsl",
-			"fragment_shadowMap.glsl"));
+			"vertex_shadowMap.vert",
+			"fragment_shadowMap.frag"));
 }
 
 
@@ -426,7 +426,7 @@ void Game::initModels(float sphereRadius)
 	// position is pushed backwards to simulate sun object.
 	meshes.push_back( new Mesh( 
 		&Sphere(sphereRadius*5, 36, 18),
-		glm::vec3(0.f), (*this->lights[0]) * 10.f));
+		glm::vec3(0.f), (*this->lights[0]) * 5.f));
 
 	models.push_back( new Model(
 		glm::vec3(0.f),
@@ -502,7 +502,6 @@ void Game::updateUniforms()
 void Game::updateUniforms_LightPOV()
 {
 	// Get View Matrix from Light POV.
-	//this->ViewMatrix = this->camera.getViewMatrix();
 	this->ViewMatrix = glm::mat4(1.f);
 	this->ViewMatrix = glm::lookAt( *(this->lights[0]), 
 		glm::vec3(0.f), 
@@ -569,53 +568,41 @@ void Game::RenderFromCameraPOV()
 {
 	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	DepthMapFBO->BindForReading(2);
 
 	/* ---------------   START OF CURRENT BOX_PROGRAM --------------- */
-	//this->models[MODEL_BOX]->render(this->shaders[SHADER_BOX], GL_LINES);
-	this->shaders[SHADER_CORE]->set1i(0, "DRAW_MODE");
-	this->models[MODEL_BOX]->render(this->shaders[SHADER_CORE], GL_LINES, this->DepthMapFBO);
+	this->models[MODEL_BOX]->render(this->shaders[SHADER_BOX], GL_LINES, this->DepthMapFBO);
 
 	// Unbind the current program
 	glBindVertexArray(0);
 	glUseProgram(0);
-	
-	glBindTexture(GL_TEXTURE_2D,0);
 	/* ---------------   END OF CURRENT BOX_PROGRAM --------------- */	
 
+
 	/* ---------------   START OF CURRENT SPHERES_PROGRAM --------------- */
-	//this->models[MODEL_SPHERES]->render(this->shaders[SHADER_SPHERES], GL_TRIANGLES);
-	this->shaders[SHADER_CORE]->set1i(1, "DRAW_MODE");
-	this->models[MODEL_SPHERES]->render(this->shaders[SHADER_CORE], GL_TRIANGLES, this->DepthMapFBO);
+	this->models[MODEL_SPHERES]->render(this->shaders[SHADER_SPHERES], GL_TRIANGLES, this->DepthMapFBO);
 
 	// Unbind the current program
 	glBindVertexArray(0);
 	glUseProgram(0);
-	glBindTexture(GL_TEXTURE_2D,0);
 	/* ---------------   END OF CURRENT SPHERES_PROGRAM --------------- */
-
-	//glUniform1i(glGetUniformLocation( shaders[SHADER_CORE]->getID(), "shadowMapTex"), 3);
-	DepthMapFBO->BindForReading(2);
+	
 	
 	/* ---------------   START OF CURRENT FLOOR_PROGRAM --------------- */
-	//this->models[MODEL_FLOOR]->render(this->shaders[SHADER_FLOOR], GL_TRIANGLES);
-	this->shaders[SHADER_CORE]->set1i(2, "DRAW_MODE");
-	this->models[MODEL_FLOOR]->render(this->shaders[SHADER_CORE], GL_TRIANGLES, this->DepthMapFBO);
+	this->models[MODEL_FLOOR]->render(this->shaders[SHADER_FLOOR], GL_TRIANGLES, this->DepthMapFBO);
 	
 	// Unbind the current program
 	glBindVertexArray(0);
 	glUseProgram(0);
-	glBindTexture(GL_TEXTURE_2D,0);
 	/* ---------------   END OF CURRENT FLOOR_PROGRAM --------------- */
 
+
 	/* ---------------   START OF CURRENT LIGHT_SPHERE_PROGRAM --------------- */
-	//this->models[MODEL_FLOOR]->render(this->shaders[SHADER_FLOOR], GL_TRIANGLES);
-	this->shaders[SHADER_CORE]->set1i(3, "DRAW_MODE");
-	this->models[MODEL_LIGHT_SPHERE]->render(this->shaders[SHADER_CORE], GL_TRIANGLES, this->DepthMapFBO);
+	this->models[MODEL_LIGHT_SPHERE]->render(this->shaders[SHADER_BOX], GL_TRIANGLES);
 	
 	// Unbind the current program
 	glBindVertexArray(0);
 	glUseProgram(0);
-	glBindTexture(GL_TEXTURE_2D,0);
 	/* ---------------   END OF CURRENT FLOOR_PROGRAM --------------- */
 }
 
@@ -765,6 +752,9 @@ void Game::update()
 	/* CHECK INPUT */
 	this->updateInput();
 
+	/* UPDATE SPHERES POSITION */
+	this->models[MODEL_SPHERES]->move();
+
 #ifdef DEBUG
 	std::cout << "DT: " << this->dt << "; Mouse offsetX: " << this->mouseOffsetX  <<  "; offsetY: "<< this->mouseOffsetY << std::endl;
 #endif
@@ -783,15 +773,12 @@ void Game::render()
 	/* CLEAR */
 	glClearColor(0.f, 0.f, 0.f, 1.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);		//Clear all three buffers.
-
-	/* UPDATE */
-	// Update uniforms (variables send to gpu [shader] from cpu)- every change they're updated.
-	this->models[MODEL_SPHERES]->move();
-
-	/* DRAW */
+	
+	/* RENDER FROM LIGHT POV */
 	this->updateUniforms_LightPOV();
 	this->RenderFromLightPOV();
 
+	/* RENDER FROM CAMERA POV */
 	this->updateUniforms();
 	this->RenderFromCameraPOV();
 

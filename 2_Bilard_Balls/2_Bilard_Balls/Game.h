@@ -10,7 +10,6 @@ enum shaders_enum
 	SHADER_BOX = 0,
 	SHADER_SPHERES,
 	SHADER_FLOOR,
-	SHADER_CORE,
 	SHADER_SHADOW
 };
 

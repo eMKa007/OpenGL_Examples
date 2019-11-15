@@ -148,16 +148,16 @@
     <ClInclude Include="Vertex.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="fragment_shader_box.glsl" />
-    <None Include="fragment_shader_core.glsl" />
-    <None Include="fragment_shader_floor.glsl" />
-    <None Include="fragment_shader_sphere.glsl" />
-    <None Include="fragment_shadowMap.glsl" />
-    <None Include="vertex_shader_box.glsl" />
-    <None Include="vertex_shader_core.glsl" />
-    <None Include="vertex_shader_floor.glsl" />
-    <None Include="vertex_shader_sphere.glsl" />
-    <None Include="vertex_shadowMap.glsl" />
+    <None Include="fragment_shader_box.frag" />
+    <None Include="fragment_shader_core.frag" />
+    <None Include="fragment_shader_floor.frag" />
+    <None Include="fragment_shader_sphere.frag" />
+    <None Include="fragment_shadowMap.frag" />
+    <None Include="vertex_shader_box.vert" />
+    <None Include="vertex_shader_core.vert" />
+    <None Include="vertex_shader_floor.vert" />
+    <None Include="vertex_shader_sphere.vert" />
+    <None Include="vertex_shadowMap.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
