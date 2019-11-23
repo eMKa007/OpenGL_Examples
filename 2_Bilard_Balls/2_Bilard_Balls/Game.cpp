@@ -53,9 +53,13 @@ Game::Game(const char* title, const int WINDOW_WIDTH, const int WINDOW_HEIGHT,
 	this->initShaders();
 	this->initTextures();
 	this->initMaterials();
-	this->initModels( 0.2f );
 	this->initLights();
+	this->initModels( 0.2f );
 	this->initUniforms();
+
+	this->initDephMapFrameObject();
+
+	glfwSwapInterval(1);
 }
 
 
@@ -85,6 +89,8 @@ Game::~Game()
 
 	for( size_t i = 0; i < this->lights.size(); i++)
 		delete this->lights[i];
+
+	delete DepthMapFBO;
 }
 
 
@@ -229,23 +235,28 @@ void Game::initShaders()
 	 */
 	this->shaders.push_back(
 		new Shader(this->GL_VERSION_MAJOR, this->GL_VERSION_MINOR, 
-			"vertex_shader_box.glsl", 
-			"fragment_shader_box.glsl"));
+			"vertex_shader_box.vert", 
+			"fragment_shader_box.frag"));
 
 	this->shaders.push_back(
 	new Shader(this->GL_VERSION_MAJOR, this->GL_VERSION_MINOR,
-		"vertex_shader_sphere.glsl",
-		"fragment_shader_sphere.glsl"));
+		"vertex_shader_sphere.vert",
+		"fragment_shader_sphere.frag"));
 
 	this->shaders.push_back(
 	new Shader(this->GL_VERSION_MAJOR, this->GL_VERSION_MINOR,
-		"vertex_shader_floor.glsl",
-		"fragment_shader_floor.glsl"));
+		"vertex_shader_floor.vert",
+		"fragment_shader_floor.frag"));
 
 	this->shaders.push_back(
 		new Shader(this->GL_VERSION_MAJOR, this->GL_VERSION_MINOR,
-			"vertex_shader_core.glsl",
-			"fragment_shader_core.glsl"));
+			"vertex_shader_core.vert",
+			"fragment_shader_core.frag"));
+
+	this->shaders.push_back(
+		new Shader(this->GL_VERSION_MAJOR, this->GL_VERSION_MINOR,
+			"vertex_shadowMap.vert",
+			"fragment_shadowMap.frag"));
 }
 
 
@@ -289,6 +300,19 @@ void Game::initMaterials()
 	materials.push_back( new Material(
 	glm::vec3(0.1f), glm::vec3(1.f), glm::vec3(1.f),
 		0, 1));
+}
+
+
+/*	----------------------------------------------------------
+*	Function name: initLights()
+*	Parameters:	none
+*	Used to: Determine lights position.
+*	Return:	void
+*/
+void Game::initLights()
+{
+	// LIGHTS
+	this->lights.push_back( new glm::vec3 (10.f, 10.f, 10.f) );
 }
 
 
@@ -397,11 +421,42 @@ void Game::initModels(float sphereRadius)
 		this->textures[TEX_FLOOR_SPECULAR], 
 		meshes));
 
+	meshes.clear();
+
+	// position is pushed backwards to simulate sun object.
+	meshes.push_back( new Mesh( 
+		&Sphere(sphereRadius*5, 36, 18),
+		glm::vec3(0.f), (*this->lights[0]) * 5.f));
+
+	models.push_back( new Model(
+		glm::vec3(0.f),
+		this->materials[MAT_SPHERES],
+		nullptr,
+		nullptr, 
+		meshes));
+
 	// Remove unnecessary meshes
 	for( auto *& i : meshes )
 	{
 		delete i;
 	}
+
+    /* Initialize Assimp Models */
+
+    std::unique_ptr<AssimpLoader> SpiderModel = std::make_unique<AssimpLoader>("Models/spider.3mf", 
+        aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals );
+    const std::vector<Mesh*> spiderMeshes = SpiderModel->GetMeshes();
+
+    models.push_back( new Model(
+		glm::vec3(0.f),
+		this->materials[MAT_SPHERES],
+		nullptr,
+		nullptr, 
+		spiderMeshes));
+
+    this->models[MODEL_SPIDER]->setScale(glm::vec3(0.03f));
+    this->models[MODEL_SPIDER]->rotate(glm::vec3(0.f, 150.f, 0.f));
+    this->models[MODEL_SPIDER]->moveMeshes( glm::vec3(0.f, -0.8f, -6.f));
 }
 
 /*	----------------------------------------------------------
@@ -412,40 +467,7 @@ void Game::initModels(float sphereRadius)
 */
 void Game::initDephMapFrameObject()
 {
-	glGenBuffers(1, &this->dephMapFBO);
-
-	// Generate Texture object for depth buffer.
-	glGenTextures(1, &this->depthMap);
-	glBindTexture(GL_TEXTURE_2D, this->depthMap);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, 
-		this->framebufferWidth, this->framebufferHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-	// Bind depth texture to depth buffer
-	glBindFramebuffer(GL_FRAMEBUFFER, this->dephMapFBO);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, this->depthMap, 0);
-	glDrawBuffer(GL_NONE);
-	glReadBuffer(GL_NONE);
-
-	// Unbind current buffer
-	glBindBuffer(GL_FRAMEBUFFER, 0);
-
-}
-
-
-/*	----------------------------------------------------------
-*	Function name: initLights()
-*	Parameters:	none
-*	Used to: Determine lights position.
-*	Return:	void
-*/
-void Game::initLights()
-{
-	// LIGHTS
-	this->lights.push_back( new glm::vec3 (4.f, 4.f, 4.f) );
+	this->DepthMapFBO = new ShadowMapFBO(WINDOW_WIDTH, WINDOW_HEIGHT);
 }
 
 
@@ -491,6 +513,27 @@ void Game::updateUniforms()
 		this->farPlane
 	);
 
+	this->SendUniformsToShaders();
+}
+
+void Game::updateUniforms_LightPOV()
+{
+	// Get View Matrix from Light POV.
+	this->ViewMatrix = glm::mat4(1.f);
+	this->ViewMatrix = glm::lookAt( *(this->lights[0]), 
+		glm::vec3(0.f), 
+		glm::vec3(0.f, 1.0f, 0.f));
+
+	// Update frame buffers size, and Projection Matrix.
+	glfwGetFramebufferSize(this->window, &this->framebufferWidth, &this->framebufferHeight);
+	this->ProjectionMatrix = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, this->nearPlane, this->farPlane); 
+
+	this->LightSpaceMatrix = ProjectionMatrix * this->ViewMatrix; 
+	this->SendUniformsToShaders();
+}
+
+void Game::SendUniformsToShaders()
+{
 	for( auto& i : this->shaders )
 	{
 		if( glGetUniformLocation( i->getID(), "ViewMatrix") != -1)
@@ -504,9 +547,102 @@ void Game::updateUniforms()
 
 		if( glGetUniformLocation( i->getID(), "lightPos0") != -1)
 			i->setVec3f(*this->lights[0], "lightPos0");
+
+		if( glGetUniformLocation( i->getID(), "LightSpaceMatrix") != -1)
+			i->setMat4fv(this->LightSpaceMatrix, "LightSpaceMatrix");
 	}
 }
 
+void Game::RenderFromLightPOV()
+{
+	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+	this->DepthMapFBO->BindForWriting();
+	
+	glClear( GL_DEPTH_BUFFER_BIT);
+
+	/* ---------------   START OF CURRENT SPHERES_PROGRAM --------------- */
+	glCullFace(GL_FRONT);
+	this->models[MODEL_SPHERES]->render(this->shaders[SHADER_SHADOW], GL_TRIANGLES);
+	glCullFace(GL_BACK); // don't forget to reset original culling face
+
+	// Unbind the current program
+	glBindVertexArray(0);
+	glUseProgram(0);
+	/* ---------------   END OF CURRENT SPHERES_PROGRAM --------------- */
+
+
+    /* ---------------   START OF CURRENT SPIDER_PROGRAM --------------- */
+	glCullFace(GL_FRONT);
+	this->models[MODEL_SPIDER]->render(this->shaders[SHADER_SHADOW], GL_TRIANGLES);
+	glCullFace(GL_BACK); // don't forget to reset original culling face
+
+	// Unbind the current program
+	glBindVertexArray(0);
+	glUseProgram(0);
+	/* ---------------   END OF CURRENT SPHERES_PROGRAM --------------- */
+
+
+	/* ---------------   START OF CURRENT FLOOR_PROGRAM --------------- */
+	this->models[MODEL_FLOOR]->render(this->shaders[SHADER_SHADOW], GL_TRIANGLES);
+	
+	// Unbind the current program
+	glBindVertexArray(0);
+	glUseProgram(0);
+	/* ---------------   END OF CURRENT FLOOR_PROGRAM --------------- */
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void Game::RenderFromCameraPOV()
+{
+	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	DepthMapFBO->BindForReading(2);
+
+	/* ---------------   START OF CURRENT BOX_PROGRAM --------------- */
+	this->models[MODEL_BOX]->render(this->shaders[SHADER_BOX], GL_LINES, this->DepthMapFBO);
+
+	// Unbind the current program
+	glBindVertexArray(0);
+	glUseProgram(0);
+	/* ---------------   END OF CURRENT BOX_PROGRAM --------------- */	
+
+
+	/* ---------------   START OF CURRENT SPHERES_PROGRAM --------------- */
+	this->models[MODEL_SPHERES]->render(this->shaders[SHADER_SPHERES], GL_TRIANGLES, this->DepthMapFBO);
+
+	// Unbind the current program
+	glBindVertexArray(0);
+	glUseProgram(0);
+	/* ---------------   END OF CURRENT SPHERES_PROGRAM --------------- */
+	
+	
+	/* ---------------   START OF CURRENT FLOOR_PROGRAM --------------- */
+	this->models[MODEL_FLOOR]->render(this->shaders[SHADER_FLOOR], GL_TRIANGLES, this->DepthMapFBO);
+	
+	// Unbind the current program
+	glBindVertexArray(0);
+	glUseProgram(0);
+	/* ---------------   END OF CURRENT FLOOR_PROGRAM --------------- */
+
+
+    /* ---------------   START OF CURRENT SPIDER_PROGRAM --------------- */
+	this->models[MODEL_SPIDER]->render(this->shaders[SHADER_SPHERES], GL_TRIANGLES, this->DepthMapFBO);
+	
+	// Unbind the current program
+	glBindVertexArray(0);
+	glUseProgram(0);
+	/* ---------------   END OF CURRENT FLOOR_PROGRAM --------------- */
+
+
+	/* ---------------   START OF CURRENT LIGHT_SPHERE_PROGRAM --------------- */
+	this->models[MODEL_LIGHT_SPHERE]->render(this->shaders[SHADER_BOX], GL_TRIANGLES);
+	
+	// Unbind the current program
+	glBindVertexArray(0);
+	glUseProgram(0);
+	/* ---------------   END OF CURRENT FLOOR_PROGRAM --------------- */
+}
 
 
 /* ---------------------------- PUBLIC FUNCTIONS ---------------------------- */
@@ -592,7 +728,7 @@ void Game::updateKeyboardInput()
 		camera.move(this->dt, UPWARD);
 	}
 
-	if( glfwGetKey( this->window, GLFW_KEY_LEFT_CONTROL ) == GLFW_PRESS )
+	if( glfwGetKey( this->window, GLFW_KEY_C ) == GLFW_PRESS )
 	{
 		camera.move(this->dt, DOWNWARD);
 	}
@@ -654,6 +790,9 @@ void Game::update()
 	/* CHECK INPUT */
 	this->updateInput();
 
+	/* UPDATE SPHERES POSITION */
+	this->models[MODEL_SPHERES]->move();
+
 #ifdef DEBUG
 	std::cout << "DT: " << this->dt << "; Mouse offsetX: " << this->mouseOffsetX  <<  "; offsetY: "<< this->mouseOffsetY << std::endl;
 #endif
@@ -669,55 +808,17 @@ void Game::update()
 */
 void Game::render()
 {
-	/* DRAW */
-		// Clear
-	glClearColor(1.f, 1.f, 1.f, 1.f);
+	/* CLEAR */
+	glClearColor(0.f, 0.f, 0.f, 1.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);		//Clear all three buffers.
-		
-	// Update uniforms (variables send to gpu [shader] from cpu)- every change they're updated.
+	
+	/* RENDER FROM LIGHT POV */
+	this->updateUniforms_LightPOV();
+	this->RenderFromLightPOV();
+
+	/* RENDER FROM CAMERA POV */
 	this->updateUniforms();
-
-
-	/* ---------------   START OF CURRENT BOX_PROGRAM --------------- */
-	//this->models[MODEL_BOX]->render(this->shaders[SHADER_BOX], GL_LINES);
-	this->shaders[SHADER_CORE]->set1i(0, "DRAW_MODE");
-	this->models[MODEL_BOX]->render(this->shaders[SHADER_CORE], GL_LINES);
-
-	
-	// Unbind the current program
-	glBindVertexArray(0);
-	glUseProgram(0);
-	glActiveTexture(0);
-	glBindTexture(GL_TEXTURE_2D,0);
-	/* ---------------   END OF CURRENT BOX_PROGRAM --------------- */	
-
-
-	/* ---------------   START OF CURRENT SPHERES_PROGRAM --------------- */
-	this->models[MODEL_SPHERES]->move();
-	//this->models[MODEL_SPHERES]->render(this->shaders[SHADER_SPHERES], GL_TRIANGLES);
-	this->shaders[SHADER_CORE]->set1i(1, "DRAW_MODE");
-	this->models[MODEL_SPHERES]->render(this->shaders[SHADER_CORE], GL_TRIANGLES);
-
-	// Unbind the current program
-	glBindVertexArray(0);
-	glUseProgram(0);
-	glActiveTexture(0);
-	glBindTexture(GL_TEXTURE_2D,0);
-	/* ---------------   END OF CURRENT SPHERES_PROGRAM --------------- */
-
-	/* ---------------   START OF CURRENT FLOOR_PROGRAM --------------- */
-	//this->models[MODEL_FLOOR]->render(this->shaders[SHADER_FLOOR], GL_TRIANGLES);
-	this->shaders[SHADER_CORE]->set1i(2, "DRAW_MODE");
-	this->models[MODEL_FLOOR]->render(this->shaders[SHADER_CORE], GL_TRIANGLES);
-	
-	// Unbind the current program
-	glBindVertexArray(0);
-	glUseProgram(0);
-	glActiveTexture(0);
-	glBindTexture(GL_TEXTURE_2D,0);
-	/* ---------------   END OF CURRENT FLOOR_PROGRAM --------------- */
-
-
+	this->RenderFromCameraPOV();
 
 	// End Draw
 	glfwSwapBuffers(window);

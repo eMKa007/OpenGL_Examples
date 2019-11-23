@@ -36,6 +36,33 @@ Model::Model(glm::vec3 position,
 	}
 }
 
+Model::Model(glm::vec3 position, Material* material, Texture* ovTexDiff, Texture* ovTexSpec, std::vector<Mesh> meshes)
+{
+    this->position = position;
+	this->material = material;
+	this->overrideTextureDiffuse = nullptr;
+	this->overrideTextureSpecular = nullptr;
+
+	if( ovTexDiff != nullptr )
+		this->overrideTextureDiffuse = ovTexDiff;
+
+	if( ovTexDiff != nullptr )
+		this->overrideTextureSpecular = ovTexSpec;
+
+	
+	for( auto i: meshes)
+	{
+		this->meshes.push_back(new Mesh(i));
+	}
+
+	//Move every mesh of given offset
+	for( auto &i : this->meshes)
+	{
+		i->move(this->position);
+		i->setOrigin(this->position);
+	}
+}
+
 Model::~Model()
 {
 	for( auto *&i: this->meshes)
@@ -49,7 +76,7 @@ void Model::update()
 
 }
 
-void Model::render(Shader* shader, GLenum mode)
+void Model::render(Shader* shader, GLenum mode, ShadowMapFBO* shaderMapFBO)
 {
 	// Update uniforms (variables send to gpu [shader] from cpu)- every change they're updated.
 	this->updateUniforms();
@@ -60,11 +87,26 @@ void Model::render(Shader* shader, GLenum mode)
 		// Use a program (shader) - need to tell what shader we want to use.
 	shader->use();
 
+	GLint tex_unit = 0;
 		// Activate Texture
-	if( overrideTextureDiffuse != nullptr )
-		overrideTextureDiffuse->bind(0);
-	if( overrideTextureSpecular != nullptr )
-		overrideTextureSpecular->bind(1);
+	if( this->overrideTextureDiffuse != nullptr )
+	{
+		overrideTextureDiffuse->bind(tex_unit);
+		glUniform1i(glGetUniformLocation(shader->getID(), "diffuseTex"), tex_unit++);
+	}
+		
+	if( this->overrideTextureSpecular != nullptr )
+	{
+		overrideTextureSpecular->bind(tex_unit);
+		glUniform1i(glGetUniformLocation(shader->getID(), "specularTex"), tex_unit++);
+	}
+
+	if( shaderMapFBO )
+	{
+		shaderMapFBO->BindForReading(tex_unit);
+		glUniform1i(glGetUniformLocation(shader->getID(), "shadowMapTex"), tex_unit++);
+	}
+		
 
 		// Draw
 	for( auto &i : this->meshes )

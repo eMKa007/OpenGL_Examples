@@ -41,6 +41,36 @@ Mesh::Mesh(Vertex* vertexArray, const unsigned& nrOfVertices, GLuint* indexArray
 	this->updateModelMatrix();
 }
 
+Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned> indices, std::vector<Texture> textures)
+{
+    // Set Variables
+	this->position = glm::vec3(0.f);
+	this->origin = glm::vec3(0.f);
+	this->rotation = glm::vec3(0.f);
+	this->scale = glm::vec3(1.f);
+	
+	this->nrOfVertices = vertices.size();
+	this->nrOfIndices = indices.size();
+
+	// Copy every Vertex data to Mesh Vertex array
+	this->vertexArray = new Vertex[this->nrOfVertices];
+	for( size_t i = 0; i < this->nrOfVertices; i++)
+	{
+		this->vertexArray[i] = vertices[i];
+	}
+
+	// Copy every index data to Mesh index array
+	this->indexArray = new GLuint[this->nrOfIndices];
+	for( size_t i = 0; i < this->nrOfIndices; i++)
+	{
+		this->indexArray[i] = indices[i];
+	}
+
+	this->initVAO();	
+	
+	this->updateModelMatrix();
+}
+
 
 /*	----------------------------------------------------------
 *	Class constructor

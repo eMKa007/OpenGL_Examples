@@ -10,7 +10,7 @@ enum shaders_enum
 	SHADER_BOX = 0,
 	SHADER_SPHERES,
 	SHADER_FLOOR,
-	SHADER_CORE
+	SHADER_SHADOW
 };
 
 enum textureUnit_enum
@@ -35,7 +35,9 @@ enum model_enum
 {
 	MODEL_BOX = 0,
 	MODEL_SPHERES,
-	MODEL_FLOOR
+	MODEL_FLOOR,
+	MODEL_LIGHT_SPHERE,
+    MODEL_SPIDER
 };
 
 class Game
@@ -49,11 +51,11 @@ private:
 	int framebufferHeight;
 
 	// FrameBuffer Object
-	unsigned int dephMapFBO;
+	ShadowMapFBO* DepthMapFBO;
 
-	// Depth map Texture
-	unsigned int depthMap;
-
+	// Light Space Matrix
+	glm::mat4 LightSpaceMatrix;
+	
 	//OpenGL Context
 	const int GL_VERSION_MAJOR;
 	const int GL_VERSION_MINOR;
@@ -112,12 +114,18 @@ private:
 	void initShaders();
 	void initTextures();
 	void initMaterials();
+	void initLights();
 	void initModels( float SphereRadius );
 	void initDephMapFrameObject();
-	void initLights();
 	void initUniforms();
 
 	void updateUniforms();
+	void updateUniforms_LightPOV();
+
+	void RenderFromLightPOV();
+	void RenderFromCameraPOV();
+
+	void SendUniformsToShaders();
 
 public:
 	/* CONSTRUCTORS/DESTRUCTORS */
