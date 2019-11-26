@@ -1,6 +1,5 @@
 #include "Game.h"
 
-
 Game::Game(std::string* WindowTitle)
     : WINDOW_WIDTH(1200), WINDOW_HEIGHT(800), camera001( Camera(12.5f, 0.45) )
 {
@@ -12,6 +11,7 @@ Game::Game(std::string* WindowTitle)
     this->lastFrame = 0.0f;
 
     this->angle = 0;
+    this->pause = 0;
 
     this->initGLFW();
     this->initWindow(WindowTitle);
@@ -28,7 +28,15 @@ Game::Game(std::string* WindowTitle)
 
 Game::~Game()
 {
+    TwTerminate();    
+    glfwDestroyWindow(this->window);
+	glfwTerminate();
+	
+    for( size_t i = 0; i < this->shaders.size(); i++)
+		delete this->shaders[i];
 
+    for( size_t i = 0; i<this->models.size(); i++)
+        delete this->models[i];
 }
 
 void Game::run()
@@ -41,9 +49,6 @@ void Game::run()
         /* RENDER SCENE */
         this->renderScene();
     }
-
-    TwTerminate();
-	glfwTerminate();
 }
 
 void Game::initGLFW()
@@ -212,7 +217,7 @@ void Game::initUI()
 
 	/* Create UI */
 	this->speed = 1.0f; 
-	this->height = 1.75f;
+	this->height = 5.f;
 	this->distance = 4.0f;
 	this->intensity = 1.0f;
 	this->showEdge = 0;
@@ -237,8 +242,7 @@ void Game::initUI()
 	TwDefine(" ShadowVolumeOption resizable=false ");
 	TwDefine(" ShadowVolumeOption size='280 230' ");
 	TwDefine(" GLOBAL fontsize=3 ");
-	TwDefine(" ShadowVolumeOption refresh=0.1 ");
-
+	TwDefine(" ShadowVolumeOption refresh=0.10 ");
 }
 
 void Game::updateVariables()
@@ -252,7 +256,11 @@ void Game::updateVariables()
     /* Update Input Events */
     glfwPollEvents();
 
-    this->UpdateLightPosition();
+    this->updateKeyboardInput();
+    this->updateMouseInput();
+
+    if(!this->pause)
+        this->UpdateLightPosition();
 }
 
 void Game::updateMatrices()
@@ -279,10 +287,7 @@ void Game::UpdateLightPosition()
 	    this->angle -= glm::two_pi<float>();
 
     this->lightPosition = glm::vec4(
-        3.0f * glm::vec3(cosf(angle) * distance,    // x
-        height,                                     // y
-        sinf(angle) * distance),                    // z
-        1.0f);
+        3.0f * glm::vec3(cosf(angle) * distance, height, sinf(angle) * distance), 1.0f);
 
 }
 
@@ -296,7 +301,7 @@ void Game::renderScene()
 
     /*  */
     this->renderThirdPass();
-
+    TwRefreshBar(this->bar);
     TwDraw();
 	glfwSwapBuffers(window);
 }
@@ -318,7 +323,7 @@ void Game::renderFirstPass()
     this->shaders[SHADER_RENDER]->use();
 	this->shaders[SHADER_RENDER]->setMat4("ModelViewMatrix", this->view);
 	this->shaders[SHADER_RENDER]->setMat4("ProjMatrix", this->projection);
-	this->shaders[SHADER_RENDER]->setVec3("LightPosition", this->lightPosition*this->view);
+	this->shaders[SHADER_RENDER]->setVec3("LightPosition", this->view * this->lightPosition);
 	this->shaders[SHADER_RENDER]->setFloat("LightIntensity", this->intensity);
     this->shaders[SHADER_RENDER]->setMat3("NormalMatrix", glm::mat3(
         glm::vec3(this->mv[0]), 
@@ -336,7 +341,7 @@ void Game::renderFirstPass()
 	this->shaders[SHADER_PLANE]->setMat4("ModelViewMatrix",this->view);
 	this->shaders[SHADER_PLANE]->setMat4("ProjMatrix", this->projection);
 	this->shaders[SHADER_PLANE]->setVec3("u_color", 0.6f, 0.6f, 0.6f);
-	this->shaders[SHADER_PLANE]->setVec3("LightPosition", this->lightPosition*this->view);
+	this->shaders[SHADER_PLANE]->setVec3("LightPosition", this->view * this->lightPosition);
 	this->shaders[SHADER_PLANE]->setFloat("LightIntensity", this->intensity);
     this->shaders[SHADER_PLANE]->setMat3("NormalMatrix", glm::mat3(
         glm::vec3(this->view[0]), 
@@ -382,7 +387,7 @@ void Game::renderSecondPass()
 
 	this->shaders[SHADER_VOLUME]->setMat4("ModelViewMatrix", this->view);
 	this->shaders[SHADER_VOLUME]->setMat4("ProjMatrix", this->projection);
-	this->shaders[SHADER_VOLUME]->setVec3("LightPosition", this->lightPosition*this->view);
+	this->shaders[SHADER_VOLUME]->setVec3("LightPosition", this->view * this->lightPosition);
 
 	this->models[MODEL_DEER]->Draw(*this->shaders[SHADER_VOLUME]);
 
@@ -410,66 +415,62 @@ void Game::renderThirdPass()
 
 
 /* CALLBACKS FUNCTIONALITY */
-void Game::cursorPositionCallback(GLFWwindow *const window, const double xpos, const double ypos)
+void Game::updateKeyboardInput()
 {
-		this->gCursorPositionY = ypos;
-		if (!TwEventMousePosGLFW(static_cast<int>(xpos), static_cast<int>(ypos)))
-			mouse_callback(window, xpos, ypos);
-}
-
-void Game::keyCallback(GLFWwindow *const window, const int key,
-		const int scancode, const int action, const int mods)
-{
-		if (TwEventKeyGLFW(key, action) == 0)
-		{
-			// gApplication.onKey(key, scancode, action, mods);
-		}
-}
-
-void Game::scrollCallback(GLFWwindow *const window, const double xoffset, const double yoffset)
-{
-		if (!TwEventMouseWheelGLFW(static_cast<int>(this->gCursorPositionY)))
-		{
-			this->camera001.updateZoom(yoffset);
-		}
-}
-
-void Game::key_callback(GLFWwindow* window, int key, int scancode, int action, int mode)
-{
-	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+    // Application
+	if( glfwGetKey( this->window, GLFW_KEY_ESCAPE ) == GLFW_PRESS )
+	{
 		glfwSetWindowShouldClose(window, GL_TRUE);
+	}
 
-	if (action == GLFW_PRESS)
-		this->keys[key] = true;
-	else if (action == GLFW_RELEASE)
-		this->keys[key] = false;
+	// Camera
+	if( glfwGetKey( this->window, GLFW_KEY_W ) == GLFW_PRESS )
+	{
+		//camera.move(this->dt, FORWARD);
+	}
+
+	if( glfwGetKey( this->window, GLFW_KEY_S ) == GLFW_PRESS )
+	{
+		//camera.move(this->dt, BACKWARD);
+	}
+
+	if( glfwGetKey( this->window, GLFW_KEY_A ) == GLFW_PRESS )
+	{
+		//camera.move(this->dt, LEFT);
+	}
+
+	if( glfwGetKey( this->window, GLFW_KEY_D ) == GLFW_PRESS )
+	{
+		//camera.move(this->dt, RIGTH);
+	}
+
+    if( glfwGetKey( this->window, GLFW_KEY_P ) == GLFW_PRESS )
+	{
+		this->pause = ~this->pause;
+	}
+
+	if( glfwGetKey( this->window, GLFW_KEY_X ) == GLFW_PRESS )
+	{
+		this->showEdge = ~this->showEdge;
+	}
+
+	if( glfwGetKey( this->window, GLFW_KEY_Z ) == GLFW_PRESS )
+	{
+        this->showFrustum = ~this->showFrustum;
+	}
 }
 
-void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
+void Game::updateMouseInput()
 {
-		if (!TwEventMouseButtonGLFW(button, action))
-		{
-			// gApplication.onMouseButton(button, action, mods);
-		}
-}
+    double curr_x;
+    double curr_y;
+    glfwGetCursorPos(this->window, &curr_x, &curr_y);
 
-void Game::mouse_callback(GLFWwindow* window, double xpos, double ypos)
-{
 	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
-		this->camera001.updatePosition(xpos, ypos, this->firstMouse);
+		this->camera001.updatePosition(curr_x, curr_y, this->firstMouse);
 		this->firstMouse = false;
 	} else {
 		this->camera001.resetCamera();
 		this->firstMouse = true;
 	}
 }
-
-void Game::scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
-{
-
-}
-
-
-
-
-

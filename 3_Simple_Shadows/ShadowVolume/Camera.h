@@ -37,7 +37,9 @@ public:
 			dp[0] = xpos - old_xpos;
 			dp[1] = ypos - old_ypos;
 
-			this->lat = glm::clamp((this->lat) + dp[1] * dec_fact, -(this->halfPi), this->halfPi - 0.0001f);
+			this->lat = glm::clamp((this->lat) + dp[1] * dec_fact,
+                -(this->halfPi), 
+                this->halfPi - 0.0001f);
 			this->lon += dp[0] * dec_fact;
 			updateCamera();
 		}

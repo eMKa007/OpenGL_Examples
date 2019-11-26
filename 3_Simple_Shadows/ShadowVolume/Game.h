@@ -86,6 +86,7 @@ private:
     int showEdge;
     int showFrustum;
     float fps;
+    int pause;
 
     /* ENVIRONMENTAL VARIABLES */
     float angle;
@@ -123,13 +124,6 @@ private:
     void renderThirdPass();
 
     /* Callbacks functions */
-    void cursorPositionCallback(GLFWwindow *const window, const double xpos, const double ypos);
-	void keyCallback(GLFWwindow *const window, const int key, const int scancode, const int action, const int mods);
-	void scrollCallback(GLFWwindow *const window, const double xoffset, const double yoffset);
-	void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
-
-    bool keys[1024];
-    void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
-    void mouse_callback(GLFWwindow* window, double xpos, double ypos);
-    void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+    void updateKeyboardInput();
+    void updateMouseInput();
 };
