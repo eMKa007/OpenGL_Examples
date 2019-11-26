@@ -1,6 +1,7 @@
-//#include <detail/type_mat.hpp>
+#pragma once
+
+#include <detail/type_mat2x3.hpp>
 #include <vec3.hpp>
-#include <gtc/matrix_transform.hpp>
 #include <gtc/type_ptr.hpp>
 #include <gtc/constants.hpp>
 

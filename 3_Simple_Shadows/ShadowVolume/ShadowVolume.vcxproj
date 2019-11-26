@@ -19,11 +19,14 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Game.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="ContextManager.h" />
+    <ClInclude Include="Game.h" />
+    <ClInclude Include="libs.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="MyCamera.h" />
@@ -119,7 +122,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <AdditionalLibraryDirectories>E:\vcpkg\packages\assimp_x86-windows\lib;E:\Repozytoria\OpenGL_Examples\Linking\Soil2\lib;E:\Repozytoria\OpenGL_Examples\Linking\GLFW\lib;E:\Repozytoria\OpenGL_Examples\Linking\GLEW\lib;E:\Repozytoria\OpenGL_Examples\Linking\AntTweak;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>AntTweakBar.lib;AntTweakBar64.lib;glew32s.lib;glfw3.lib;soil2.lib;opengl32.lib;assimp-vc141-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>AntTweakBar.lib;glew32.lib;glfw3.lib;soil2.lib;opengl32.lib;assimp-vc141-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">

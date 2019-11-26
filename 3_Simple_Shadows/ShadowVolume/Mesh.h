@@ -1,6 +1,7 @@
 #ifndef MESH_H
 #define MESH_H
 
+
 // Std. Includes
 #include <string>
 #include <fstream>
@@ -12,6 +13,9 @@ using namespace std;
 #include <glew.h> // Contains all the necessery OpenGL includes
 #include <glm.hpp>
 #include <gtc/matrix_transform.hpp>
+
+
+#include "Shader.h"
 
 
 struct Vertex {
