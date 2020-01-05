@@ -54,6 +54,14 @@ public:
 			meshes[i].Draw2(shader);
 	}
 
+    void scale( glm::vec3 scaleVec )
+	{
+	    for ( Mesh& mesh : this->meshes )
+	    {
+	        mesh.scale(scaleVec);
+	    }
+	}
+
 private:
 	/*  Functions   */
 	// loads a model with supported ASSIMP extensions from file and stores the resulting meshes in the meshes vector.
@@ -107,15 +115,18 @@ private:
 			Vertex vertex;
 			glm::vec3 vector; // we declare a placeholder vector since assimp uses its own vector class that doesn't directly convert to glm's vec3 class so we transfer the data to this placeholder glm::vec3 first.
 							  // positions
-			vector.x = mesh->mVertices[i].x;
-			vector.y = mesh->mVertices[i].y;
-			vector.z = mesh->mVertices[i].z;
+			vector.x = mesh->mVertices[i].x*25.f;
+			vector.y = mesh->mVertices[i].y*25.f;
+			vector.z = mesh->mVertices[i].z*25.f;
 			vertex.Position = vector;
 			// normals
-			vector.x = mesh->mNormals[i].x;
-			vector.y = mesh->mNormals[i].y;
-			vector.z = mesh->mNormals[i].z;
-			vertex.Normal = vector;
+            if( mesh->mNormals !=  NULL)
+            {
+                vector.x = mesh->mNormals[i].x;
+			    vector.y = mesh->mNormals[i].y;
+			    vector.z = mesh->mNormals[i].z;
+			    vertex.Normal = vector;
+            }
 			// texture coordinates
 			if (mesh->mTextureCoords[0]) // does the mesh contain texture coordinates?
 			{
@@ -129,15 +140,21 @@ private:
 			else
 				vertex.TexCoords = glm::vec2(0.0f, 0.0f);
 			// tangent
-			vector.x = mesh->mTangents[i].x;
-			vector.y = mesh->mTangents[i].y;
-			vector.z = mesh->mTangents[i].z;
-			vertex.Tangent = vector;
+            if( mesh->mTangents != NULL )
+            {
+                vector.x = mesh->mTangents[i].x;
+                vector.y = mesh->mTangents[i].y;
+                vector.z = mesh->mTangents[i].z;
+                vertex.Tangent = vector;
+            }
 			// bitangent
-			vector.x = mesh->mBitangents[i].x;
-			vector.y = mesh->mBitangents[i].y;
-			vector.z = mesh->mBitangents[i].z;
-			vertex.Bitangent = vector;
+            if( mesh->mBitangents != NULL )
+            {
+                vector.x = mesh->mBitangents[i].x;
+                vector.y = mesh->mBitangents[i].y;
+                vector.z = mesh->mBitangents[i].z;
+                vertex.Bitangent = vector;
+            }
 			vertices.push_back(vertex);
 		}
 		// now wak through each of the mesh's faces (a face is a mesh its triangle) and retrieve the corresponding vertex indices.
