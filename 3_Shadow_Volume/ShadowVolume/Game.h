@@ -78,7 +78,6 @@ private:
     glm::mat4 mv;
 
     /* UI VARIABLES */
-    TwBar* bar;
     float speed;
     float height;
     float distance;

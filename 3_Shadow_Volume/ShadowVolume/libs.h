@@ -30,9 +30,6 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
-/* AntTweakBar - ui */
-#include <AntTweakBar.h>
-
 #include "Mesh.h"
 #include "Shader.h"
 #include "Camera.h"

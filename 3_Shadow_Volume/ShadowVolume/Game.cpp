@@ -28,7 +28,6 @@ Game::Game(std::string* WindowTitle)
 
 Game::~Game()
 {
-    TwTerminate();    
     glfwDestroyWindow(this->window);
 	glfwTerminate();
 	
@@ -250,7 +249,6 @@ void Game::initVars()
 	this->showFrustum = 0;
 	this->time = 0.0f;
 	this->fps = 60.0f;
-	this->bar = nullptr;
 }
 
 void Game::updateVariables()
