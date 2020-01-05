@@ -108,6 +108,15 @@ public:
 		glActiveTexture(GL_TEXTURE0);
 	}
 
+    void scale( glm::vec3 scaleVec )
+	{
+        for( int i = 0; i < vertices.size(); i++)
+        {
+            vertices[i].Position.x = vertices[i].Position.x * scaleVec.x;
+            vertices[i].Position.y = vertices[i].Position.y * scaleVec.y;
+            vertices[i].Position.z = vertices[i].Position.z * scaleVec.z;
+        }
+	}
 
 private:
 	/*  Render data  */
