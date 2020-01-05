@@ -40,7 +40,7 @@ vec3 calculateSpecular( vec3 cameraPosition, vec3 vs_position, vec3 lightPos0 )
 	vec3 reflectDir = reflect( -lightDir, normalize(fs_in.vs_normal) );
 	float spec = pow( max( dot( viewDir, reflectDir), 0.0), 32);
 
-	return specularLightning * spec * ( DRAW_MODE == 1 ? vec3(1.f) : texture(specularTex, fs_in.vs_texcoord).rgb );
+	return specularLightning * spec * vec3(1.f);//( DRAW_MODE == 1 ? vec3(1.f) : texture(specularTex, fs_in.vs_texcoord).rgb );
 }
 
 float ShadowCalculation(vec4 fragPosLightSpace)
@@ -81,7 +81,7 @@ float ShadowCalculation(vec4 fragPosLightSpace)
 void main()
 {
 	// Ambient 
-	vec3 ambient = length(ambientLightning) > 0.f ? ambientLightning : vec3(1.f);
+	vec3 ambient = length(ambientLightning) > 0.f ? ambientLightning * fs_in.vs_color : vec3(0.5f);
 
 	// Diffuse
 	vec3 diffuse = length(diffuseLightning) > 0.f ? calculateDiffuse( fs_in.vs_normal, lightPos0, fs_in.vs_position ) : vec3(1.f);
@@ -95,5 +95,5 @@ void main()
 	// Final Color
 	vec3 final_color = ambient + (1.0 - shadow) * (diffuse + specular );
 		
-	fs_color = vec4(final_color, 1.f) * texture(diffuseTex, fs_in.vs_texcoord);
+	fs_color = vec4(final_color, 1.f);// * texture(diffuseTex, fs_in.vs_texcoord);
 }

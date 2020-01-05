@@ -1,4 +1,5 @@
 #include "Game.h"
+#include <sstream>
 
 /* ---------------------------- CONSTRUCTORS/DESTRUCTORS ---------------------------- */
 
@@ -19,7 +20,7 @@ Game::Game(const char* title, const int WINDOW_WIDTH, const int WINDOW_HEIGHT,
 	WINDOW_HEIGHT(WINDOW_HEIGHT), 
 	GL_VERSION_MAJOR(GL_VERSION_MAJOR), 
 	GL_VERSION_MINOR(GL_VERSION_MINOR),
-	camera(glm::vec3(3.5f, 4.f, 5.f), glm::vec3(-30.f, -120.f, 0.f), glm::vec3(0.f, 1.f, 0.f))
+	camera(glm::vec3(6.f,10.f, 10.f), glm::vec3(-30.f, -120.f, 0.f), glm::vec3(0.f, 1.f, 0.f))
 {
 	this->window = nullptr;
 	this->framebufferWidth = WINDOW_WIDTH;
@@ -32,6 +33,9 @@ Game::Game(const char* title, const int WINDOW_WIDTH, const int WINDOW_HEIGHT,
 	this->fov = 45.f;	// Field of view. 90 degrees.
 	this->nearPlane = 0.1f;
 	this->farPlane = 1000.f;
+
+    this->angle = 0.0f;
+    this->updateLight = true;
 
 	this->dt = 0.0f;
 	this->currTime = 0.f;
@@ -59,7 +63,7 @@ Game::Game(const char* title, const int WINDOW_WIDTH, const int WINDOW_HEIGHT,
 
 	this->initDephMapFrameObject();
 
-	glfwSwapInterval(1);
+	//glfwSwapInterval(1);
 }
 
 
@@ -270,7 +274,7 @@ void Game::initShaders()
 void Game::initTextures()
 {
 	this->textures.push_back(
-		new Texture("Images/floor.png", GL_TEXTURE_2D));
+		new Texture("Images/texture1.bmp", GL_TEXTURE_2D));
 
 	this->textures.push_back(
 		new Texture("Images/floor_specular.png", GL_TEXTURE_2D));
@@ -312,7 +316,7 @@ void Game::initMaterials()
 void Game::initLights()
 {
 	// LIGHTS
-	this->lights.push_back( new glm::vec3 (10.f, 10.f, 10.f) );
+	this->lights.push_back( new glm::vec3 (10.f, 6.f, 10.f) );
 }
 
 
@@ -443,20 +447,20 @@ void Game::initModels(float sphereRadius)
 
     /* Initialize Assimp Models */
 
-    std::unique_ptr<AssimpLoader> SpiderModel = std::make_unique<AssimpLoader>("Models/spider.3mf", 
+    std::unique_ptr<AssimpLoader> SpiderModel = std::make_unique<AssimpLoader>("Models/bunny.obj", 
         aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals );
     const std::vector<Mesh*> spiderMeshes = SpiderModel->GetMeshes();
 
     models.push_back( new Model(
 		glm::vec3(0.f),
 		this->materials[MAT_SPHERES],
-		nullptr,
+		this->textures[TEX_FLOOR],
 		nullptr, 
 		spiderMeshes));
 
-    this->models[MODEL_SPIDER]->setScale(glm::vec3(0.03f));
-    this->models[MODEL_SPIDER]->rotate(glm::vec3(0.f, 150.f, 0.f));
-    this->models[MODEL_SPIDER]->moveMeshes( glm::vec3(0.f, -0.8f, -6.f));
+    this->models[MODEL_SPIDER]->setScale(glm::vec3(25.f));
+    this->models[MODEL_SPIDER]->rotate(glm::vec3(0.f, 90.f, 0.f));
+    this->models[MODEL_SPIDER]->moveMeshes( glm::vec3(0.f, -3.f, -5.f));
 }
 
 /*	----------------------------------------------------------
@@ -514,6 +518,8 @@ void Game::updateUniforms()
 	);
 
 	this->SendUniformsToShaders();
+
+
 }
 
 void Game::updateUniforms_LightPOV()
@@ -561,9 +567,9 @@ void Game::RenderFromLightPOV()
 	glClear( GL_DEPTH_BUFFER_BIT);
 
 	/* ---------------   START OF CURRENT SPHERES_PROGRAM --------------- */
-	glCullFace(GL_FRONT);
-	this->models[MODEL_SPHERES]->render(this->shaders[SHADER_SHADOW], GL_TRIANGLES);
-	glCullFace(GL_BACK); // don't forget to reset original culling face
+	//glCullFace(GL_FRONT);
+	//this->models[MODEL_SPHERES]->render(this->shaders[SHADER_SHADOW], GL_TRIANGLES);
+	//glCullFace(GL_BACK); // don't forget to reset original culling face
 
 	// Unbind the current program
 	glBindVertexArray(0);
@@ -600,7 +606,7 @@ void Game::RenderFromCameraPOV()
 	DepthMapFBO->BindForReading(2);
 
 	/* ---------------   START OF CURRENT BOX_PROGRAM --------------- */
-	this->models[MODEL_BOX]->render(this->shaders[SHADER_BOX], GL_LINES, this->DepthMapFBO);
+	//this->models[MODEL_BOX]->render(this->shaders[SHADER_BOX], GL_LINES, this->DepthMapFBO);
 
 	// Unbind the current program
 	glBindVertexArray(0);
@@ -609,7 +615,7 @@ void Game::RenderFromCameraPOV()
 
 
 	/* ---------------   START OF CURRENT SPHERES_PROGRAM --------------- */
-	this->models[MODEL_SPHERES]->render(this->shaders[SHADER_SPHERES], GL_TRIANGLES, this->DepthMapFBO);
+	//this->models[MODEL_SPHERES]->render(this->shaders[SHADER_SPHERES], GL_TRIANGLES, this->DepthMapFBO);
 
 	// Unbind the current program
 	glBindVertexArray(0);
@@ -685,6 +691,22 @@ void Game::updateInput()
 	this->updateKeyboardInput();
 	this->updateMouseInput();
 	this->camera.updateInput(this->dt, -1, this->mouseOffsetX, this->mouseOffsetY);
+
+    /* Update light position */
+    if( updateLight )
+    {
+        this->angle += this->dt * 0.7f;
+
+        if (this->angle > glm::two_pi<float>()) 
+            this->angle -= glm::two_pi<float>();
+
+
+        float new_x = std::cosf(this->angle) * 7.f;
+        float new_z = std::sinf(this->angle) * 7.f;
+
+        this->lights[0]->x = new_x;
+        this->lights[0]->z = new_z;
+    }
 }
 
 
@@ -732,6 +754,11 @@ void Game::updateKeyboardInput()
 	{
 		camera.move(this->dt, DOWNWARD);
 	}
+
+    if( glfwGetKey( this->window, GLFW_KEY_P ) == GLFW_PRESS )
+	{
+		this->updateLight = !this->updateLight;
+	}
 }
 
 
@@ -775,6 +802,28 @@ void Game::updateDt()
 	this->lastTime = this->currTime;
 }
 
+void Game::run()
+{
+    double lastTime = glfwGetTime();
+    this->nbFrames = 0;
+
+    while( !this->getWindodShouldClose() )
+    {
+        this->update();
+        this->render();
+
+        double currentTime = glfwGetTime();
+        this->nbFrames++;
+        if( currentTime - lastTime >= 1.0 )
+        {
+            float oneFrameTime = 1000.f/static_cast<double>(this->nbFrames);
+            float FPS = 1000.f/oneFrameTime;
+            printf("%.3f ms/frame --- ~%.1f FPS\n", oneFrameTime, FPS);
+            this->nbFrames = 0;
+            lastTime += 1.0;
+        }
+    }
+}
 
 
 /*	----------------------------------------------------------
@@ -823,6 +872,7 @@ void Game::render()
 	// End Draw
 	glfwSwapBuffers(window);
 	glFlush();
+
 }
 
 
