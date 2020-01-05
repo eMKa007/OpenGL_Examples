@@ -22,7 +22,7 @@ Game::Game(std::string* WindowTitle)
     this->initBuffers();
     this->initScreenVAO();
     this->initFloorVAO();
-    this->initUI();
+    this->initVars();
 }
 
 
@@ -41,11 +41,22 @@ Game::~Game()
 
 void Game::run()
 {
+    double lastTime = glfwGetTime();
+    int nbFrames = 0;
+
     while ( !glfwWindowShouldClose(this->window) )
     {
         /* UPDATE SCENE */
         this->updateVariables();
 
+        double currentTime = glfwGetTime();
+        nbFrames++;
+        if ( currentTime - lastTime >= 1.0 ){ // If last prinf() was more than 1 sec ago
+            // printf and reset timer
+            printf("%f ms/frame\n", 1000.0/double(nbFrames));
+            nbFrames = 0;
+            lastTime += 1.0;
+        }
         /* RENDER SCENE */
         this->renderScene();
     }
@@ -54,18 +65,31 @@ void Game::run()
 void Game::initGLFW()
 {
     // GLFW
-	glfwInit();
+	if( glfwInit() == GLFW_FALSE )
+	{
+		glfwTerminate();
+        throw std::exception("ERROR::GLFW_INIT_FAILED  \n");
+	}
+
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);	
 	glfwWindowHint(GLFW_SAMPLES, 4);
+
+    glfwSwapInterval(0);
 }
 
 void Game::initWindow(std::string* Title)
 {
     this->window = glfwCreateWindow(this->WINDOW_WIDTH, this->WINDOW_HEIGHT, Title->c_str(), nullptr, nullptr);
-	glfwMakeContextCurrent(this->window);
+	if( this->window == nullptr)
+	{
+		glfwTerminate();
+        throw std::exception("ERROR::GLFW_WINDOW_INIT_FAILED  \n");
+	}
+    
+    glfwMakeContextCurrent(this->window);
 }
 
 void Game::initCallbacks()
@@ -79,7 +103,11 @@ void Game::initCallbacks()
 void Game::initGLEW()
 {
     glewExperimental = GL_TRUE;
-	glewInit();
+	if( glewInit() != GLEW_OK )
+	{
+		glfwTerminate();
+        throw std::exception("ERROR::GAME::GLEW_INIT_FAILED");
+	}
 
     glViewport(0, 0, this->WINDOW_WIDTH, this->WINDOW_HEIGHT);
 	glEnable(GL_DEPTH_TEST);
@@ -96,7 +124,7 @@ void Game::initShaders()
 
 void Game::initModels()
 {
-    this->models.push_back( new Model("Deer/Deer.obj"));
+    this->models.push_back( new Model("Models/bunny.obj"));
 }
 
 void Game::initBuffers()
@@ -172,7 +200,9 @@ void Game::initLights()
 
 void Game::initMatrices()
 {
-    this->model = glm::scale(this->model, glm::vec3(0.7f, 0.7f, 0.7f));
+    this->model = glm::mat4(1.f);
+    this->model = glm::translate(this->model, glm::vec3(5.f, 0.f, 0.f));	// vec3 - translation vector
+    this->model = glm::scale(this->model, glm::vec3(0.f));
 	this->model = glm::rotate(this->model, 1.1f, glm::vec3(0.0f, 1.0f, 0.0f));
 
     this->projection = glm::perspective(1.0f, (float)this->WINDOW_WIDTH / (float)this->WINDOW_HEIGHT, 0.2f, 50.0f);
@@ -210,12 +240,8 @@ void Game::initFloorVAO()
 	glBindVertexArray(0);
 }
 
-void Game::initUI()
+void Game::initVars()
 {
-    TwInit(TW_OPENGL_CORE, NULL);
-	TwWindowSize(this->WINDOW_WIDTH, this->WINDOW_HEIGHT);
-
-	/* Create UI */
 	this->speed = 1.0f; 
 	this->height = 5.f;
 	this->distance = 4.0f;
@@ -224,25 +250,7 @@ void Game::initUI()
 	this->showFrustum = 0;
 	this->time = 0.0f;
 	this->fps = 60.0f;
-	this->bar = TwNewBar("ShadowVolumeOption");
-
-	TwAddVarRW(this->bar, "Show Edge", TW_TYPE_BOOL32, &this->showEdge, "label='Show Edge' group=Geometry");
-	TwAddVarRW(this->bar, "Show Frustum", TW_TYPE_BOOL32, &this->showFrustum, "label='Show Frustum' group=Geometry");
-
-	TwAddVarRW(this->bar, "Light Orbit Distance", TW_TYPE_FLOAT, &this->distance, "label='Light Orbit Distance' min=0.1 max=10 step=0.02 group=Lighting");
-	TwAddVarRW(this->bar, "Light Height", TW_TYPE_FLOAT, &this->height, "label='Light Height' min=0.1 max=5 step=0.02 group=Lighting");
-	TwAddVarRW(this->bar, "Light Speed", TW_TYPE_FLOAT, &this->speed, "label='Light Speed' min=-3 max=3 step=0.1 group=Lighting");
-	TwAddVarRW(this->bar, "Light Intensity", TW_TYPE_FLOAT, &this->intensity, "label='Light Intensity' min=0.0 max=2.0 step=0.1 group=Lighting");
-
-	TwAddVarRO(this->bar, "Time", TW_TYPE_FLOAT, &this->time, "label='Time'  group=Info");
-	TwAddVarRO(this->bar, "FPS", TW_TYPE_FLOAT, &this->fps, "label='FPS'  group=Info");
-
-	TwDefine(" GLOBAL fontresizable=false ");
-	TwDefine(" TW_HELP visible=false ");
-	TwDefine(" ShadowVolumeOption resizable=false ");
-	TwDefine(" ShadowVolumeOption size='280 230' ");
-	TwDefine(" GLOBAL fontsize=3 ");
-	TwDefine(" ShadowVolumeOption refresh=0.10 ");
+	this->bar = nullptr;
 }
 
 void Game::updateVariables()
@@ -265,7 +273,7 @@ void Game::updateVariables()
 
 void Game::updateMatrices()
 {
-    this->projection = glm::perspective(1.0f, (float)this->WINDOW_WIDTH / (float)this->WINDOW_HEIGHT, 0.2f, 50.0f);
+    this->projection = glm::perspective(1.0f, (float)this->WINDOW_WIDTH / (float)this->WINDOW_HEIGHT, 0.1f, 50.0f);
     this->view = this->camera001.getRotViewMatrix();
 
     this->mv = this->view * this->model;
@@ -293,6 +301,7 @@ void Game::UpdateLightPosition()
 
 void Game::renderScene()
 {
+
     /* Render whole scene into FBO .... */
     this->renderFirstPass();
 
@@ -301,8 +310,7 @@ void Game::renderScene()
 
     /*  */
     this->renderThirdPass();
-    TwRefreshBar(this->bar);
-    TwDraw();
+
 	glfwSwapBuffers(window);
 }
 
@@ -334,7 +342,7 @@ void Game::renderFirstPass()
 	glBindFramebuffer(GL_FRAMEBUFFER, this->colorDepthFBO);
 	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
-	this->models[MODEL_DEER]->Draw(*this->shaders[SHADER_RENDER]);
+	this->models[MODEL_BUNNY]->Draw(*this->shaders[SHADER_RENDER]);
 
     /* Render Floor Using Floor Shader */
 	this->shaders[SHADER_PLANE]->use();
@@ -383,13 +391,13 @@ void Game::renderSecondPass()
 	glStencilOpSeparate(GL_FRONT, GL_KEEP, GL_DECR_WRAP, GL_KEEP);
 	glStencilOpSeparate(GL_BACK, GL_KEEP, GL_INCR_WRAP, GL_KEEP);
 
-	this->shaders[SHADER_VOLUME]->use();   
+	this->shaders[SHADER_VOLUME]->use();
 
 	this->shaders[SHADER_VOLUME]->setMat4("ModelViewMatrix", this->view);
 	this->shaders[SHADER_VOLUME]->setMat4("ProjMatrix", this->projection);
 	this->shaders[SHADER_VOLUME]->setVec3("LightPosition", this->view * this->lightPosition);
 
-	this->models[MODEL_DEER]->Draw(*this->shaders[SHADER_VOLUME]);
+	this->models[MODEL_BUNNY]->Draw(*this->shaders[SHADER_VOLUME]);
 
 	glDisable(GL_DEPTH_CLAMP);
 	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);

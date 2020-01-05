@@ -7,6 +7,7 @@
 #include <iostream>
 #include <map>
 #include <vector>
+#include <chrono>
 
 // GL Includes
 #include <glew.h>

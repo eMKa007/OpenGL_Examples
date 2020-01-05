@@ -12,7 +12,7 @@ enum SHADERS_ENUM
 
 enum MODELS_ENUM
 {
-    MODEL_DEER
+    MODEL_BUNNY
 };
 
 class Game
@@ -60,10 +60,10 @@ private:
 
     /* FLOOR VARIABLES */
     GLfloat FloorVertices[12] = {
-		15.0f, 0.0f, 15.0f,
-		-15.0f, 0.0f, 15.0f,
-		15.0f, 0.0f, -15.0f,
-		-15.0f, 0.0f, -15.0f
+		15.0f, 0.95f, 15.0f,
+		-15.0f, 0.95f, 15.0f,
+		15.0f, 0.95f, -15.0f,
+		-15.0f, 0.95f, -15.0f
 	};
     GLuint VBO;
     GLuint VAO;
@@ -109,7 +109,7 @@ private:
     void initMatrices();
     void initScreenVAO();
     void initFloorVAO();
-    void initUI();
+    void initVars();
 
     /* Update Functions */
     void updateVariables();

@@ -70,12 +70,6 @@
     <None Include="Shader\render.vert">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="Shader\skybox.frag">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="Shader\skybox.vert">
-      <Filter>Shaders</Filter>
-    </None>
     <None Include="Shader\volume.frag">
       <Filter>Shaders</Filter>
     </None>

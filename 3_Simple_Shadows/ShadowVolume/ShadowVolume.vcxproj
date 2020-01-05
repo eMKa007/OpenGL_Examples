@@ -40,8 +40,6 @@
     <None Include="Shader\plane.vert" />
     <None Include="Shader\render.frag" />
     <None Include="Shader\render.vert" />
-    <None Include="Shader\skybox.frag" />
-    <None Include="Shader\skybox.vert" />
     <None Include="Shader\volume.frag" />
     <None Include="Shader\volume.geom" />
     <None Include="Shader\volume.vert" />
@@ -157,7 +155,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>E:\vcpkg\packages\assimp_x86-windows\lib;E:\Repozytoria\OpenGL_Examples\Linking\Soil2\lib;E:\Repozytoria\OpenGL_Examples\Linking\GLFW\lib;E:\Repozytoria\OpenGL_Examples\Linking\GLEW\lib;E:\Repozytoria\OpenGL_Examples\Linking\AntTweak;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>AntTweakBar.lib;AntTweakBar64.lib;glew32s.lib;glfw3.lib;soil2.lib;opengl32.lib;assimp-vc141-mt.lib;AntTweakBar.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>AntTweakBar.lib;AntTweakBar64.lib;glew32.lib;glfw3.lib;soil2.lib;opengl32.lib;assimp-vc141-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
