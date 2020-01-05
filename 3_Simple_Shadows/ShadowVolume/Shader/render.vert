@@ -13,7 +13,8 @@ uniform mat4 ProjMatrix;
 
 void main() {
 	TexCoord = VertexTexCoord;
-    Normal = normalize( NormalMatrix * VertexNormal);
+    //Normal = normalize( NormalMatrix * VertexNormal);
+    Normal = VertexNormal;
     Position = vec3( ModelViewMatrix * vec4(VertexPosition,1.0) );
 
     gl_Position = ProjMatrix * vec4(Position,1.0);

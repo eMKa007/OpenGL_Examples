@@ -13,11 +13,11 @@ layout( location = 1 ) out vec4 DiffSpec;
 void main() {
     vec3 toLight = normalize(LightPosition - Position);
 	vec3 toV = normalize(vec3(-Position));
-	vec3 r = reflect( -toLight, Normal );
+	vec3 r = normalize(reflect( -toLight, normalize(Normal )));
 
-	float diffuse = max(0.0f, dot(Normal, toLight));
-	float specular = pow(max(0.0, dot(r, Normal)), 640.0);
+	float diffuse =  clamp( dot(toLight, Normal), 0, 1);
+	float specular = pow( max( dot( toV, r), 0), 35);
 
-	Ambient = vec4(texture(texture_diffuse1, TexCoord)) * 0.2f *LightIntensity;
-    DiffSpec = vec4(texture(texture_diffuse1, TexCoord))*(diffuse+specular) * LightIntensity + Ambient ;
+	Ambient		= vec4(1.f) * LightIntensity * 0.1f ;
+    DiffSpec	= vec4(1.f) * (diffuse+specular) * LightIntensity * 0.3f + Ambient;
 }
