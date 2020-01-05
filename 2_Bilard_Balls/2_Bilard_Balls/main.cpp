@@ -9,12 +9,15 @@ int main( int argc, char* argv[] )
 		4,
 		true);
 
-	/* Main Loop */
-	while( !game.getWindodShouldClose() )
+	try
 	{
-		game.update();
-		game.render();
+	    game.run();
 	}
+    catch (std::exception& ex )
+    {
+        std::cerr << ex.what() << std::endl;
+        return EXIT_FAILURE;
+    }
 
 	return 0;
 }

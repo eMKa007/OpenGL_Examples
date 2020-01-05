@@ -76,6 +76,9 @@ private:
 	float currTime;
 	float lastTime;
 
+    float angle;
+    bool updateLight;
+
 	//Camera
 	Camera camera;
 
@@ -102,6 +105,9 @@ private:
 
 	// Lights
 	std::vector<glm::vec3*> lights;
+
+    // Time measurement
+    int nbFrames;
 
 	/* STATIC VARIABLES */
 
@@ -147,6 +153,7 @@ public:
 	void updateMouseInput();
 	void updateDt();
 
+    void run();
 	void update();
 	void render();
 
