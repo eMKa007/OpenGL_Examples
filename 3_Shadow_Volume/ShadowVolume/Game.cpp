@@ -48,16 +48,19 @@ void Game::run()
         /* UPDATE SCENE */
         this->updateVariables();
 
+        /* RENDER SCENE */
+        this->renderScene();
+    
         double currentTime = glfwGetTime();
         nbFrames++;
-        if ( currentTime - lastTime >= 1.0 ){ // If last prinf() was more than 1 sec ago
-            // printf and reset timer
-            printf("%f ms/frame\n", 1000.0/double(nbFrames));
+        if ( currentTime - lastTime >= 1.0 )
+        {
+            float oneFrameTime = 1000.f/static_cast<double>(nbFrames);
+            float FPS = 1000.f/oneFrameTime;
+            printf("%.3f ms/frame --- ~%.1f FPS\n", oneFrameTime, FPS);
             nbFrames = 0;
             lastTime += 1.0;
         }
-        /* RENDER SCENE */
-        this->renderScene();
     }
 }
 
