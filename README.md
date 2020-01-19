@@ -1,4 +1,5 @@
 ## OpenGL_Examples
+Both 'Shadow Mapping' and 'Shadow Volume' techniques were used to compare shadow generation techniques for diploma thesis purpose.
 
 #### 1_OpenGL-Cpp_Tutorial
 Project which follows ["C++ OpenGL 3D Tutorial"](https://www.youtube.com/playlist?list=PL6xSOsbVA1eYSZTKBxnoXYboy7wc4yg-Z) by Suraj Sharma available on YouTube platform.
@@ -16,14 +17,16 @@ Project which follows ["C++ OpenGL 3D Tutorial"](https://www.youtube.com/playlis
    
 ------
 
-#### 2_Bilard_Balls
-Based on previously created class hierarchy project shows spheres moving within box boundaries.  
-Added light source and lightning to spheres ( ambient, diffuse and specular ).
+#### 2_Shadow_Mapping
+Implementation of 'Shadow Mapping' technique. 
+Code is based on previous class hierarchy and shadow mapping tutorial available at [learnopengl.com](https://learnopengl.com/Advanced-Lighting/Shadows/Shadow-Mapping) website. 
 
-<img src="https://raw.githubusercontent.com/eMKa007/OpenGL_Examples/master/2_Bilard_Balls/GIFS/v01.gif" width="500" height="350" />
+<img src="https://raw.githubusercontent.com/eMKa007/OpenGL_Examples/master/GIFS/ShadowMapping_01.gif" width="500" height="350" />
 
    
 ------
 
-#### 3_Simple_Shadows
-Attempt to add shadows calculation to simple scene.
+#### 3_Shadow_Volume
+Implementation of 'Volumetric Shadows' technique. Based on Federico Ciardi repository available [here](https://github.com/fede-Raider/ShadowVolume).
+
+<img src="https://raw.githubusercontent.com/eMKa007/OpenGL_Examples/master/GIFS/ShadowVolume_01.gif" width="500" height="350" />
